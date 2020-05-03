@@ -2,6 +2,7 @@ package com.gaurav.display.process;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.adempiere.util.Callback;
@@ -304,10 +305,13 @@ public class TransferDisplay extends SvrProcess {
 
 				assetAdd.setA_Asset_ID(asset.getA_Asset_ID());
 				if (asset.getA_Asset_Status().equals(X_A_Asset.A_ASSET_STATUS_New)) {
-					MAssetGroupAcct assetgrpacct = MAssetGroupAcct.forA_Asset_Group_ID(Env.getCtx(),
+					List<MAssetGroupAcct> assetGrpAccounts = MAssetGroupAcct.forA_Asset_Group_ID(Env.getCtx(),
 							asset.getA_Asset_Group_ID(), assetAdd.getPostingType());
-					assetAdd.setDeltaUseLifeYears(assetgrpacct.getUseLifeYears());
-					assetAdd.setDeltaUseLifeYears_F(assetgrpacct.getUseLifeYears_F());
+					for(MAssetGroupAcct assetgrpacct:assetGrpAccounts)
+					{
+						assetAdd.set_ValueNoCheck("DeltaUseLifeYears", assetgrpacct.getUseLifeYears());
+						assetAdd.set_ValueNoCheck("DeltaUseLifeYears_F",assetgrpacct.getUseLifeYears_F());
+					}
 				}
 			} else {
 				assetAdd.setA_Asset_ID(line.get_ValueAsInt("A_Asset_ID"));

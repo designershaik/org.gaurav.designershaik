@@ -85,4 +85,16 @@ public class ArchiveAlfresco implements IArchiveStore
 		}
 		return true;
 	}
+
+	@Override
+	public boolean isPendingFlush() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void flush(MArchive archive, MStorageProvider prov) {
+		// TODO Auto-generated method stub
+		
+	}
 }
