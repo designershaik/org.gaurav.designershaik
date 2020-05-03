@@ -1,0 +1,16 @@
+eclipse.preferences.version=1
+encoding//src/com/examples/www/wsdl/HelloService_wsdl/Hello_BindingStub.java=UTF-8
+encoding//src/com/examples/www/wsdl/HelloService_wsdl/Hello_PortType.java=UTF-8
+encoding//src/com/examples/www/wsdl/HelloService_wsdl/Hello_Service.java=UTF-8
+encoding//src/com/examples/www/wsdl/HelloService_wsdl/Hello_ServiceLocator.java=UTF-8
+encoding//src/com/microsoft/schemas/_2003/_10/Serialization/Arrays/ArrayOfKeyValueOfstringArrayOfTrackingResultmFAkxlpYKeyValueOfstringArrayOfTrackingResultmFAkxlpY.java=UTF-8
+encoding//src/net/aramex/ws/ShippingAPI/v1/BasicHttpBinding_Service_1_0Stub.java=UTF-8
+encoding//src/net/aramex/ws/ShippingAPI/v1/ClientInfo.java=UTF-8
+encoding//src/net/aramex/ws/ShippingAPI/v1/Notification.java=UTF-8
+encoding//src/net/aramex/ws/ShippingAPI/v1/Service_1_0_PortType.java=UTF-8
+encoding//src/net/aramex/ws/ShippingAPI/v1/Service_1_0_Service.java=UTF-8
+encoding//src/net/aramex/ws/ShippingAPI/v1/Service_1_0_ServiceLocator.java=UTF-8
+encoding//src/net/aramex/ws/ShippingAPI/v1/ShipmentTrackingRequest.java=UTF-8
+encoding//src/net/aramex/ws/ShippingAPI/v1/ShipmentTrackingResponse.java=UTF-8
+encoding//src/net/aramex/ws/ShippingAPI/v1/TrackingResult.java=UTF-8
+encoding//src/net/aramex/ws/ShippingAPI/v1/Transaction.java=UTF-8

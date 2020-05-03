@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Service-Component: OSGI-INF/*.xml
+Bundle-Vendor: Logilite
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: lib/alfresco-opencmis-extension-0.2.jar,lib/chemistr
+ y-opencmis-client-api-0.6.0.jar,lib/chemistry-opencmis-client-binding
+ s-0.6.0.jar,lib/chemistry-opencmis-client-impl-0.6.0.jar,lib/chemistr
+ y-opencmis-commons-api-0.6.0.jar,lib/chemistry-opencmis-commons-impl-
+ 0.6.0.jar,lib/chemistry-opencmis-server-bindings-0.6.0.jar,lib/chemis
+ try-opencmis-server-support-0.6.0.jar,.
+Bundle-Version: 1.0.0.201608160933
+Bundle-Name: Alfresco
+Bundle-Activator: org.adempiere.plugin.utils.AdempiereActivator
+Bundle-ManifestVersion: 2
+Import-Package: compiere.model,org.adempiere.exceptions,org.adempiere.
+ plugin.utils,org.apache.commons.logging;version="1.1.1",org.compiere.
+ model,org.compiere.util,org.osgi.framework;version="1.3.0"
+Bundle-SymbolicName: com.logilite.cms.alfresco;singleton:=true
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+

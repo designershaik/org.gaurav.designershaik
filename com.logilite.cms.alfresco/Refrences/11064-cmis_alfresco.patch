@@ -1,0 +1,192 @@
+# HG changeset patch
+# User Logilite
+# Date 1442668826 -19800
+#      Sat Sep 19 18:50:26 2015 +0530
+# Branch release-2.1
+# Node ID c09363e63f7ccfb52914ff1fb737a5e167fde61d
+# Parent  0a681ff9aebd1882e912942ba3e6cba96e6c68cc
+Add Alfresco View Button
+
+diff -r 0a681ff9aebd -r c09363e63f7c org.adempiere.base/src/org/compiere/model/MAttachmentEntry.java
+--- a/org.adempiere.base/src/org/compiere/model/MAttachmentEntry.java	Fri May 15 12:52:37 2015 -0500
++++ b/org.adempiere.base/src/org/compiere/model/MAttachmentEntry.java	Sat Sep 19 18:50:26 2015 +0530
+@@ -300,4 +300,31 @@
+ 		m_index = index;
+ 	}
+ 	
++	// CMIS by KTU
++	public MAttachmentEntry(String name, byte[] data, String docid, int index) {
++		this(name, data, index);
++		setDocId(docid);
++	} // MAttachmentItem
++
++	/** The docid */
++	private String m_docid = "";
++
++	/**
++	 * @return Returns the docid.
++	 */
++	public String getDocId() {
++		return m_docid;
++	}
++
++	/**
++	 * @param name
++	 *            The docid to set.
++	 */
++	public void setDocId(String docid) {
++		if (docid != null)
++			m_docid = docid;
++		if (docid == null)
++			m_docid = "";
++	} // setDocId
++	// --
+ }	//	MAttachmentItem
+diff -r 0a681ff9aebd -r c09363e63f7c org.adempiere.ui.zk/WEB-INF/src/org/adempiere/webui/panel/WAttachment.java
+--- a/org.adempiere.ui.zk/WEB-INF/src/org/adempiere/webui/panel/WAttachment.java	Fri May 15 12:52:37 2015 -0500
++++ b/org.adempiere.ui.zk/WEB-INF/src/org/adempiere/webui/panel/WAttachment.java	Sat Sep 19 18:50:26 2015 +0530
+@@ -41,7 +41,9 @@
+ import org.adempiere.webui.window.FDialog;
+ import org.compiere.model.MAttachment;
+ import org.compiere.model.MAttachmentEntry;
++import org.compiere.model.MClient;
+ import org.compiere.util.CLogger;
++import org.compiere.util.DB;
+ import org.compiere.util.Env;
+ import org.compiere.util.Msg;
+ import org.compiere.util.Util;
+@@ -112,6 +114,12 @@
+ 	private Hlayout confirmPanel = new Hlayout();
+ 
+ 	private int displayIndex;
++	
++	// --> CMIS
++	private boolean isCmis = false;
++	private String cmisViewerURL = "";
++	private Button bOpenCMIS = new Button();
++	// <--
+ 
+ 	private static List<String> autoPreviewList;
+ 
+@@ -217,6 +225,15 @@
+ 
+ 	void staticInit() throws Exception
+ 	{
++		// --> CMIS 
++		
++		final MClient client = new MClient(Env.getCtx(), Env.getAD_Client_ID(Env.getCtx()), null);
++		isCmis = client.get_ValueAsBoolean("StoreAttachmentsOnCMIS");
++		cmisViewerURL =  DB.getSQLValueString(null,
++				"SELECT SP.ViewUrl FROM AD_ClientInfo CI JOIN AD_StorageProvider SP ON SP.AD_StorageProvider_ID = CI.AD_StorageProvider_ID Where CI.AD_Client_ID = ? AND SP.Method = 'Alfresco'",
++				client.getAD_Client_ID());
++		// <--
++		
+ 		this.setAttribute(AdempiereWebUI.WIDGET_INSTANCE_NAME, "attachment");
+ 		this.setMaximizable(true);
+ 		this.setWidth("700px");
+@@ -247,7 +264,10 @@
+ 		toolBar.appendChild(bSave);
+ 		toolBar.appendChild(cbContent);
+ 		toolBar.appendChild(sizeLabel);
+-
++		// --> CMIS
++		if (isCmis)
++			toolBar.appendChild(bOpenCMIS);
++		// <--
+ 		mainPanel.appendChild(northPanel);
+ 		Vlayout div = new Vlayout();
+ 		div.appendChild(toolBar);
+@@ -257,6 +277,13 @@
+ 		
+ 		div.appendChild(text);
+ 		northPanel.appendChild(div);
++		
++		// --> CMIS
++		bOpenCMIS.setEnabled(false);
++		bOpenCMIS.setImage(ThemeManager.getThemeResource("images/Online24.png"));
++		bOpenCMIS.setTooltiptext(Msg.getMsg(Env.getCtx(), "OpenInCMIS"));
++		bOpenCMIS.addEventListener(Events.ON_CLICK, this);
++		// <--
+ 
+ 		bSave.setEnabled(false);
+ 		bSave.setSclass("img-btn");
+@@ -353,6 +380,8 @@
+ 		{
+ 			cbContent.setSelectedIndex(0);
+ 		}
++		
++		
+ 
+ 	} // loadAttachment
+ 
+@@ -376,7 +405,10 @@
+ 
+ 			bSave.setEnabled(true);
+ 			bDelete.setEnabled(true);
+-
++			bDeleteAll.setEnabled(true);
++			// --> CMIS
++			bOpenCMIS.setEnabled(true);
++			// <--
+ 			if (autoPreviewList.contains(mimeType))
+ 			{
+ 				displayData(index, immediate);
+@@ -389,8 +421,12 @@
+ 		}
+ 		else
+ 		{
++			// --> CMIS
++				bOpenCMIS.setEnabled(false);
++			// <--
+ 			bSave.setEnabled(false);
+ 			bDelete.setEnabled(false);
++			bDeleteAll.setEnabled(false);
+ 			sizeLabel.setText("");
+ 			return false;
+ 		}
+@@ -428,6 +464,9 @@
+ 		if (log.isLoggable(Level.CONFIG)) log.config("Index=" + displayIndex + " - " + entry);
+ 		if (entry != null && entry.getData() != null && autoPreviewList.contains(entry.getContentType()))
+ 		{
++			// --> CMIS
++			bOpenCMIS.setEnabled(true);
++			// <--
+ 			if (log.isLoggable(Level.CONFIG)) log.config(entry.toStringX());
+ 
+ 			try
+@@ -523,6 +562,12 @@
+ 		} else if (e.getTarget() == bRefresh) {
+ 			displayData(cbContent.getSelectedIndex(), true);
+ 		}
++		// --> CMIS
++		// Open Attachment in CMIS
++		else if (e.getTarget() == bOpenCMIS) {
++			openAttachmentCMIS();
++		}
++		// --
+ 
+ 	}	//	onEvent
+ 
+@@ -686,4 +731,22 @@
+ 		}
+ 		return "UTF-8";
+ 	}
++	
++	private boolean openAttachmentCMIS ()
++    {
++        int index = cbContent.getSelectedIndex();
++        MAttachmentEntry docEntry = m_attachment.getEntry(index);
++        if (docEntry == null)
++            return false;
++        try 
++        {
++            //Set your page url in this string. For eg, I m using URL for Google Search engine
++            String url = cmisViewerURL + docEntry.getDocId();
++            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
++        }
++        catch (java.io.IOException e) {
++        	log.log(Level.SEVERE, "", e);
++        } 
++        return false;
++    }    //    openFileViaCMIS
+ }

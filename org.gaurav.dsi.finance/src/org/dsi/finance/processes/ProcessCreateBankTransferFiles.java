@@ -1,0 +1,552 @@
+package org.dsi.finance.processes;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+
+import org.adempiere.exceptions.AdempiereException;
+import org.compiere.model.MAttachment;
+import org.compiere.model.MClient;
+import org.compiere.model.MMailText;
+import org.compiere.model.MPayment;
+import org.compiere.model.MQuery;
+import org.compiere.model.MSysConfig;
+import org.compiere.model.MUser;
+import org.compiere.model.MUserMail;
+import org.compiere.model.PrintInfo;
+import org.compiere.model.Query;
+import org.compiere.print.MPrintFormat;
+import org.compiere.print.ReportEngine;
+import org.compiere.process.SvrProcess;
+import org.compiere.util.DB;
+import org.compiere.util.EMail;
+import org.compiere.util.Env;
+import org.gaurav.dsi.model.I_DS_B2B_EmailConf;
+import org.gaurav.dsi.model.MDSB2BConfiguration;
+import org.gaurav.dsi.model.MDSB2BEmailConf;
+import org.gaurav.dsi.model.MDSIExportPayments;
+
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+
+public class ProcessCreateBankTransferFiles extends SvrProcess
+{
+	PreparedStatement pstmt;
+	ResultSet rs;
+	int C_bankAccount_ID;
+	String p_SalaryMonth;
+	String orgName;
+	int p_Year;
+	String S1;
+	String S2;
+	String S3;
+	String line;
+	File TextFile;
+	String FileName;
+	int exportBatch_ID;
+	private boolean		p_CreateEadvice = true;
+	File directory;
+	String DocumentNote;
+	String eAdviceH1;
+	String eAdviceH2;
+	String eAdviceH3;
+	File eAdviceFile;
+	String eAdvicefileName;
+	static String finalFileName;
+	CreateEAdviceFile eAdvice=new CreateEAdviceFile();
+	PrintWriter eadviceWriter;
+	PrintWriter pw;
+	String headerFileName;
+	MDSIExportPayments export ;
+	static String LINE_Seperator = "\r\n";
+	@Override
+	protected void prepare() 
+	{
+		exportBatch_ID = getRecord_ID();
+	}
+
+	@Override
+	protected String doIt() throws Exception
+	{
+		export = new MDSIExportPayments(getCtx(),exportBatch_ID, get_TrxName());
+		DocumentNote = export.getDocumentNote();
+		if(export.getDS_PaymentType().equalsIgnoreCase("IP"))
+			FileName=createVendorIndividualPayments();
+		else if(export.getDS_PaymentType().equalsIgnoreCase("BP"))
+			FileName=createVendorBatchPayment();
+		else if(export.getDS_PaymentType().equalsIgnoreCase("SP"))
+		{
+			C_bankAccount_ID=export.getC_BankAccount_ID();
+			p_SalaryMonth=export.getDSI_Month();
+			p_Year=export.getCalendarYear();
+			orgName=export.getOrgName();
+		}
+		export.setProcessed(true);
+		export.save();
+		export.setDocumentNote(DocumentNote.concat(" , ").concat(FileName));
+		export.save();	
+		return FileName;
+	}
+
+	private String createVendorBatchPayment() throws IOException 
+	{		
+		if(export.getDescription()==null || export.getDescription().isBlank())
+			throw new AdempiereException("Description can not be empty.");
+		
+		createFiles();
+		addTopSection();
+		String sql = "select SECTIONHEADER,TRANSFERMETHOD,sum(CREDITAMOUNT) as CreditAmount,CURRENCY,EXCHANGERATE,DEALREFNO," +
+				"PREFEREDVALUEDATE,DEBITACCOUNTNO, BENBANKACCOUNTNUMBER,max(UNIQTRANSREF) as UniqueReference," +
+				"coalesce(replace(SUBSTR(Description,1,35), ','::text, ''::text),'') ||',' as DebNar1,coalesce(replace(SUBSTR(Description,36,35), ','::text, ''::text),'') ||',' as DebNar2, " +
+				"coalesce(replace(SUBSTR(Description,1,35), ','::text, ''::text),'') ||',' as CredNar,coalesce(replace(SUBSTR(Description,1,35), ','::text, ''::text),'') ||',' as PayDet1," +
+				" coalesce(replace(SUBSTR(Description,36,35), ','::text, ''::text),'') ||',' as PayDet2,coalesce(replace(SUBSTR(Description,71,35), ','::text, ''::text),'') ||',' as PayDet3," +
+				" coalesce(replace(SUBSTR(Description,106,35), ','::text, ''::text),'') ||',' as PayDet4,ACCOUNTNAME,BENADRESS1,BENADRESS2,BENIFICIARYBANK," +
+				" BENBANKADRESS1,BENBANKADRESS2,BENBANKADDRESS3,SWIFTCODE,ACCOUNTNO,INTERBANKSWIFTCODE, INTERMEDIATEBANKNAME," +
+				"INTERMEDIATEBANKADDRES1,INTERMEDIATEBANKADDRESS2,INTERMEDIATEBANKADDRES3, CHARGESTYPE,SORTCODE,BIC,ROUTINGNO," +
+				"DSI_EXPORTPAYMENTS_ID from DSI_ExportVendorPayment  where DSI_EXPORTPAYMENTS_ID="+exportBatch_ID +
+				"group by SECTIONHEADER,TRANSFERMETHOD,CURRENCY,EXCHANGERATE,DEALREFNO,PREFEREDVALUEDATE," +
+				"DEBITACCOUNTNO,BENBANKACCOUNTNUMBER,ACCOUNTNAME,BENADRESS1,BENADRESS2,BENIFICIARYBANK,BENBANKADRESS1," +
+				"BENBANKADRESS2,BENBANKADDRESS3,SWIFTCODE,ACCOUNTNO,INTERBANKSWIFTCODE,INTERMEDIATEBANKNAME,INTERMEDIATEBANKADDRES1," +
+				"INTERMEDIATEBANKADDRESS2,INTERMEDIATEBANKADDRES3,CHARGESTYPE,SORTCODE,BIC,ROUTINGNO,DSI_EXPORTPAYMENTS_ID,description";
+
+		addDetails(sql, true); 
+		sql = "select 'S3,' as Sindex ,1 || ',' as TotalCount,sum(cp.PAYAMT) as TotalPay from DSI_EXPORTPAYMENTSLINE line," +
+				"c_payment cp where line.c_payment_id=cp.c_payment_id and line.DSI_EXPORTPAYMENTS_ID="+exportBatch_ID;
+		
+		addTotalSection(sql);
+		updatePayments();
+		return postProcessFiles();
+	}
+	
+	private String createVendorIndividualPayments() throws IOException 
+	{
+		createFiles();
+		addTopSection();
+
+		String sql = "select SECTIONHEADER,TRANSFERMETHOD,CREDITAMOUNT,CURRENCY,EXCHANGERATE,"
+				+ "DEALREFNO,PREFEREDVALUEDATE,DEBITACCOUNTNO,BENBANKACCOUNTNUMBER,UNIQTRANSREF,"
+				+ "DEBNAR1,DEBNAR2,CREDNAR,PAYDET1,PAYDET2,PAYDET3,PAYDET4,ACCOUNTNAME,BENADRESS1,"
+				+ "BENADRESS2,BENIFICIARYBANK,BENBANKADRESS1,BENBANKADRESS2,BENBANKADDRESS3,SWIFTCODE,ACCOUNTNO,"
+				+ "INTERBANKSWIFTCODE,INTERMEDIATEBANKNAME,INTERMEDIATEBANKADDRES1,INTERMEDIATEBANKADDRESS2,"
+				+ "INTERMEDIATEBANKADDRES3,CHARGESTYPE,SORTCODE,BIC,ROUTINGNO,"
+				+ "C_PAYMENT_ID,LINENO,DSI_EXPORTPAYMENTS_ID,DESCRIPTION from DSI_EXPORTVENDORPAYMENT "
+				+ "where DSI_EXPORTPAYMENTS_ID="
+				+ exportBatch_ID
+				+ " order by LineNo ";
+		addDetails(sql, false);
+		
+		sql = "select 'S3,' as Sindex ,count(*) ||',' as TotalCount,sum(cp.PAYAMT) as TotalPay"
+				+ " from DSI_EXPORTPAYMENTSLINE line,c_payment cp where "
+				+ "line.c_payment_id=cp.c_payment_id and line.DSI_EXPORTPAYMENTS_ID="
+				+ exportBatch_ID;
+		
+		addTotalSection(sql);
+		return postProcessFiles();
+	}
+	
+	private void createFiles() throws IOException 
+	{
+		directory = new File("C:" + File.separator + "VendorPayemts");
+		String FilePath=directory+File.separator+"DS_PAY";
+		String eAdvicePath=directory+File.separator+"DS_EADVICE";
+		directory.mkdirs();
+		MDSIExportPayments export= new MDSIExportPayments(getCtx(), exportBatch_ID, get_TrxName());
+		DocumentNote=export.getDocumentNote();
+		if(!(DocumentNote != null))
+		{
+			DocumentNote=" ";
+		}
+		String d="select TO_CHAR(now(), 'DDMMYYYYHH24MISS') ";
+		pstmt = DB.prepareStatement(d, get_TrxName());
+		try
+		{
+			rs = pstmt.executeQuery();
+			while (rs.next()) 
+			{
+				TextFile = new File(FilePath+"_"+rs.getString(1)+".txt");
+				FileName=FilePath+"_"+rs.getString(1)+".txt";
+				
+				// (works for both Windows and Linux)
+				TextFile.createNewFile();
+				finalFileName="DS_PAY_"+rs.getString(1)+".txt";
+				/*
+				 *  EAdvice part added later 02-11-2014 
+				 *  
+				 */
+				eAdviceFile=new File(eAdvicePath+"_"+rs.getString(1)+".txt");
+				eAdvicefileName=eAdvicePath+"_"+rs.getString(1)+".txt";
+				eAdviceFile.createNewFile();
+			}
+		}
+		catch (Exception e) 
+		{
+			log.log(Level.SEVERE, d, e);
+		} 
+		finally
+		{
+			DB.close(rs, pstmt);
+			rs = null;
+			pstmt = null;
+		}
+		pw = new PrintWriter(new FileWriter(TextFile));
+		eadviceWriter=new PrintWriter(new FileWriter(eAdviceFile));
+	}
+
+	private void addTopSection() throws IOException 
+	{
+		String sql = "select 'S1,',inf.DUNS||',',',' as DebitAccount,'MXD,' as TransferMethod," +
+				"'M,',','DebitNarrative ,Exp.DATE1||',' as RequestDate, " +
+				"TO_Char(Exp.DATE1,'DDMMYYYY')||Exp.DSI_EXPORTPAYMENTS_ID as BatchNo " +
+				"from DSI_EXPORTPAYMENTS exp,ad_org org,ad_orginfo inf " +
+				"where exp.ad_org_id=org.ad_org_id and org.ad_org_id=inf.ad_org_id " +
+				"and exp.DSI_EXPORTPAYMENTS_ID="+exportBatch_ID;
+		
+		pstmt = DB.prepareStatement(sql, get_TrxName());
+		try {
+			rs = pstmt.executeQuery();
+			while (rs.next()) 
+			{
+				S1 = rs.getString(1); // Section Index
+				S1 = S1.concat(rs.getString(2)); // Company CR
+				S1 = S1.concat(rs.getString(3)); // Debit Account Number 
+				S1 = S1.concat(rs.getString(4)); // Transfer Method
+				S1 = S1.concat(rs.getString(5)); // Debit Mode
+				S1 = S1.concat(rs.getString(6)); // Debit Narrative (reference)
+				SimpleDateFormat filedateFormat=new SimpleDateFormat("dd-MMM-yyyy");
+				String PayDate = filedateFormat.format(export.getDate1()).concat(",");
+				S1 = S1.concat(PayDate); // Request Date
+				S1 = S1.concat(rs.getString(8)); // Company's Batch Reference
+				pw.write(S1);
+				pw.append(LINE_Seperator);
+				
+//				EAdvice part added later 02-11-2014   
+				eAdviceH1 = "H,";
+				eAdviceH1 = eAdviceH1.concat(finalFileName.concat(","));
+				eAdviceH1 = eAdviceH1.concat(rs.getString(8));
+				eadviceWriter.write(eAdviceH1);
+				eadviceWriter.append(LINE_Seperator);
+			}
+		} catch (Exception e) {
+			log.log(Level.SEVERE, sql, e);
+		} finally {
+			DB.close(rs, pstmt);
+			rs = null;
+			pstmt = null;
+		}
+	}
+	
+	private void addDetails(String sql, boolean batch) 
+	{
+		pstmt = DB.prepareStatement(sql, get_TrxName());
+		try {
+			rs = pstmt.executeQuery();
+			while (rs.next()) 
+			{
+				int paymentID = 0;
+				S2 = rs.getString(1); // Section Index
+				S2 = S2.concat(rs.getString(2)); // Transfer Method
+				DecimalFormat df = new DecimalFormat("#.000");
+				Double Amount=rs.getDouble(3);
+				String roundedAmt=df.format(Amount);
+				S2 = S2.concat(roundedAmt); // Credit Amount
+				S2 = S2.concat(rs.getString(4)); // Credit Currency
+				S2 = S2.concat(rs.getString(5)); // Exchange Rate
+				S2 = S2.concat(rs.getString(6)); // Deal Ref No
+				S2 = S2.concat(rs.getString(7)); // Preferred Value Date
+				S2 = S2.concat(rs.getString(8)); // Debit Account Number
+				S2 = S2.concat(rs.getString(9)); // Beneficiary Account Number
+				S2 = S2.concat(rs.getString(10)); // Unique Transaction Ref No
+				S2 = S2.concat(rs.getString(11)); // Debit Narrative 1
+				S2 = S2.concat(rs.getString(12)); // Debit Narrative 2
+				S2 = S2.concat(rs.getString(13)); // Credit Narrative
+				S2 = S2.concat(rs.getString(14)); // Payment Details Line 1
+				S2 = S2.concat(rs.getString(15)); // Payment Details Line 2
+				S2 = S2.concat(rs.getString(16)); // Payment Details Line 3
+				S2 = S2.concat(rs.getString(17)); // Payment Details Line 4
+				S2 = S2.concat(rs.getString(18)); // Beneficiary Name
+				S2 = S2.concat(rs.getString(19)); // Beneficiary Address Line 1
+				S2 = S2.concat(rs.getString(20)); // Beneficiary Address Line 2
+				S2 = S2.concat(rs.getString(21)); // Beneficiary Bank Name
+				S2 = S2.concat(rs.getString(22)); // Beneficiary Bank Address 1
+				S2 = S2.concat(rs.getString(23)); // Beneficiary Bank Address 2
+				S2 = S2.concat(rs.getString(24)); // Beneficiary Bank Address 3
+				S2 = S2.concat(rs.getString(25)); // SWIFT Code
+				S2 = S2.concat(rs.getString(26)); // Intermediary Account
+				S2 = S2.concat(rs.getString(27)); // Intermediary Swift Code
+				S2 = S2.concat(rs.getString(28)); // Intermediary Name
+				S2 = S2.concat(rs.getString(29)); // Intermediary Address 1
+				S2 = S2.concat(rs.getString(30)); // Intermediary Address 2
+				S2 = S2.concat(rs.getString(31)); // Intermediary Address 3
+				S2 = S2.concat(rs.getString(32)); // Charges Type
+				S2 = S2.concat(rs.getString(33)); // Sort Code
+				S2 = S2.concat(rs.getString(34)); // BIC
+//				S2 = S2.concat(rs.getString(35)); // ABA Routing Number
+				pw.write(S2);
+				pw.append(LINE_Seperator);
+				
+				if(!batch)
+				{
+					paymentID = rs.getInt(36);
+					MPayment mp = new MPayment(getCtx(), paymentID, get_TrxName());
+					mp.set_ValueOfColumn("DSI_IsExported", true);
+					mp.saveEx();
+				}
+				if(batch)
+					paymentID=DB.getSQLValue(get_TrxName(), "select line.C_PAYMENT_ID from DSI_EXPORTPAYMENTSLINE line where line.DSI_EXPORTPAYMENTS_ID=?", exportBatch_ID);
+				
+				String eadviceDes;
+				eAdviceH2 = "D,";
+				eAdviceH2 = eAdviceH2.concat(rs.getString(11));
+				ArrayList<String> getDet=eAdvice.getDetailsPerPayment(paymentID);
+				eAdviceH2=eAdviceH2.concat(getDet.get(0).concat(","));
+				eAdviceH2=eAdviceH2.concat(getDet.get(1).concat(","));
+				eAdviceH2=eAdviceH2.concat(getDet.get(2).concat(","));
+				if(rs.getString(11).length()<20)
+				{
+					eadviceDes=rs.getString(11);
+					eadviceDes.replace(',','-');
+				}
+				else
+				{
+					eadviceDes=rs.getString(11).substring(0, 20);
+				}
+				eAdviceH2=eAdviceH2.concat(eadviceDes.concat(","));
+				eAdviceH2=eAdviceH2.concat((rs.getString(4).substring(1,4)).concat(" ".concat(roundedAmt)));
+				eadviceWriter.write(eAdviceH2);
+				eadviceWriter.append(LINE_Seperator);
+			}
+			
+		} 
+		catch (Exception e) 
+		{
+			log.log(Level.SEVERE, sql, e);
+		} 
+		finally
+		{
+			DB.close(rs, pstmt);
+			rs = null;
+			pstmt = null;
+		}
+	}
+
+	private String postProcessFiles() throws IOException 
+	{
+		if (!(DocumentNote != null)) {
+			MAttachment ma = new MAttachment(getCtx(), 0, get_TrxName());
+			ma.setRecord_ID(exportBatch_ID);
+			ma.addEntry(TextFile);
+			ma.addEntry(eAdviceFile);
+			ma.set_TrxName(get_TrxName());
+			ma.setAD_Table_ID(getTable_ID());
+			ma.addTextMsg("Added new Text File" + FileName);
+			ma.saveEx();
+		} else {
+			MAttachment maa = new MAttachment(getCtx(), getTable_ID(),
+					exportBatch_ID, get_TrxName());
+			maa.addEntry(TextFile);
+			maa.addEntry(eAdviceFile);
+			maa.set_TrxName(get_TrxName());
+			maa.addTextMsg("Added new Text File" + FileName);
+			maa.saveEx();
+		}
+		boolean uploadedSuccessfully = UploadToSFTP(TextFile,eAdviceFile);
+		return "File Created : -" + FileName + " E Advice created : -"
+				+ eAdvicefileName +" File uploaded "+ uploadedSuccessfully;
+		
+	}
+
+	private void addTotalSection(String sql) 
+	{
+		pstmt = DB.prepareStatement(sql, get_TrxName());
+		try {
+			rs = pstmt.executeQuery();
+			while (rs.next()) 
+			{
+				
+				S3 = rs.getString(1); // Section Index
+				S3 = S3.concat(rs.getString(2)); // Number of Records
+				DecimalFormat df = new DecimalFormat("#.000");
+				Double Amount=rs.getDouble(3);
+				String roundedAmt=df.format(Amount);
+				S3 = S3.concat(roundedAmt);// Hash Total
+				pw.write(S3);
+				pw.append(LINE_Seperator);
+				if(p_CreateEadvice)
+				{
+				eAdviceH2 = "T,"; // Section Index
+				eAdviceH2 = eAdviceH2.concat(rs.getString(2)); // Number of Records
+				eAdviceH2 = eAdviceH2.concat(roundedAmt);// Hash Total
+				eadviceWriter.write(eAdviceH2);
+				eadviceWriter.append(LINE_Seperator);
+				}
+			}
+		} 
+		catch (Exception e) 
+		{
+			log.log(Level.SEVERE, sql, e);
+		} finally {
+			DB.close(rs, pstmt);
+			rs = null;
+			pstmt = null;
+		}
+		
+		eadviceWriter.close();
+		pw.close();
+	}
+
+	private boolean UploadToSFTP(File MainFile, File eAdviceFile) throws IOException 
+	{
+		int B2BConfigurationID = DB.getSQLValue(get_TrxName(), "select DS_B2B_Configuration_ID from DS_B2B_Configuration Where ad_org_id = ? ", Env.getAD_Org_ID(getCtx()));
+		MDSB2BConfiguration conf = new MDSB2BConfiguration(getCtx(), B2BConfigurationID, get_TrxName());
+
+		String SFTPHOST = conf.getDS_SftpHost();
+		int SFTPPORT = conf.getDS_SftpPort();
+		String SFTPUSER = conf.getDS_SftpUser();
+		String SFTPPASS = conf.getDS_SftpPassword();
+		String SFTPWORKINGDIR = conf.getDS_SftpWorkingDir();
+		if(SFTPHOST!=null || SFTPPORT!=0 || SFTPUSER!=null || SFTPPASS!=null || SFTPWORKINGDIR!=null)
+		{
+			Session session = null ;
+			Channel channel = null ;
+			ChannelSftp channelSftp = null ; 
+			
+			try 
+			{
+			    JSch jsch = new JSch();
+		        session = jsch.getSession(SFTPUSER, SFTPHOST, SFTPPORT);
+		        session.setPassword(SFTPPASS);
+		        java.util.Properties config = new java.util.Properties();
+		        config.put("StrictHostKeyChecking", "no");
+		        session.setConfig(config);
+		        session.connect();
+		        log.info("Host connected.");
+		        channel = session.openChannel("sftp");
+		        channel.connect();
+		        log.info("sftp channel opened and connected.");
+		        channelSftp = (ChannelSftp) channel;
+		        channelSftp.cd(SFTPWORKINGDIR);
+		        channelSftp.put(new FileInputStream(MainFile), MainFile.getName());
+		        channelSftp.put(new FileInputStream(eAdviceFile), eAdviceFile.getName());
+		        log.info("File transfered successfully to host.");
+			} 
+			catch (Exception ex) 
+			{
+				 log.warning("Exception found while tranfer the response.");
+		    }
+	    
+			finally
+			{
+		        channelSftp.exit();
+		        log.info("sftp Channel exited.");
+		        channel.disconnect();
+		        log.info("Channel disconnected.");
+		        session.disconnect();
+		        log.info("Host Session disconnected.");
+		    }
+			sendUploadEmail(conf);
+		}
+		return true;
+		
+	}
+
+	private void sendUploadEmail(MDSB2BConfiguration conf) throws IOException 
+	{
+		int PrintFormatID = 0 ;
+		MClient client = MClient.get(getCtx());
+		MMailText mText = new MMailText(getCtx(), conf.getR_MailText_ID(), get_TrxName());
+		int B2BEmailConfID = DB.getSQLValue(get_TrxName(), "select DS_B2B_EmailConf_ID from DS_B2B_EmailConf Where ad_org_id = ? ", Env.getAD_Org_ID(getCtx()));
+		MDSB2BEmailConf Emailconf = new MDSB2BEmailConf(getCtx(), B2BEmailConfID, get_TrxName());
+		String toEmailIDs = MSysConfig.getValue("B2B_Default_EmailToID","gaurav@shaik.net");
+		EMail email = client.createEMail(toEmailIDs, null, null);
+		List<MDSB2BEmailConf> contacts= new Query(getCtx(), I_DS_B2B_EmailConf.Table_Name," AD_Org_ID = ? ", get_TrxName())
+												.setParameters(Env.getAD_Org_ID(getCtx()))
+												.setOnlyActiveRecords(true)
+												.list();
+		for(MDSB2BEmailConf contact : contacts)
+		{
+			MUser user = new MUser(getCtx(), contact.getAD_User_ID(), get_TrxName());
+			email.addTo(user.getEMail());
+			mText.setPO(Emailconf);
+			mText.setUser(user);
+			mText.saveEx();
+		}
+		if (!email.isValid())
+		{
+			StringBuilder msglog = new StringBuilder("@RequestActionEMailError@ Invalid EMail: ").append(toEmailIDs);
+			log.severe(" Email sent failed "+msglog);
+		}
+		PrintFormatID = MSysConfig.getIntValue("B2B_Default_PrintFormat", 1000129);
+		PrintFormatID = conf.getAD_PrintFormat_ID();
+		MQuery query = new MQuery("DSI_ExportPayments");
+		query.addRestriction("DSI_ExportPayments_ID", MQuery.EQUAL, export.getDSI_ExportPayments_ID());
+		
+		MPrintFormat format = MPrintFormat.get (getCtx(),PrintFormatID , false);
+		PrintInfo info = new PrintInfo("B2B file Transfer",MDSIExportPayments.Table_ID,export.getDSI_ExportPayments_ID(),0);
+		ReportEngine re = null;
+		if (format != null)
+			re = new ReportEngine(getCtx(), format, query, info);
+		
+		File attachment = re.getPDF(File.createTempFile("VendorPayments", ".pdf"));
+		StringBuilder msglog = new StringBuilder().append(toEmailIDs.toString()).append(" - ").append(attachment);
+		if (log.isLoggable(Level.FINE)) log.fine(msglog.toString());
+		email.addAttachment(attachment);
+		
+		
+		String message = mText.getMailText(true);
+		if (mText.isHtml())
+			email.setMessageHTML(mText.getMailHeader(), message);
+		else
+		{
+			email.setSubject (mText.getMailHeader());
+			email.setMessageText (message);
+		}
+		//
+		//
+		String msg = email.send();
+		for(MDSB2BEmailConf contact : contacts)
+		{
+			MUserMail um = new MUserMail(mText, contact.getAD_User_ID(), email);
+			um.saveEx();
+		}
+		log.info("Email sent with the subject "+msg);
+	}
+
+	private void updatePayments() 
+	{
+		String sql="select c_payment_id from DSI_ExportVendorPayment where DSI_EXPORTPAYMENTS_ID="+exportBatch_ID;
+		pstmt = DB.prepareStatement(sql, get_TrxName());
+		try {
+			rs = pstmt.executeQuery();
+			while (rs.next()) 
+			{
+				int paymentID = rs.getInt(1);
+				MPayment mp=new MPayment(getCtx(), paymentID, get_TrxName());
+				mp.set_ValueOfColumn("DSI_IsExported", true);
+				mp.saveEx();
+			}
+		}
+		catch (Exception e) 
+		{
+			log.log(Level.SEVERE, sql, e);
+		} 
+		finally 
+		{
+			DB.close(rs, pstmt);
+			rs = null;
+			pstmt = null;
+		}
+		
+	}
+
+}

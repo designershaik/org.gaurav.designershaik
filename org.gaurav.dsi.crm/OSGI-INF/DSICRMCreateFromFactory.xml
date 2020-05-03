@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="com.gaurav.dsi.crm.create.from">
+   <service>
+      <provide interface="org.compiere.grid.ICreateFromFactory"/>
+   </service>
+   <implementation class="org.dsi.crm.factories.DSICRMCreateFromFactory"/>
+   <property name="service.ranking" type="Integer" value="100"/>
+</scr:component>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="com.logilite.esignature.topaz.displaytype.factory">
+   <implementation class="com.logilite.esignature.topaz.factory.SignatureDisplayTypeFactory"/>
+   <property name="service.ranking" type="Integer" value="5"/>
+   <service>
+      <provide interface="org.adempiere.base.IDisplayTypeFactory"/>
+   </service>
+</scr:component>

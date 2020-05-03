@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="com.logilite.cms.model.ProjectValidator"
+         name="com.logilite.cms.model.ProjectValidator"
+         point="org.adempiere.base.ModelValidator">
+      <listener
+            class="com.logilite.cms.model.ProjectValidator"
+            priority="com.logilite.cms.model.ProjectValidator">
+      </listener>
+   </extension>
+
+</plugin>

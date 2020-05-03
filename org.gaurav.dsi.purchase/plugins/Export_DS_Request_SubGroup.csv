@@ -1,0 +1,104 @@
+AD_Org_ID[Name],Value,Name,Priority,R_Group_ID[Name],IsActive,DSI_GroupResponsible>AD_Org_ID[Name],DSI_GroupResponsible>Priority,DSI_GroupResponsible>R_Group_ID[Name],DSI_GroupResponsible>AD_User_ID[Name],DSI_GroupResponsible>DS_CanApprove,DSI_GroupResponsible>DS_Request_SubGroup_ID[Value],DSI_GroupResponsible>IsActive
+*,Other,Other,0,Other,Y,,,,,,,
+*,Administration/HR,Administration/HR,10,Administration/HR,Y,Headquarter,10,,Rose Rosales,Y,Administration/HR,Y
+,,,,,,Headquarter,30,,Bobby Thomas,Y,Administration/HR,Y
+,,,,,,Headquarter,20,,Sherryl Daguio,Y,Administration/HR,Y
+*,Foreign Purchases,Foreign Purchases,10,Foreign Purchases,Y,Headquarter,10,,Mohammed Al Asfoor,Y,Foreign Purchases,Y
+,,,,,,Headquarter,20,,Rose Rosales,Y,Foreign Purchases,Y
+,,,,,,Headquarter,30,,Sherryl Daguio,Y,Foreign Purchases,Y
+*,Foreign/Local Trips (Cash),Foreign/Local Trips (Cash),40,Foreign/Local Trips (Cash),Y,Headquarter,10,,Vinod Kumar,Y,Foreign/Local Trips (Cash),Y
+,,,,,,Headquarter,20,,Sherryl Daguio,Y,Foreign/Local Trips (Cash),Y
+,,,,,,Headquarter,10,,Rose Rosales,Y,Foreign/Local Trips (Cash),Y
+*,Local Purchase,Local Purchase,30,Local Purchase,Y,Headquarter,10,,Rose Rosales,Y,Local Purchase,Y
+,,,,,,Headquarter,30,,Vinod Kumar,Y,Local Purchase,Y
+,,,,,,Headquarter,20,,Sherryl Daguio,Y,Local Purchase,Y
+*,Display,Display,40,Display,Y,Headquarter,30,,Vinod Kumar,Y,Display,Y
+,,,,,,Headquarter,80,,Maria Daisy,Y,Display,Y
+*,Watch,Watch,90,Watch,Y,Headquarter,10,,Edgardo Peredes,Y,Watch,Y
+,,,,,,Headquarter,20,,Erwin D. Macni,Y,Watch,Y
+,,,,,,Headquarter,30,,Rose Rosales,Y,Watch,Y
+*,Administrator/HR,Administrator/HR,60,Administrator/HR,Y,Headquarter,10,,Rose Rosales,Y,Administrator/HR,Y
+,,,,,,Headquarter,20,,Sherryl Daguio,Y,Administrator/HR,Y
+*,Carpentry Purchase,Carpentry Purchase,300,Carpentry Purchase,Y,Headquarter,10,,Younis Ali Mansoor Ali,Y,Carpentry Purchase,Y
+,,,,,,Headquarter,20,,Rose Rosales,Y,Carpentry Purchase,Y
+*,Display and Merchandising,Display and Merchandising,30,Display and Merchandising,Y,Headquarter,10,,Rose Rosales,Y,Display and Merchandising,Y
+,,,,,,Headquarter,20,,Carla Punzalan,Y,Display and Merchandising,Y
+,,,,,,Headquarter,40,,Edgardo Peredes,Y,Display and Merchandising,Y
+*,Engineering,Engineering,110,Engineering,Y,Headquarter,40,,Rose Rosales,Y,Engineering,Y
+,,,,,,Headquarter,10,,Mohammed Al Asfoor,Y,Engineering,Y
+,,,,,,Headquarter,20,,Harold Usita,Y,Engineering,Y
+,,,,,,Headquarter,30,,Edgardo Peredes,Y,Engineering,Y
+*,Facilities,Facilities,120,Facilities,Y,Headquarter,20,,Rose Rosales,Y,Facilities,Y
+,,,,,,Headquarter,30,,Sherryl Daguio,Y,Facilities,Y
+,,,,,,Headquarter,10,,Mohammed Al Asfoor,Y,Facilities,Y
+,,,,,,Headquarter,5,,Janardhanan Pillai Vijayan Pillai,Y,Facilities,Y
+*,Fashion,Fashion,40,Fashion,Y,Headquarter,10,,Edgardo Peredes,Y,Fashion,Y
+,,,,,,Headquarter,20,,Rose Rosales,Y,Fashion,Y
+*,IT,IT,60,IT,Y,Headquarter,20,,Rose Rosales,Y,IT,Y
+,,,,,,Headquarter,10,,Mohammed Al Asfoor,Y,IT,Y
+*,Leather Goods,Leather Goods,80,Leather Goods,Y,Headquarter,30,,Rose Rosales,Y,Leather Goods,Y
+,,,,,,Headquarter,10,,Mohammed Al Asfoor,Y,Leather Goods,Y
+,,,,,,Headquarter,20,,Edgardo Peredes,Y,Leather Goods,Y
+*,Maintainance & Service,Maintainance & Service,40,Maintainance & Service,Y,Headquarter,10,,Rose Rosales,Y,Maintainance & Service,Y
+*,Media,Media,60,Media,Y,Headquarter,30,,Rose Rosales,Y,Media,Y
+,,,,,,Headquarter,40,,Mohammed Al Asfoor,Y,Media,Y
+,,,,,,Headquarter,20,,Edgardo Peredes,Y,Media,Y
+,,,,,,Headquarter,10,,Amani Alasfoor,Y,Media,Y
+*,Production,Production,50,Production,Y,Headquarter,10,,Rowell Sumpay Cuba,Y,Production,Y
+,,,,,,Headquarter,20,,Edgardo Peredes,Y,Production,Y
+*,Retail Account Support,Retail Account Support,120,Retail Account Support,Y,Headquarter,20,,Vinod Kumar,Y,Retail Account Support,Y
+,,,,,,Headquarter,10,,Rose Rosales,Y,Retail Account Support,Y
+,,,,,,Headquarter,30,,Younis Ali Mansoor Ali,Y,Retail Account Support,Y
+*,Staff Accommodation,Staff Accommodation,50,Staff Accommodation,Y,Headquarter,10,,Rose Rosales,Y,Staff Accommodation,Y
+,,,,,,Headquarter,20,,Sherryl Daguio,Y,Staff Accommodation,Y
+*,Trips/Liquidations,Trips/Liquidations,140,Trips/Liquidations,Y,Headquarter,10,,Rose Rosales,Y,Trips/Liquidations,Y
+*,Watch (Horology),Watch (Horology),60,Watch (Horology),Y,Headquarter,20,,Edgardo Peredes,Y,Watch (Horology),Y
+,,,,,,Headquarter,30,,Rose Rosales,Y,Watch (Horology),Y
+,,,,,,Headquarter,10,,Mohammed Al Asfoor,Y,Watch (Horology),Y
+*,Water,Water,70,Water,Y,Headquarter,30,,Edgardo Peredes,Y,Water,Y
+,,,,,,Headquarter,20,,Rose Rosales,Y,Water,Y
+,,,,,,Headquarter,10,,Mohammed Al Asfoor,Y,Water,Y
+*,Carpentry,Carpentry,70,Carpentry,Y,Headquarter,10,,Janardhanan Pillai Vijayan Pillai,Y,Carpentry,Y
+*,Home Appliances,Home Appliances,70,Home Appliances,Y,,,,,,,
+*,Mechanical,Mechanical,10,Mechanical,Y,,,,,,,
+*,Others,Others,10,Others,Y,,,,,,,
+*,Plumbing,Plumbing,10,Plumbing,Y,,,,,,,
+*,CEO (MA),CEO (MA),10,CEO (MA),Y,Headquarter,10,,Rose Rosales,Y,CEO (MA),Y
+,,,,,,Headquarter,20,,Sherryl Daguio,Y,CEO (MA),Y
+*,Payment Authorization Purchase/Employees,Payment Authorization Purchase/Employees,110,Payment Authorization Purchase/Employees,Y,Headquarter,40,,Vinod Kumar,Y,Payment Authorization Purchase/Employees,Y
+,,,,,,Headquarter,30,,Sherryl Daguio,Y,Payment Authorization Purchase/Employees,Y
+,,,,,,Headquarter,20,,Rose Rosales,Y,Payment Authorization Purchase/Employees,Y
+,,,,,,Headquarter,10,,Edgardo Peredes,Y,Payment Authorization Purchase/Employees,Y
+*,Vehicle Repairs & Maintenance,Vehicle Repairs & Maintenance,40,Logistics,Y,Headquarter,20,Logistics,Rose Rosales,Y,Vehicle Repairs & Maintenance,Y
+,,,,,,Headquarter,10,Logistics,Younis Ali Mansoor Ali,Y,Vehicle Repairs & Maintenance,Y
+,,,,,,Headquarter,30,Logistics,Sherryl Daguio,Y,Vehicle Repairs & Maintenance,Y
+*,Fuel,Fuel,40,Logistics,Y,Headquarter,20,Logistics,Rose Rosales,Y,Fuel,Y
+,,,,,,Headquarter,10,Logistics,Younis Ali Mansoor Ali,Y,Fuel,Y
+,,,,,,Headquarter,30,Logistics,Sherryl Daguio,Y,Fuel,Y
+*,Transportation,Transportation,40,Logistics,Y,Headquarter,20,Logistics,Rose Rosales,Y,Transportation,Y
+,,,,,,Headquarter,10,Logistics,Younis Ali Mansoor Ali,Y,Transportation,Y
+,,,,,,Headquarter,30,Logistics,Sherryl Daguio,Y,Transportation,Y
+*,Telephone,Telephone,40,Logistics,Y,Headquarter,20,Logistics,Rose Rosales,Y,Telephone,Y
+,,,,,,Headquarter,10,Logistics,Younis Ali Mansoor Ali,Y,Telephone,Y
+,,,,,,Headquarter,30,Logistics,Sherryl Daguio,Y,Telephone,Y
+*,Annual Registrations,Annual Registrations,40,Logistics,Y,Headquarter,20,Logistics,Rose Rosales,Y,Annual Registrations,Y
+,,,,,,Headquarter,10,Logistics,Younis Ali Mansoor Ali,Y,Annual Registrations,Y
+,,,,,,Headquarter,30,Logistics,Sherryl Daguio,Y,Annual Registrations,Y
+*,"Certifications, Permits, Licenses","Certifications, Permits, Licenses",40,Logistics,Y,Headquarter,20,Logistics,Rose Rosales,Y,"Certifications, Permits, Licenses",Y
+,,,,,,Headquarter,10,Logistics,Younis Ali Mansoor Ali,Y,"Certifications, Permits, Licenses",Y
+,,,,,,Headquarter,30,Logistics,Sherryl Daguio,Y,"Certifications, Permits, Licenses",Y
+*,Custom Clearance,Custom Clearance,40,Logistics,Y,Headquarter,20,Logistics,Rose Rosales,Y,Custom Clearance,Y
+,,,,,,Headquarter,10,Logistics,Younis Ali Mansoor Ali,Y,Custom Clearance,Y
+,,,,,,Headquarter,30,Logistics,Sherryl Daguio,Y,Custom Clearance,Y
+*,Business Trips,Business Trips,40,Logistics,Y,Headquarter,10,Logistics,Rose Rosales,Y,Business Trips,Y
+,,,,,,Headquarter,20,Logistics,Younis Ali Mansoor Ali,Y,Business Trips,Y
+,,,,,,Headquarter,30,Logistics,Sherryl Daguio,Y,Business Trips,Y
+*,Training,Training,40,Logistics,Y,Headquarter,10,Logistics,Rose Rosales,Y,Training,Y
+,,,,,,Headquarter,20,Logistics,Younis Ali Mansoor Ali,Y,Training,Y
+,,,,,,Headquarter,30,Logistics,Sherryl Daguio,Y,Training,Y
+*,Aub Corporate Cards Liquidation,Aub Corporate Cards Liquidation,40,Logistics,Y,Headquarter,10,Logistics,Rose Rosales,Y,Aub Corporate Cards Liquidation,Y
+,,,,,,Headquarter,20,Logistics,Younis Ali Mansoor Ali,Y,Aub Corporate Cards Liquidation,Y
+,,,,,,Headquarter,30,Logistics,Sherryl Daguio,Y,Aub Corporate Cards Liquidation,Y
+*,Requests For Assets Purchase,Requests For Assets Purchase,40,Logistics,Y,Headquarter,10,Logistics,Rose Rosales,Y,Requests For Assets Purchase,Y
+,,,,,,Headquarter,20,Logistics,Younis Ali Mansoor Ali,Y,Requests For Assets Purchase,Y
+,,,,,,Headquarter,30,Logistics,Sherryl Daguio,Y,Requests For Assets Purchase,Y
