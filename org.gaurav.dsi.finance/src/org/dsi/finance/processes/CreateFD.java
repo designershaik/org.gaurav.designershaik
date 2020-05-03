@@ -18,6 +18,7 @@ import org.compiere.model.MConversionRate;
 import org.compiere.model.MJournal;
 import org.compiere.model.MJournalLine;
 import org.compiere.model.MPayment;
+import org.compiere.model.X_C_DocType;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
@@ -89,7 +90,11 @@ public class CreateFD extends SvrProcess
 			throw new AdempiereException("Please provide the type");
 		if(actionWithFD.equalsIgnoreCase("NE"))
 		{
-			MPayment newDeposit = CreatePayment(deposit.getDS_PrincipalAmtCharge_ID(),deposit.getDS_PrincipalAmount(),deposit.getC_Currency_ID(),false);
+			int C_DocTypePayment_ID = DB.getSQLValue(get_TrxName(), "SELECT C_DocType_ID FROM C_DocType "
+					+ "Where BankAccountType like ? and AD_Client_ID = ? AND DocBaseType = ? ", 
+					deposit.getC_BankAccount().getBankAccountType(),getAD_Client_ID(),X_C_DocType.DOCBASETYPE_APPayment);
+			
+			MPayment newDeposit = CreatePayment(deposit.getDS_PrincipalAmtCharge_ID(),deposit.getDS_PrincipalAmount(),deposit.getC_Currency_ID(),false,C_DocTypePayment_ID);
 			addLog(newDeposit.getC_Payment_ID(),newDeposit.getDateAcct(),newDeposit.getPayAmt(),newDeposit.getDocumentNo(),I_C_Payment.Table_ID,newDeposit.getC_Payment_ID());
 			
 		}
@@ -170,7 +175,11 @@ public class CreateFD extends SvrProcess
 			}
 			else
 			{
-				MPayment InterestReceived = CreatePayment(deposit.getDS_InterestAmtCharge_ID(),deposit.getInterestAmt(),deposit.getC_Currency_ID(),true);
+				int C_DocTypePayment_ID = DB.getSQLValue(get_TrxName(), "SELECT C_DocType_ID FROM C_DocType "
+						+ "Where BankAccountType like ? and AD_Client_ID = ? AND DocBaseType = ? ", 
+						deposit.getC_BankAccount().getBankAccountType(),getAD_Client_ID(),X_C_DocType.DOCBASETYPE_ARReceipt);
+				
+				MPayment InterestReceived = CreatePayment(deposit.getDS_InterestAmtCharge_ID(),deposit.getInterestAmt(),deposit.getC_Currency_ID(),true,C_DocTypePayment_ID);
 				addLog(InterestReceived.getC_Payment_ID(),InterestReceived.getDateAcct(),InterestReceived.getPayAmt(),InterestReceived.getDocumentNo(),I_C_Payment.Table_ID,InterestReceived.getC_Payment_ID());
 			}
 			
@@ -179,27 +188,42 @@ public class CreateFD extends SvrProcess
 		}
 		else if(actionWithFD.equalsIgnoreCase("TE"))
 		{
-			MPayment interestReceiptEntry = CreatePayment(deposit.getDS_InterestAmtCharge_ID(),deposit.getInterestAmt(),deposit.getC_Currency_ID(),true);
+			int C_DocTypePayment_ID = DB.getSQLValue(get_TrxName(), "SELECT C_DocType_ID FROM C_DocType "
+					+ "Where BankAccountType like ? and AD_Client_ID = ? AND DocBaseType = ? ", 
+					deposit.getC_BankAccount().getBankAccountType(),getAD_Client_ID(),X_C_DocType.DOCBASETYPE_ARReceipt);
+			
+			Timestamp today = Env.getContextAsDate(getCtx(), "#Date");
+			MPayment interestReceiptEntry = CreatePayment(deposit.getDS_InterestAmtCharge_ID(),deposit.getInterestAmt(),deposit.getC_Currency_ID(),true,C_DocTypePayment_ID);
 			addLog(interestReceiptEntry.getC_Payment_ID(),interestReceiptEntry.getDateAcct(),interestReceiptEntry.getPayAmt(),interestReceiptEntry.getDocumentNo(),I_C_Payment.Table_ID,interestReceiptEntry.getC_Payment_ID());
 			
-			MPayment  terminateFDReceipt = CreatePayment(deposit.getDS_PrincipalAmtCharge_ID(),deposit.getDS_PrincipalAmount(),deposit.getC_Currency_ID(),true);
+			MPayment  terminateFDReceipt = CreatePayment(deposit.getDS_PrincipalAmtCharge_ID(),deposit.getDS_PrincipalAmount(),deposit.getC_Currency_ID(),true,C_DocTypePayment_ID);
 			addLog(terminateFDReceipt.getC_Payment_ID(),terminateFDReceipt.getDateAcct(),terminateFDReceipt.getPayAmt(),terminateFDReceipt.getDocumentNo(),I_C_Payment.Table_ID,terminateFDReceipt.getC_Payment_ID());
+			
+			deposit.setProcessed(true);
+			deposit.setCloseDate(today);
+			deposit.setDS_Matured(true);
+			deposit.saveEx();
 		}
 		return null;
 	}
 	
-	private MPayment CreatePayment(int ChargeID, BigDecimal Amt, int C_Currency_ID, boolean receipt) 
+	private MPayment CreatePayment(int ChargeID, BigDecimal Amt, int C_Currency_ID, boolean receipt, int c_DocTypePayment_ID) 
 	{
+		Timestamp paymentDate = deposit.getDS_MaturityDate();
+		if(actionWithFD.equalsIgnoreCase("NE"))
+			paymentDate = deposit.getDateAcct();
 		MPayment payment = new MPayment(getCtx(), 0, get_TrxName());
 		payment.setC_BankAccount_ID(deposit.getC_BankAccount_ID());
+		payment.setC_DocType_ID(c_DocTypePayment_ID);
 		payment.setAmount(C_Currency_ID,Amt );
-		payment.setDateAcct(deposit.getDateAcct());
-		payment.setDateTrx(deposit.getDateAcct());
+		payment.setDateAcct(paymentDate);
+		payment.setDateTrx(paymentDate);
 		payment.setC_BPartner_ID(deposit.getC_BPartner_ID());
 		payment.setC_Charge_ID(ChargeID);
 		payment.setCheckNo(deposit.getDS_CertificateNumber());
+		payment.setDescription("FD Certificate number: "+deposit.getDS_CertificateNumber());
 		payment.set_ValueOfColumn("DS_FixedDeposit_ID", FixedDeposit_ID);
-		payment.setC_DocType_ID(receipt);
+		payment.setIsReceipt(receipt);
 		payment.setAD_Org_ID(deposit.getAD_Org_ID());
 		payment.saveEx();
 		

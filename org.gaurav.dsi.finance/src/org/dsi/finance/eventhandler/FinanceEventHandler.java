@@ -180,6 +180,8 @@ public class FinanceEventHandler extends AbstractEventHandler
 				
 				if (ci.isSendEMail()) 
 					SendEmails.sendEmail(ci,billpartnerID,billPartnerLocationID,ci.get_TrxName());
+				
+				updateImportInvoices(ci);
 			}
 			if(event.getTopic().equalsIgnoreCase(IEventTopics.PO_BEFORE_NEW))
 			{
@@ -376,6 +378,7 @@ public class FinanceEventHandler extends AbstractEventHandler
 					throw new AdempiereException(Msg.getMsg(ctx, "DS_SaveCategoryError"));
 			}
 		}
+		
 		if(po instanceof MDSIExportPaymentsLine)
 		{
 			MDSIExportPaymentsLine line = (MDSIExportPaymentsLine)po;
@@ -406,6 +409,11 @@ public class FinanceEventHandler extends AbstractEventHandler
 		}
 	}
 	
+	private void updateImportInvoices(MInvoice ci) 
+	{
+		
+	}
+
 	private void lockParentRecord(int AD_User_ID, int AD_Table_ID, int ID) 
 	{
 		MPrivateAccess access = MPrivateAccess.get (ctx, AD_User_ID,AD_Table_ID, ID);
@@ -432,6 +440,12 @@ public class FinanceEventHandler extends AbstractEventHandler
 				int User2_ID = po.get_ValueAsInt("User2_ID");
 				if(C_Activity_ID == 0 || User1_ID == 0 || User2_ID == 0)
 					throw new AdempiereException(Msg.getMsg(ctx, "DS_CostCenter_RevenueCode_ProfitCenter_Mandatory"));
+			}
+			if(po.get_Table_ID()==MInvoiceLine.Table_ID && value.get_ValueAsBoolean("DS_IsInvestmentRelated") && C_Charge_ID!=chargeFreightID)
+			{
+				int relatedProduct_ID = po.get_ValueAsInt("RelatedProduct_ID");
+				if(relatedProduct_ID<=0)
+					throw new AdempiereException("Related product is mandatory");
 			}
 		}
 	}
@@ -505,6 +519,7 @@ public class FinanceEventHandler extends AbstractEventHandler
 		registerTableEvent(IEventTopics.PO_BEFORE_NEW, MDSIExportPaymentsLine.Table_Name);
 		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, MDSIExportPaymentsLine.Table_Name);
 		registerTableEvent(IEventTopics.PO_BEFORE_NEW, MDSIExportPayments.Table_Name);
+
 	}
 
 }

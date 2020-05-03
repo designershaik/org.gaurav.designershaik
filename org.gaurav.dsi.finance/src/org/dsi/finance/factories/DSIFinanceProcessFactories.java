@@ -9,6 +9,7 @@ import org.dsi.finance.processes.CreateFD;
 import org.dsi.finance.processes.DSAging;
 import org.dsi.finance.processes.DSCustomDunningRunCreate;
 import org.dsi.finance.processes.DSICustomDunningPrint;
+import org.dsi.finance.processes.GenerateFDBankBalances;
 import org.dsi.finance.processes.InventoryAging;
 import org.dsi.finance.processes.OpenPaymentWindow;
 import org.dsi.finance.processes.PaySelectionCreateCheck;
@@ -85,7 +86,8 @@ public class DSIFinanceProcessFactories implements IProcessFactory{
 		if(className.equals(TaxFiling.class.getName()))
 			return new TaxFiling();
 		
-		
+		if(className.equals(GenerateFDBankBalances.class.getName()))
+			return new GenerateFDBankBalances();		
 		
 		return null;
 	}

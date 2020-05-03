@@ -81,8 +81,10 @@ public class ProductRecall extends SvrProcess {
 		for(int pp_order_id : orderIds)
 		{
 			MPPOrder order = new MPPOrder(getCtx(), pp_order_id, get_TrxName());
+			System.out.println("Product Name: "+order.getM_Product().getValue());
 			updateSerialNumber(pp_order_id, order.getM_Product_ID());
 			loopOnTheASI(order.getM_AttributeSetInstance_ID(), order.getM_Product_ID());
+			
 		}
 	}
 	

@@ -17,9 +17,11 @@ import org.gaurav.dsi.model.MDSAttachmentTags;
 import org.gaurav.dsi.model.MDSAvailEmployee;
 import org.gaurav.dsi.model.MDSB2BConfiguration;
 import org.gaurav.dsi.model.MDSB2BEmailConf;
+import org.gaurav.dsi.model.MDSBankBalancesFD;
 import org.gaurav.dsi.model.MDSContactMaster;
 import org.gaurav.dsi.model.MDSContactMasterLocation;
 import org.gaurav.dsi.model.MDSContactRelation;
+import org.gaurav.dsi.model.MDSCouponSchedule;
 import org.gaurav.dsi.model.MDSDays;
 import org.gaurav.dsi.model.MDSDeliveryRouteDetails;
 import org.gaurav.dsi.model.MDSDeliveryTrips;
@@ -299,6 +301,12 @@ public class DSIModelFactories implements IModelFactory{
 		
 		if(tableName.equals(MDSITRecallProducts.Table_Name))
 			return MDSITRecallProducts.class;
+		
+		if(tableName.equals(MDSBankBalancesFD.Table_Name))
+			return MDSBankBalancesFD.class;
+		
+		if(tableName.equals(MDSCouponSchedule.Table_Name))
+			return MDSCouponSchedule.class;
 			
 		return null;
 	}
@@ -519,6 +527,12 @@ public class DSIModelFactories implements IModelFactory{
 		if(tableName.equals(MDSITRecallProducts.Table_Name))
 			return new MDSITRecallProducts(Env.getCtx(), Record_ID, trxName);
 		
+		if(tableName.equals(MDSBankBalancesFD.Table_Name))
+			return new MDSBankBalancesFD(Env.getCtx(), Record_ID, trxName);
+		
+		if(tableName.equals(MDSCouponSchedule.Table_Name))
+			return new MDSCouponSchedule(Env.getCtx(), Record_ID, trxName);
+		
 		return null;
 	}
 
@@ -737,6 +751,12 @@ public class DSIModelFactories implements IModelFactory{
 		
 		if(tableName.equals(MDSITRecallProducts.Table_Name))
 			return new MDSITRecallProducts(Env.getCtx(), rs, trxName);
+		
+		if(tableName.equals(MDSBankBalancesFD.Table_Name))
+			return new MDSBankBalancesFD(Env.getCtx(), rs, trxName);
+		
+		if(tableName.equals(MDSCouponSchedule.Table_Name))
+			return new MDSCouponSchedule(Env.getCtx(), rs, trxName);
 		
 		return null;
 	}

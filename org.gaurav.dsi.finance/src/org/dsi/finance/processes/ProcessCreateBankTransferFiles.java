@@ -5,14 +5,16 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MClient;
@@ -48,9 +50,9 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 	String p_SalaryMonth;
 	String orgName;
 	int p_Year;
-	String S1;
-	String S2;
-	String S3;
+	String S1 = "";
+	String S2 = "";
+	String S3 = "";
 	String line;
 	File TextFile;
 	String FileName;
@@ -91,6 +93,7 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 			p_SalaryMonth=export.getDSI_Month();
 			p_Year=export.getCalendarYear();
 			orgName=export.getOrgName();
+			FileName=createSalaryTransfer();
 		}
 		export.setProcessed(true);
 		export.save();
@@ -99,12 +102,197 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 		return FileName;
 	}
 
+	private String createSalaryTransfer() throws IOException, SQLException 
+	{
+		createFiles(true);
+		prepareSalaryDetails();
+		return postProcessFiles(true);
+	}
+
+	private void prepareSalaryDetails() throws SQLException 
+	{
+		String port = MSysConfig.getValue("DS_Vienna_Oracle_Port", 1521);
+		String hostName = MSysConfig.getValue("DS_Vienna_Oracle_Host","192.168.10.19");
+		String dbUsername = MSysConfig.getValue("DS_Vienna_Oracle_DBUsername","dsierp");
+		String dbPassword = MSysConfig.getValue("DS_Vienna_Oracle_DBPassword","dsierp");
+		String dbName = MSysConfig.getValue("DS_Vienna_Oracle_DBName","orcl");
+		ResultSet ors = null ;
+		PreparedStatement ostmt = null;
+		Connection oracleConnection = null ; 
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try 
+		{
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			oracleConnection =DriverManager.getConnection("jdbc:oracle:thin:@"+hostName+":"+port+":"+dbName,dbUsername,dbPassword);
+		} 
+		catch (ClassNotFoundException e1) 
+		{
+			log.severe("Problem getting the connection"+e1.getMessage());
+		} catch (SQLException e) 
+		{
+			log.severe("Problem getting the connection"+e.getMessage());
+		}  
+		String sql = "select distinct 'S1,',Substr(info.DUNS,1,7)||',',bank.ACCOUNTNO||',','MXD'||',','1,',',',TO_CHAR(now(),'DD-MM-YY')||',' ,TO_CHAR(now(), 'DDMMYYYYHH24MISS') "
+				+ "from AD_ORG org,AD_OrgInfo info,C_BankAccount bank "
+				+ "where bank.AD_ORG_ID=org.AD_ORG_ID and org.AD_ORG_ID=info.AD_ORG_ID and bank.c_bankaccount_id="
+				+ C_bankAccount_ID;
+		pstmt = DB.prepareStatement(sql,get_TrxName());
+		try {
+			rs = pstmt.executeQuery();
+			while (rs.next()) 
+			{
+				S1 = rs.getString(1); // Section Index
+				S1 = S1.concat(rs.getString(2)); // Company CR
+				S1 = S1.concat(rs.getString(3)); // Debit Account Number 
+				S1 = S1.concat(rs.getString(4)); // Transfer Method
+				S1 = S1.concat(rs.getString(5)); // Debit Mode
+				S1 = S1.concat(rs.getString(6)); // Debit Narrative (reference)
+				S1 = S1.concat(rs.getString(7)); // Request Date
+				S1 = S1.concat(rs.getString(8)); // Company's Batch Reference
+				pw.write(S1);
+				pw.println();
+			}
+		} catch (Exception e) {
+			log.log(Level.SEVERE, sql, e);
+			closeOracleConnection(oracleConnection,ors,ostmt,e.getMessage());
+		} finally {
+			ors = null;
+			ostmt = null;
+		}
+		sql = "select distinct 'S2,',case when bank.name like '%Ahli%' then 'TRF' else 'LCL' end ||',' as TransferMethod," +
+				"empmnth.NET_AMOUNT,',BHD,' as Currency ,',' as ExchangeRate,"
+				+ "',' as DealRefNo,',' as PrefDate,',' as DebitAccount,"
+				+ "bpacc.AccountNo||',' as EmpAccountNo,mnth.documentno||empmnth.VSS_EMPMONTHLYSALARY_ID||',' as UniqueTransRef," +
+						"trim(nvl(SUBSTR(mnth.Description,1,35),''))||',' DBNar1, ',' DBNar2,"
+				+ "trim(nvl(SUBSTR(mnth.Description,1,35),''))||',' CRNar,trim(nvl(SUBSTR(mnth.Description,1,35),''))||',' as PaymentDetail1,','PaymentDetail12,','PaymentDetail3,','PaymentDetail4,"
+				+ "SUBSTR(bp.name,1,35)||',' as BusinessPartner,nvl(SUBSTR(bpacc.A_Street,1,35),'')||',' as Adress1,"
+				+ "trim(nvl(SUBSTR(bpacc.A_City,1,35),''))||',' as Adress2,bank.name||',' as BankName,nvl(loc.ADDRESS1,'')||',',"
+				+ "nvl(loc.ADDRESS2,'')||',',nvl(loc.ADDRESS3,'')||',',bank.SwiftCode ||',' as SwiftCode ,',' IntermediateAccount,"
+				+ "',' IntermediatSwift,','IntermediateName,',' IntermediateAd1,',' IntermediateAd2,',' IntermediateAd3,'A,' ChargeType,',' SortCode,"
+				+ "',' BIC "
+				+ "from dsierp.VSS_MONTHLYSALARY mnth left outer join dsierp.vss_months mt on mnth.vss_months_id=mt.vss_months_id " 
+				+ "left outer join dsierp.VSS_EMPMONTHLYSALARY empmnth on mnth.VSS_MONTHLYSALARY_ID=empmnth.VSS_MONTHLYSALARY_ID and empmnth.IsActive='Y' "
+				+ "left outer join dsierp.VSS_EMPMONTHSALDETAILS empdet on empmnth.VSS_EMPMONTHLYSALARY_ID=empdet.VSS_EMPMONTHLYSALARY_ID "
+				+ "left outer join dsierp.C_BPartner bp on bp.c_Bpartner_id = empmnth.c_Bpartner_id "
+				+ "left outer join dsierp.C_BP_BankAccount bpacc on  bp.c_bpartner_id=bpacc.c_bpartner_id "
+				+ "left outer join dsierp.c_bank bank on bpacc.c_bank_id=bank.c_bank_id "
+				+ "left outer join dsierp.c_location loc on bank.c_location_id=loc.c_location_id "
+				+ "where mt.name like '"+p_SalaryMonth+"' "
+				+ "and mnth.attend_year="+p_Year+" " 
+				+ "and bpacc.C_Bank_ID is not null "
+				+ "and bank.swiftcode is not null AND BP.DS_ORGNAME='"+orgName+"' " +
+						" order by BankName,BusinessPartner";
+		ostmt = oracleConnection.prepareStatement(sql);
+		try {
+			ors = ostmt.executeQuery();
+			while (ors.next()) {
+				S2 = ors.getString(1); // Section Index
+				S2 = S2.concat(ors.getString(2)); // Transfer Method
+				DecimalFormat df = new DecimalFormat("#.000");
+				Double Amount=ors.getDouble(3);
+				String roundedAmt=df.format(Amount);
+//				System.out.println(roundedAmt);
+				S2 = S2.concat(roundedAmt); // Credit Amount
+				S2 = S2.concat(ors.getString(4)); // Credit Currency
+				S2 = S2.concat(ors.getString(5)); // Exchange Rate
+				S2 = S2.concat(ors.getString(6)); // Deal Ref No
+				S2 = S2.concat(ors.getString(7)); // Preferred Value Date
+				S2 = S2.concat(ors.getString(8)); // Debit Account Number
+				S2 = S2.concat(ors.getString(9)); // Beneficiary Account Number
+				S2 = S2.concat(ors.getString(10)); // Unique Transaction Ref No
+				S2 = S2.concat(ors.getString(11)); // Debit Narrative 1
+				S2 = S2.concat(ors.getString(12)); // Debit Narrative 2
+				S2 = S2.concat(ors.getString(13)); // Credit Narrative
+				S2 = S2.concat(ors.getString(14)); // Payment Details Line 1
+				S2 = S2.concat(ors.getString(15)); // Payment Details Line 2
+				S2 = S2.concat(ors.getString(16)); // Payment Details Line 3
+				S2 = S2.concat(ors.getString(17)); // Payment Details Line 4
+				S2 = S2.concat(ors.getString(18)); // Beneficiary Name
+				S2 = S2.concat(ors.getString(19)); // Beneficiary Address Line 1
+				S2 = S2.concat(ors.getString(20)); // Beneficiary Address Line 2
+				S2 = S2.concat(ors.getString(21)); // Beneficiary Bank Name
+				S2 = S2.concat(ors.getString(22)); // Beneficiary Bank Address 1
+				S2 = S2.concat(ors.getString(23)); // Beneficiary Bank Address 2
+				S2 = S2.concat(ors.getString(24)); // Beneficiary Bank Address 3
+				S2 = S2.concat(ors.getString(25)); // SWIFT Code
+				S2 = S2.concat(ors.getString(26)); // Intermediary Account
+				S2 = S2.concat(ors.getString(27)); // Intermediary Swift Code
+				S2 = S2.concat(ors.getString(28)); // Intermediary Name
+				S2 = S2.concat(ors.getString(29)); // Intermediary Address 1
+				S2 = S2.concat(ors.getString(30)); // Intermediary Address 2
+				S2 = S2.concat(ors.getString(31)); // Intermediary Address 3
+				S2 = S2.concat(ors.getString(32)); // Charges Type
+				S2 = S2.concat(ors.getString(33)); // Sort Code
+				S2 = S2.concat(ors.getString(34)); // BIC
+//				S2 = S2.concat(ors.getString(35)); // ABA Routing Number
+				pw.write(S2);
+				pw.println();
+			}
+		} catch (Exception e) {
+			log.log(Level.SEVERE, sql, e);
+			closeOracleConnection(oracleConnection,ors,ostmt,e.getMessage());
+		} finally {
+			ors = null;
+			ostmt = null;
+		}
+		sql = " with t1 as (select distinct 'S2,',empmnth.NET_AMOUNT as Net_Amount,',','BHD,' as Currency ,',' as ExchangeRate,"
+				+ "',' as DealRefNo,',' as PrefDate,',' as DebitAccount,"
+				+ "bpacc.AccountNo||',' as EmpAccountNo,mnth.documentno||empmnth.VSS_EMPMONTHLYSALARY_ID||',' as UniqueTransRef,',' DBNar1,',' DBNar2,',' CRNar,"
+				+ "nvl(mnth.Description,' ')||',' as PaymentDetail1,','PaymentDetail12,','PaymentDetail3,' 'PaymentDetail4,SUBSTR(bp.name,1,35)||',' as BusinessPartner,"
+				+ "nvl(SUBSTR(bpacc.A_Street,1,35),' ')||',' as Adress1,nvl(SUBSTR(bpacc.A_City,1,35),' ')||',' as Adress2,bank.name||',' as BankName,nvl(loc.ADDRESS1,'')||',',"
+				+ "nvl(loc.ADDRESS2,' ')||',',nvl(loc.ADDRESS3,' ')||',',bank.swiftcode || ',' as SwiftCode,',' IntermediateAccount,','Intermediatebank,',' IntermediatSwift,','IntermediateName,"
+				+ "',' IntermediateAd1,',' IntermediateAd2,',' IntermediateAd3,'A,' ChargeType,',' SortCode,',' BIC,',' ABA " +
+						"from dsierp.VSS_MONTHLYSALARY mnth " +
+						"left outer join dsierp.vss_months mt on mnth.vss_months_id=mt.vss_months_id "
+				+ "left outer join dsierp.VSS_EMPMONTHLYSALARY empmnth on mnth.VSS_MONTHLYSALARY_ID=empmnth.VSS_MONTHLYSALARY_ID and empmnth.IsActive='Y' "
+				+ "left outer join dsierp.VSS_EMPMONTHSALDETAILS empdet on empmnth.VSS_EMPMONTHLYSALARY_ID=empdet.VSS_EMPMONTHLYSALARY_ID "
+				+ "left outer join dsierp.C_BPartner bp on bp.c_Bpartner_id = empmnth.c_Bpartner_id "
+				+ "left outer join dsierp.C_BP_BankAccount bpacc on  bp.c_bpartner_id=bpacc.c_bpartner_id "
+				+ "left outer join dsierp.c_bank bank on bpacc.c_bank_id=bank.c_bank_id "
+				+ "left outer join dsierp.c_location loc on bank.c_location_id=loc.c_location_id " +
+						"where mt.name like '"+p_SalaryMonth+"' and mnth.attend_year="+p_Year+" " +
+						"and  bpacc.C_Bank_ID is not null AND BP.DS_ORGNAME='"+orgName+"' " +
+						"and bank.swiftcode is not null ) "
+				+ "select 'S3,',count(*)||',',sum(net_amount)  from t1 ";
+		ostmt = oracleConnection.prepareStatement(sql);
+		try {
+			ors = ostmt.executeQuery();
+			while (ors.next()) {
+				S3 = ors.getString(1); // Section Index
+				S3 = S3.concat(ors.getString(2)); // Number of Records
+				DecimalFormat df = new DecimalFormat("#.000");
+				Double Amount=ors.getDouble(3);
+				String roundedAmt=df.format(Amount);
+				S3=S3.concat(roundedAmt);
+				S3 = S3.concat("");// Hash Total
+				pw.write(S3);
+				pw.println();
+			}
+		} catch (Exception e) {
+			log.log(Level.SEVERE, sql, e);
+			closeOracleConnection(oracleConnection,ors,ostmt,e.getMessage());
+		} finally {
+			closeOracleConnection(oracleConnection,ors,ostmt,"");
+		}
+		pw.close();
+	}
+
+	private void closeOracleConnection(Connection oracleConnection, ResultSet ors, PreparedStatement ostmt, String exception) throws SQLException 
+	{
+		ors = null;
+		ostmt = null;
+		oracleConnection.close();
+		if(!exception.isEmpty())
+			throw new AdempiereException(exception);
+	}
+
 	private String createVendorBatchPayment() throws IOException 
 	{		
-		if(export.getDescription()==null || export.getDescription().isBlank())
+		if(export.getDescription()==null || export.getDescription().isEmpty())
 			throw new AdempiereException("Description can not be empty.");
 		
-		createFiles();
+		createFiles(false);
 		addTopSection();
 		String sql = "select SECTIONHEADER,TRANSFERMETHOD,sum(CREDITAMOUNT) as CreditAmount,CURRENCY,EXCHANGERATE,DEALREFNO," +
 				"PREFEREDVALUEDATE,DEBITACCOUNTNO, BENBANKACCOUNTNUMBER,max(UNIQTRANSREF) as UniqueReference," +
@@ -126,12 +314,12 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 		
 		addTotalSection(sql);
 		updatePayments();
-		return postProcessFiles();
+		return postProcessFiles(false);
 	}
 	
 	private String createVendorIndividualPayments() throws IOException 
 	{
-		createFiles();
+		createFiles(false);
 		addTopSection();
 
 		String sql = "select SECTIONHEADER,TRANSFERMETHOD,CREDITAMOUNT,CURRENCY,EXCHANGERATE,"
@@ -152,13 +340,17 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 				+ exportBatch_ID;
 		
 		addTotalSection(sql);
-		return postProcessFiles();
+		return postProcessFiles(false);
 	}
 	
-	private void createFiles() throws IOException 
+	private void createFiles(boolean isSalary) throws IOException 
 	{
-		directory = new File("C:" + File.separator + "VendorPayemts");
-		String FilePath=directory+File.separator+"DS_PAY";
+		String FilePath="C:" + File.separator+"VendorPayemts";
+		directory = new File(FilePath);
+		if(isSalary)
+			FilePath = FilePath+"hello" + File.separator + orgName+"_SAL";
+		else
+			FilePath = FilePath + File.separator +"DS_PAY";
 		String eAdvicePath=directory+File.separator+"DS_EADVICE";
 		directory.mkdirs();
 		MDSIExportPayments export= new MDSIExportPayments(getCtx(), exportBatch_ID, get_TrxName());
@@ -179,14 +371,17 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 				
 				// (works for both Windows and Linux)
 				TextFile.createNewFile();
-				finalFileName="DS_PAY_"+rs.getString(1)+".txt";
-				/*
-				 *  EAdvice part added later 02-11-2014 
-				 *  
-				 */
-				eAdviceFile=new File(eAdvicePath+"_"+rs.getString(1)+".txt");
-				eAdvicefileName=eAdvicePath+"_"+rs.getString(1)+".txt";
-				eAdviceFile.createNewFile();
+				if(!isSalary)
+				{
+					finalFileName="DS_PAY_"+rs.getString(1)+".txt";
+					/*
+					 *  EAdvice part added later 02-11-2014 
+					 *  
+					 */
+					eAdviceFile=new File(eAdvicePath+"_"+rs.getString(1)+".txt");
+					eAdvicefileName=eAdvicePath+"_"+rs.getString(1)+".txt";
+					eAdviceFile.createNewFile();
+				}
 			}
 		}
 		catch (Exception e) 
@@ -200,7 +395,8 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 			pstmt = null;
 		}
 		pw = new PrintWriter(new FileWriter(TextFile));
-		eadviceWriter=new PrintWriter(new FileWriter(eAdviceFile));
+		if(!isSalary)
+			eadviceWriter=new PrintWriter(new FileWriter(eAdviceFile));
 	}
 
 	private void addTopSection() throws IOException 
@@ -230,7 +426,7 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 				pw.write(S1);
 				pw.append(LINE_Seperator);
 				
-//				EAdvice part added later 02-11-2014   
+			//	EAdvice part added later 02-11-2014   
 				eAdviceH1 = "H,";
 				eAdviceH1 = eAdviceH1.concat(finalFileName.concat(","));
 				eAdviceH1 = eAdviceH1.concat(rs.getString(8));
@@ -340,22 +536,25 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 		}
 	}
 
-	private String postProcessFiles() throws IOException 
+	private String postProcessFiles(boolean isSalary) throws IOException 
 	{
-		if (!(DocumentNote != null)) {
+		MAttachment maa = new MAttachment(getCtx(), getTable_ID(),
+				exportBatch_ID, get_TrxName());
+		if (maa.get_ID()<=0) {
 			MAttachment ma = new MAttachment(getCtx(), 0, get_TrxName());
 			ma.setRecord_ID(exportBatch_ID);
 			ma.addEntry(TextFile);
-			ma.addEntry(eAdviceFile);
+			if(!isSalary)
+				ma.addEntry(eAdviceFile);
 			ma.set_TrxName(get_TrxName());
 			ma.setAD_Table_ID(getTable_ID());
 			ma.addTextMsg("Added new Text File" + FileName);
 			ma.saveEx();
 		} else {
-			MAttachment maa = new MAttachment(getCtx(), getTable_ID(),
-					exportBatch_ID, get_TrxName());
+			
 			maa.addEntry(TextFile);
-			maa.addEntry(eAdviceFile);
+			if(!isSalary)
+				maa.addEntry(eAdviceFile);
 			maa.set_TrxName(get_TrxName());
 			maa.addTextMsg("Added new Text File" + FileName);
 			maa.saveEx();
@@ -469,18 +668,18 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 		MDSB2BEmailConf Emailconf = new MDSB2BEmailConf(getCtx(), B2BEmailConfID, get_TrxName());
 		String toEmailIDs = MSysConfig.getValue("B2B_Default_EmailToID","gaurav@shaik.net");
 		EMail email = client.createEMail(toEmailIDs, null, null);
-		List<MDSB2BEmailConf> contacts= new Query(getCtx(), I_DS_B2B_EmailConf.Table_Name," AD_Org_ID = ? ", get_TrxName())
-												.setParameters(Env.getAD_Org_ID(getCtx()))
-												.setOnlyActiveRecords(true)
-												.list();
-		for(MDSB2BEmailConf contact : contacts)
-		{
-			MUser user = new MUser(getCtx(), contact.getAD_User_ID(), get_TrxName());
-			email.addTo(user.getEMail());
-			mText.setPO(Emailconf);
-			mText.setUser(user);
-			mText.saveEx();
-		}
+		List<MDSB2BEmailConf> contacts=new Query(getCtx(), I_DS_B2B_EmailConf.Table_Name, 
+					" AD_Org_ID = ? ", get_TrxName()).
+					setParameters(Env.getAD_Org_ID(getCtx())).
+					setOnlyActiveRecords(true).list();
+			for(MDSB2BEmailConf contact : contacts)
+			{
+				MUser user = new MUser(getCtx(), contact.getAD_User_ID(), get_TrxName());
+				email.addTo(user.getEMail());
+				mText.setPO(Emailconf);
+				mText.setUser(user);
+				mText.saveEx();
+			}
 		if (!email.isValid())
 		{
 			StringBuilder msglog = new StringBuilder("@RequestActionEMailError@ Invalid EMail: ").append(toEmailIDs);
@@ -489,7 +688,8 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 		PrintFormatID = MSysConfig.getIntValue("B2B_Default_PrintFormat", 1000129);
 		PrintFormatID = conf.getAD_PrintFormat_ID();
 		MQuery query = new MQuery("DSI_ExportPayments");
-		query.addRestriction("DSI_ExportPayments_ID", MQuery.EQUAL, export.getDSI_ExportPayments_ID());
+		query.addRestriction("DSI_ExportPayments_ID", MQuery.EQUAL, 
+			new Integer(export.getDSI_ExportPayments_ID()));
 		
 		MPrintFormat format = MPrintFormat.get (getCtx(),PrintFormatID , false);
 		PrintInfo info = new PrintInfo("B2B file Transfer",MDSIExportPayments.Table_ID,export.getDSI_ExportPayments_ID(),0);

@@ -20,6 +20,7 @@ import org.dsi.finance.callouts.CallOutCalculateBaseAmt;
 import org.dsi.finance.callouts.CallOutCalculateInterestAmtForFD;
 import org.dsi.finance.callouts.CallOutCashJounrGetBPartnerOfInvoice;
 import org.dsi.finance.callouts.CallOutCheckForProfitCenterAndCostCenter;
+import org.dsi.finance.callouts.CallOutCorrectLineTotalAmt;
 import org.dsi.finance.callouts.CallOutIfTheChargeAllowedToSplit;
 import org.dsi.finance.callouts.CallOutPaymentAmt;
 import org.dsi.finance.callouts.CallOutPaymentCurrency;
@@ -74,6 +75,14 @@ public class DSIFinanceCallOutFactories implements IColumnCalloutFactory{
 		if(tableName.equalsIgnoreCase(MInvoiceLine.Table_Name)
 				&& columnName.equalsIgnoreCase(I_C_InvoiceLine.COLUMNNAME_C_Charge_ID))
 			list.add(new CallOutCheckForProfitCenterAndCostCenter());
+		
+		if(tableName.equalsIgnoreCase(MInvoiceLine.Table_Name)
+				&& columnName.equalsIgnoreCase(I_C_InvoiceLine.COLUMNNAME_LineNetAmt))
+			list.add(new CallOutCorrectLineTotalAmt());
+		
+		if(tableName.equalsIgnoreCase(MInvoiceLine.Table_Name)
+				&& columnName.equalsIgnoreCase(I_C_InvoiceLine.COLUMNNAME_TaxAmt))
+			list.add(new CallOutCorrectLineTotalAmt());
 		
 		if(tableName.equalsIgnoreCase(MOrderLine.Table_Name)
 				&& columnName.equalsIgnoreCase(I_C_OrderLine.COLUMNNAME_C_Charge_ID))
