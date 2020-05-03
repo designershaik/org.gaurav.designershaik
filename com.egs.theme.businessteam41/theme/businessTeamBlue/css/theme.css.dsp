@@ -107,7 +107,7 @@ table.z-vbox > tbody > tr > td > table {
     border-radius: 4px;
     margin: auto 1px;
     background: #fefefe;
-    background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zd…IgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCN6a2llOSkiIC8+PC9zdmc+);
+    background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdï¿½IgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCN6a2llOSkiIC8+PC9zdmc+);
     background: -moz-linear-gradient(top,#fefefe 0,#eee 100%);
     background: -webkit-gradient(linear,left top,left bottom,color-stop(0%,#fefefe),color-stop(100%,#eee));
     background: -webkit-linear-gradient(top,#fefefe 0,#eee 100%);
@@ -208,7 +208,7 @@ table.z-vbox > tbody > tr > td > table {
     background: #606C7D;
 }
 
-.z-popup-content { /* border padding a la seccion menú*/
+.z-popup-content { /* border padding a la seccion menï¿½*/
     background: #606C7D;
 }
 
@@ -275,7 +275,7 @@ table.z-vbox > tbody > tr > td > table {
     background-color: #EEF1F6;
 }
 
-/*Sección de búsqueda Menu*/
+/*Secciï¿½n de bï¿½squeda Menu*/
 
 .global-search-tabpanel .z-listbox-body {    /* Existe en ThemeCSS */
     background-color: #606C7D;
@@ -316,7 +316,7 @@ table.z-vbox > tbody > tr > td > table {
 }
 
 .global-search-tabpanel .z-listcell > div.z-listcell-content {
-    color: #fff !important;
+    color: #FF4500 !important;
 }
 
 .info-panel .z-listbox-body .z-listitem.z-listitem > .z-listcell > .z-listcell-content {
