@@ -251,7 +251,7 @@
       </process>
    </extension>
       <extension
-         id="org.libero.form.VOrderReceiptIssue"
+         id="org.libero.form.WOrderReceiptIssue"
          name="WOrderReceiptIssue"
          point="org.adempiere.webui.Form">
       <form

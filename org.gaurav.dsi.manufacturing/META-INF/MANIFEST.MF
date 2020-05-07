@@ -14,6 +14,6 @@ Require-Bundle: org.adempiere.base;bundle-version="5.1.0",
  zul;bundle-version="8.0.2",
  zcommon;bundle-version="8.0.2",
  org.gaurav.designershaik;bundle-version="1.0.0",
- org.gaurav.manufacturing;bundle-version="3.1.0"
+ com.gaurav.dsi.liberomnfg7.1;bundle-version="1.0.0"
 Service-Component: OSGI-INF/dsimanufacturingformfactory.xml,OSGI-INF/dsimanufacturingprocessfactory.xml,OSGI-INF/dsimanufacturingcreatefromfactory.xml,OSGI-INF/dsimanufacturingeventhandler.xml,
  OSGI-INF/dsimanufacturingmodelfactory.xml

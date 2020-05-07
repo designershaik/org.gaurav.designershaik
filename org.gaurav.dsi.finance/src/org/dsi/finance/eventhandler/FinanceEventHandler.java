@@ -14,7 +14,6 @@ import org.compiere.model.I_C_Cash;
 import org.compiere.model.I_C_CashLine;
 import org.compiere.model.I_C_Invoice;
 import org.compiere.model.I_C_InvoiceLine;
-import org.compiere.model.I_C_Order;
 import org.compiere.model.I_C_Payment;
 import org.compiere.model.I_GL_JournalLine;
 import org.compiere.model.I_M_InOut;
@@ -41,7 +40,9 @@ import org.compiere.model.MJournalLine;
 import org.compiere.model.MMovement;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
+import org.compiere.model.MOrderPaySchedule;
 import org.compiere.model.MPayment;
+import org.compiere.model.MPaymentTerm;
 import org.compiere.model.MPeriod;
 import org.compiere.model.MPrivateAccess;
 import org.compiere.model.MProduct;
@@ -181,7 +182,6 @@ public class FinanceEventHandler extends AbstractEventHandler
 				if (ci.isSendEMail()) 
 					SendEmails.sendEmail(ci,billpartnerID,billPartnerLocationID,ci.get_TrxName());
 				
-				updateImportInvoices(ci);
 			}
 			if(event.getTopic().equalsIgnoreCase(IEventTopics.PO_BEFORE_NEW))
 			{
@@ -212,12 +212,12 @@ public class FinanceEventHandler extends AbstractEventHandler
 					BigDecimal payAmt = (BigDecimal)payment.get_Value("DS_TotalCashBillAmt");
 					List<MDSDenomiationDetTrans> transactions = new Query(ctx, MDSDenomiationDetTrans.Table_Name, " C_Payment_ID = ? ", trxName).setParameters(payment.getC_Payment_ID()).list();
 					for(MDSDenomiationDetTrans trans : transactions)
-					{
 						trans.delete(true);
-					}
+					
 					BigDecimal remainingAmt = payAmt.compareTo(Env.ZERO)<0 ? payAmt.negate():payAmt;
 					boolean isNegative = payAmt.compareTo(Env.ZERO)<0 ? true : false;
-					List<MDSDenomiationDetCashBook> cashDenominations = new Query(ctx, MDSDenomiationDetCashBook.Table_Name, " C_BankAccount_ID = ? AND Qty<>0 AND DS_DenominationType::numeric<=? ", trxName).
+					List<MDSDenomiationDetCashBook> cashDenominations = new Query(ctx, MDSDenomiationDetCashBook.Table_Name, 
+							" C_BankAccount_ID = ? AND Qty<>0 AND DS_DenominationType::numeric<=? ", trxName).
 							setParameters(payment.getC_BankAccount_ID(),remainingAmt).
 							setOrderBy("DS_DenominationType::numeric desc").
 							list();
@@ -407,13 +407,33 @@ public class FinanceEventHandler extends AbstractEventHandler
 			MDSIExportPayments header = (MDSIExportPayments)po;
 			header.setTransfertTime(time);
 		}
+		
+		if(po instanceof MOrder)
+		{
+			if(event.getTopic().equalsIgnoreCase(IEventTopics.DOC_AFTER_PREPARE))
+			{
+				MOrder order = (MOrder)po;
+				if (order.getGrandTotal().signum() != 0
+						&& (MOrder.PAYMENTRULE_OnCredit.equals(order.getPaymentRule()) || MOrder.PAYMENTRULE_DirectDebit.equals(order.getPaymentRule())))
+				{
+					int C_PaymentTerm_ID = order.getC_PaymentTerm_ID();
+					MPaymentTerm term = new MPaymentTerm(ctx, C_PaymentTerm_ID, trxName);
+					if(term.isAfterDelivery())
+					{
+						int C_OrderPaySchedule_ID = DB.getSQLValue(trxName, "Select C_OrderPaySchedule_ID From C_OrderPaySchedule "
+								+ "Where C_Order_ID = ? and DueDate < ? Order by dueDate desc",order.getC_Order_ID(),order.getDatePromised());
+						if(C_OrderPaySchedule_ID>0)
+						{
+							MOrderPaySchedule schedule = new MOrderPaySchedule(ctx,C_OrderPaySchedule_ID,trxName);
+							schedule.setDueDate(order.getDatePromised());
+							schedule.saveEx();
+						}
+					}
+				}
+			}
+		}
 	}
 	
-	private void updateImportInvoices(MInvoice ci) 
-	{
-		
-	}
-
 	private void lockParentRecord(int AD_User_ID, int AD_Table_ID, int ID) 
 	{
 		MPrivateAccess access = MPrivateAccess.get (ctx, AD_User_ID,AD_Table_ID, ID);
@@ -466,8 +486,10 @@ public class FinanceEventHandler extends AbstractEventHandler
 		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, I_C_Invoice.Table_Name);
 		
 		
-		registerTableEvent(IEventTopics.PO_BEFORE_NEW, I_C_Order.Table_Name);
-		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, I_C_Order.Table_Name);
+		registerTableEvent(IEventTopics.PO_BEFORE_NEW, MOrder.Table_Name);
+		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, MOrder.Table_Name);
+		
+		registerTableEvent(IEventTopics.DOC_AFTER_PREPARE, MOrder.Table_Name);
 		
 		registerTableEvent(IEventTopics.PO_BEFORE_NEW, I_C_Cash.Table_Name);
 		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, I_C_Cash.Table_Name);

@@ -138,7 +138,7 @@ public class WCreateLoanGLEntries extends CreateFrom{
 					+ ", Employee=" + employee.getC_BPartner_ID() + ", GS_HR_Installments_ID =" + GS_HR_Installments_ID + ", Amt=" + installmentAMt);
 				//	
 				MJournalLine crLine = new MJournalLine (journal);
-				crLine.setDateAcct(trxDate);
+				crLine.setDateAcct(journal.getDateAcct());
 				crLine.setC_BPartner_ID(employee.getC_BPartner_ID());
 				crLine.setAmtSourceCr(loanRepaymentAmt);
 				crLine.setAccount_ID(account.getAccount_ID());
@@ -155,7 +155,7 @@ public class WCreateLoanGLEntries extends CreateFrom{
 				lineNo = getLineNumber(journal);
 				
 				MJournalLine drLine = new MJournalLine (journal);
-				drLine.setDateAcct(trxDate);
+				drLine.setDateAcct(journal.getDateAcct());
 				drLine.setC_BPartner_ID(employee.getC_BPartner_ID());
 				drLine.setAmtSourceDr(loanRepaymentAmt);
 				drLine.setAccount_ID(account.getAccount_ID());

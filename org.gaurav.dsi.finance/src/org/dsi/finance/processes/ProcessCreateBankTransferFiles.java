@@ -133,7 +133,7 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 		{
 			log.severe("Problem getting the connection"+e.getMessage());
 		}  
-		String sql = "select distinct 'S1,',Substr(info.DUNS,1,7)||',',bank.ACCOUNTNO||',','MXD'||',','1,',',',TO_CHAR(now(),'DD-MM-YY')||',' ,TO_CHAR(now(), 'DDMMYYYYHH24MISS') "
+		String sql = "select distinct 'S1,',Substr(info.DUNS,1,7)||',',bank.ACCOUNTNO||',','MXD'||',','1,',',',TO_CHAR(now(),'DD-Mon-YY')||',' ,TO_CHAR(now(), 'DDMMYYYYHH24MISS') "
 				+ "from AD_ORG org,AD_OrgInfo info,C_BankAccount bank "
 				+ "where bank.AD_ORG_ID=org.AD_ORG_ID and org.AD_ORG_ID=info.AD_ORG_ID and bank.c_bankaccount_id="
 				+ C_bankAccount_ID;
@@ -348,7 +348,7 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 		String FilePath="C:" + File.separator+"VendorPayemts";
 		directory = new File(FilePath);
 		if(isSalary)
-			FilePath = FilePath+"hello" + File.separator + orgName+"_SAL";
+			FilePath = FilePath+File.separator+"hello" + File.separator + orgName+"_SAL";
 		else
 			FilePath = FilePath + File.separator +"DS_PAY";
 		String eAdvicePath=directory+File.separator+"DS_EADVICE";
@@ -559,7 +559,7 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 			maa.addTextMsg("Added new Text File" + FileName);
 			maa.saveEx();
 		}
-		boolean uploadedSuccessfully = UploadToSFTP(TextFile,eAdviceFile);
+		boolean uploadedSuccessfully = UploadToSFTP(TextFile,eAdviceFile,isSalary);
 		return "File Created : -" + FileName + " E Advice created : -"
 				+ eAdvicefileName +" File uploaded "+ uploadedSuccessfully;
 		
@@ -604,7 +604,7 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 		pw.close();
 	}
 
-	private boolean UploadToSFTP(File MainFile, File eAdviceFile) throws IOException 
+	private boolean UploadToSFTP(File MainFile, File eAdviceFile, boolean isSalary) throws IOException 
 	{
 		int B2BConfigurationID = DB.getSQLValue(get_TrxName(), "select DS_B2B_Configuration_ID from DS_B2B_Configuration Where ad_org_id = ? ", Env.getAD_Org_ID(getCtx()));
 		MDSB2BConfiguration conf = new MDSB2BConfiguration(getCtx(), B2BConfigurationID, get_TrxName());
@@ -653,7 +653,8 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 		        session.disconnect();
 		        log.info("Host Session disconnected.");
 		    }
-			sendUploadEmail(conf);
+			if(!isSalary)
+				sendUploadEmail(conf);
 		}
 		return true;
 		
@@ -688,38 +689,39 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 		PrintFormatID = MSysConfig.getIntValue("B2B_Default_PrintFormat", 1000129);
 		PrintFormatID = conf.getAD_PrintFormat_ID();
 		MQuery query = new MQuery("DSI_ExportPayments");
-		query.addRestriction("DSI_ExportPayments_ID", MQuery.EQUAL, 
-			new Integer(export.getDSI_ExportPayments_ID()));
-		
-		MPrintFormat format = MPrintFormat.get (getCtx(),PrintFormatID , false);
-		PrintInfo info = new PrintInfo("B2B file Transfer",MDSIExportPayments.Table_ID,export.getDSI_ExportPayments_ID(),0);
-		ReportEngine re = null;
-		if (format != null)
-			re = new ReportEngine(getCtx(), format, query, info);
-		
-		File attachment = re.getPDF(File.createTempFile("VendorPayments", ".pdf"));
-		StringBuilder msglog = new StringBuilder().append(toEmailIDs.toString()).append(" - ").append(attachment);
-		if (log.isLoggable(Level.FINE)) log.fine(msglog.toString());
-		email.addAttachment(attachment);
-		
-		
-		String message = mText.getMailText(true);
-		if (mText.isHtml())
-			email.setMessageHTML(mText.getMailHeader(), message);
-		else
+		query.addRestriction("DSI_ExportPayments_ID", MQuery.EQUAL, export.getDSI_ExportPayments_ID());
+		if(PrintFormatID>0)
 		{
-			email.setSubject (mText.getMailHeader());
-			email.setMessageText (message);
+			MPrintFormat format = MPrintFormat.get (getCtx(),PrintFormatID , false);
+			PrintInfo info = new PrintInfo("B2B file Transfer",MDSIExportPayments.Table_ID,export.getDSI_ExportPayments_ID(),0);
+			ReportEngine re = null;
+			if (format != null)
+				re = new ReportEngine(getCtx(), format, query, info);
+			
+			File attachment = re.getPDF(File.createTempFile("VendorPayments", ".pdf"));
+			StringBuilder msglog = new StringBuilder().append(toEmailIDs.toString()).append(" - ").append(attachment);
+			if (log.isLoggable(Level.FINE)) log.fine(msglog.toString());
+			email.addAttachment(attachment);
+			
+			
+			String message = mText.getMailText(true);
+			if (mText.isHtml())
+				email.setMessageHTML(mText.getMailHeader(), message);
+			else
+			{
+				email.setSubject (mText.getMailHeader());
+				email.setMessageText (message);
+			}
+			//
+			//
+			String msg = email.send();
+			for(MDSB2BEmailConf contact : contacts)
+			{
+				MUserMail um = new MUserMail(mText, contact.getAD_User_ID(), email);
+				um.saveEx();
+			}
+			log.info("Email sent with the subject "+msg);
 		}
-		//
-		//
-		String msg = email.send();
-		for(MDSB2BEmailConf contact : contacts)
-		{
-			MUserMail um = new MUserMail(mText, contact.getAD_User_ID(), email);
-			um.saveEx();
-		}
-		log.info("Email sent with the subject "+msg);
 	}
 
 	private void updatePayments() 

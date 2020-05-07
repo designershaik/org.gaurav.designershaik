@@ -10,7 +10,6 @@ import java.util.logging.Level;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.I_C_Payment;
-import org.compiere.model.I_GL_Journal;
 import org.compiere.model.I_GL_JournalLine;
 import org.compiere.model.MAccount;
 import org.compiere.model.MAcctSchema;
@@ -101,7 +100,7 @@ public class CreateFD extends SvrProcess
 		else if(actionWithFD.equalsIgnoreCase("RE"))
 		{
 //			renewalDate = deposit.getDS_MaturityDate();
-			if(FDTerm==deposit.getDS_FDTerm() && !IncludeInterestWhileRenewing)
+			if(!IncludeInterestWhileRenewing)
 				renewalPrincipalAmt = deposit.getDS_PrincipalAmount();
 			else
 				renewalPrincipalAmt = deposit.getDS_PrincipalAmount().add(deposit.getInterestAmt());
@@ -112,7 +111,6 @@ public class CreateFD extends SvrProcess
 			int InterestAmtChargeID = deposit.getDS_InterestAmtCharge_ID();
 			int principalValidCombinationID = DB.getSQLValue(get_TrxName(), "Select Ch_Expense_Acct From C_Charge_Acct Where C_Charge_ID = ? ", PrincipalAmtChargeID);
 			int interestValidCombinationID = DB.getSQLValue(get_TrxName(), "Select Ch_Expense_Acct From C_Charge_Acct Where C_Charge_ID = ? ", InterestAmtChargeID);
-			
 			Timestamp newFDMaturityDate = getMaturityDate();
 			BigDecimal renewalInterestAmt = getInterestAmt(renewalPrincipalAmt);
 			BigDecimal renewalInterestBaseAmt = MConversionRate.convertBase(getCtx(), renewalInterestAmt, deposit.getC_Currency_ID(), renewalDate, 114,getAD_Client_ID(), deposit.getAD_Org_ID());
@@ -162,16 +160,16 @@ public class CreateFD extends SvrProcess
 			journal.setGL_Category_ID(GL_Category_ID);
 			journal.setC_ConversionType_ID(114);
 			journal.save();
-			
 			MJournalLine totalDrEntry= createPrincipalJournalLine(C_Currency_ID,deposit.getC_BPartner_ID(),principalValidCombinationID,renewalPrincipalAmt,renewalPrincipalBaseAmt,journal.getGL_Journal_ID(),true,renewdDeposit.getDS_FixedDeposit_ID());
 			addLog(totalDrEntry.getGL_JournalLine_ID(),totalDrEntry.getDateAcct(),totalDrEntry.getAmtAcctDr(),"New FD : "+totalDrEntry.getDescription(),I_GL_JournalLine.Table_ID,totalDrEntry.getGL_JournalLine_ID());
+			
+			MJournalLine principalCrEntry = createPrincipalJournalLine(C_Currency_ID,deposit.getC_BPartner_ID(),principalValidCombinationID,deposit.getDS_PrincipalAmount(),deposit.getDS_BasePrincipalAmount(),journal.getGL_Journal_ID(),false,renewdDeposit.getDS_FixedDeposit_ID());
+			addLog(principalCrEntry.getGL_JournalLine_ID(),principalCrEntry.getDateAcct(),principalCrEntry.getAmtAcctCr(),"Old FD principal Amt Interest: "+principalCrEntry.getDescription(),I_GL_JournalLine.Table_ID,principalCrEntry.getGL_JournalLine_ID());
+
 			if(IncludeInterestWhileRenewing)
 			{
 				MJournalLine interestCrEntry = createPrincipalJournalLine(C_Currency_ID,deposit.getC_BPartner_ID(),interestValidCombinationID,deposit.getInterestAmt(),deposit.getDS_BaseInterestAmount(),journal.getGL_Journal_ID(),false,FixedDeposit_ID);
 				addLog(interestCrEntry.getGL_JournalLine_ID(),interestCrEntry.getDateAcct(),interestCrEntry.getAmtAcctCr(),"Old FD principal Amt : "+interestCrEntry.getDescription(),I_GL_JournalLine.Table_ID,interestCrEntry.getGL_JournalLine_ID());
-				
-				MJournalLine principalCrEntry = createPrincipalJournalLine(C_Currency_ID,deposit.getC_BPartner_ID(),principalValidCombinationID,deposit.getDS_PrincipalAmount(),deposit.getDS_BasePrincipalAmount(),journal.getGL_Journal_ID(),false,FixedDeposit_ID);
-				addLog(principalCrEntry.getGL_JournalLine_ID(),principalCrEntry.getDateAcct(),principalCrEntry.getAmtAcctCr(),"Old FD principal Amt Interest: "+principalCrEntry.getDescription(),I_GL_JournalLine.Table_ID,principalCrEntry.getGL_JournalLine_ID());
 			}
 			else
 			{
@@ -182,9 +180,6 @@ public class CreateFD extends SvrProcess
 				MPayment InterestReceived = CreatePayment(deposit.getDS_InterestAmtCharge_ID(),deposit.getInterestAmt(),deposit.getC_Currency_ID(),true,C_DocTypePayment_ID);
 				addLog(InterestReceived.getC_Payment_ID(),InterestReceived.getDateAcct(),InterestReceived.getPayAmt(),InterestReceived.getDocumentNo(),I_C_Payment.Table_ID,InterestReceived.getC_Payment_ID());
 			}
-			
-				
-			
 		}
 		else if(actionWithFD.equalsIgnoreCase("TE"))
 		{

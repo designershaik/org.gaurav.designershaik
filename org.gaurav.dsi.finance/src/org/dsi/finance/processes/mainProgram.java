@@ -112,15 +112,18 @@ public class mainProgram {
 		 
 		 System.out.println(decimalPlaces);
 		 
+		 BigDecimal abc = new BigDecimal(-10);
+		 BigDecimal ss = new BigDecimal(10);
+//		 BigDecimal openAmt = new BigDecimal(140);
+//		 System.out.println("Integer amt : "+openAmt.divide(new BigDecimal(50)).intValue());
+//		 BigDecimal penaltyRate = openAmt.multiply(new BigDecimal(0.01)).setScale(5, RoundingMode.HALF_UP);
+//		 BigDecimal agingInBD = new BigDecimal(1635);
+//		 BigDecimal months = agingInBD.divide(new BigDecimal(365), 5, RoundingMode.HALF_UP).multiply(new BigDecimal(12));
+//		 BigDecimal penalty = penaltyRate.multiply(months).compareTo(Env.ZERO)<0 ? Env.ZERO:penaltyRate.multiply(months);
+////		 totalPenaltyAmt = totalPenaltyAmt.add(penalty);
+//		 System.out.println("Opent Amt: "+openAmt+" penalty Rate: "+penaltyRate+" Aging in months: "+months+" Actual Penalty: "+penalty.setScale(2, RoundingMode.HALF_UP));
+		 System.out.println(abc.abs()+" "+ss.abs()+" "+abc.abs().subtract(ss.abs()));
 		 
-		 BigDecimal openAmt = new BigDecimal(140);
-		 System.out.println("Integer amt : "+openAmt.divide(new BigDecimal(50)).intValue());
-		 BigDecimal penaltyRate = openAmt.multiply(new BigDecimal(0.01)).setScale(5, RoundingMode.HALF_UP);
-		 BigDecimal agingInBD = new BigDecimal(1635);
-		 BigDecimal months = agingInBD.divide(new BigDecimal(365), 5, RoundingMode.HALF_UP).multiply(new BigDecimal(12));
-		 BigDecimal penalty = penaltyRate.multiply(months).compareTo(Env.ZERO)<0 ? Env.ZERO:penaltyRate.multiply(months);
-//		 totalPenaltyAmt = totalPenaltyAmt.add(penalty);
-		 System.out.println("Opent Amt: "+openAmt+" penalty Rate: "+penaltyRate+" Aging in months: "+months+" Actual Penalty: "+penalty.setScale(2, RoundingMode.HALF_UP));
 	   }
 	}
 

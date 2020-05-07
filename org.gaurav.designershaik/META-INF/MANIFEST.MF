@@ -8,8 +8,7 @@ Require-Bundle: org.adempiere.base;bundle-version="5.1.0",
  org.adempiere.plugin.utils;bundle-version="5.1.0",
  org.adempiere.ui;bundle-version="5.1.0",
  org.adempiere.ui.zk;bundle-version="5.1.0"
-Service-Component: OSGI-INF/dsifinancemodelfactory.xml,OSGI-INF/dsifinancecalloutfactory.xml,
- OSGI-INF/dsidesignershaikcreatefromfactory.xml
+Service-Component: OSGI-INF/dsifinancemodelfactory.xml,OSGI-INF/dsifinancecalloutfactory.xml
 Export-Package: org.gaurav.dsi.model,
  org.gaurav.dsi.processes
 Bundle-Vendor: Gaurav
