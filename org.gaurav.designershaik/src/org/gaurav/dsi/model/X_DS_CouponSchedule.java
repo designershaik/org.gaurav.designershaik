@@ -26,14 +26,14 @@ import org.compiere.util.Env;
 
 /** Generated Model for DS_CouponSchedule
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_DS_CouponSchedule extends PO implements I_DS_CouponSchedule, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20200428L;
+	private static final long serialVersionUID = 20200722L;
 
     /** Standard Constructor */
     public X_DS_CouponSchedule (Properties ctx, int DS_CouponSchedule_ID, String trxName)
@@ -74,6 +74,90 @@ public class X_DS_CouponSchedule extends PO implements I_DS_CouponSchedule, I_Pe
       return sb.toString();
     }
 
+	public org.compiere.model.I_C_BPartner getC_BPartner() throws RuntimeException
+    {
+		return (org.compiere.model.I_C_BPartner)MTable.get(getCtx(), org.compiere.model.I_C_BPartner.Table_Name)
+			.getPO(getC_BPartner_ID(), get_TrxName());	}
+
+	/** Set Business Partner .
+		@param C_BPartner_ID 
+		Identifies a Business Partner
+	  */
+	public void setC_BPartner_ID (int C_BPartner_ID)
+	{
+		if (C_BPartner_ID < 1) 
+			set_Value (COLUMNNAME_C_BPartner_ID, null);
+		else 
+			set_Value (COLUMNNAME_C_BPartner_ID, Integer.valueOf(C_BPartner_ID));
+	}
+
+	/** Get Business Partner .
+		@return Identifies a Business Partner
+	  */
+	public int getC_BPartner_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_C_BPartner_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public org.compiere.model.I_C_Currency getC_Currency() throws RuntimeException
+    {
+		return (org.compiere.model.I_C_Currency)MTable.get(getCtx(), org.compiere.model.I_C_Currency.Table_Name)
+			.getPO(getC_Currency_ID(), get_TrxName());	}
+
+	/** Set Currency.
+		@param C_Currency_ID 
+		The Currency for this record
+	  */
+	public void setC_Currency_ID (int C_Currency_ID)
+	{
+		if (C_Currency_ID < 1) 
+			set_Value (COLUMNNAME_C_Currency_ID, null);
+		else 
+			set_Value (COLUMNNAME_C_Currency_ID, Integer.valueOf(C_Currency_ID));
+	}
+
+	/** Get Currency.
+		@return The Currency for this record
+	  */
+	public int getC_Currency_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_C_Currency_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public org.compiere.model.I_C_InvoiceLine getC_InvoiceLine() throws RuntimeException
+    {
+		return (org.compiere.model.I_C_InvoiceLine)MTable.get(getCtx(), org.compiere.model.I_C_InvoiceLine.Table_Name)
+			.getPO(getC_InvoiceLine_ID(), get_TrxName());	}
+
+	/** Set Invoice Line.
+		@param C_InvoiceLine_ID 
+		Invoice Detail Line
+	  */
+	public void setC_InvoiceLine_ID (int C_InvoiceLine_ID)
+	{
+		if (C_InvoiceLine_ID < 1) 
+			set_Value (COLUMNNAME_C_InvoiceLine_ID, null);
+		else 
+			set_Value (COLUMNNAME_C_InvoiceLine_ID, Integer.valueOf(C_InvoiceLine_ID));
+	}
+
+	/** Get Invoice Line.
+		@return Invoice Detail Line
+	  */
+	public int getC_InvoiceLine_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_C_InvoiceLine_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
 	public org.compiere.model.I_C_Invoice getC_Invoice() throws RuntimeException
     {
 		return (org.compiere.model.I_C_Invoice)MTable.get(getCtx(), org.compiere.model.I_C_Invoice.Table_Name)
@@ -100,6 +184,43 @@ public class X_DS_CouponSchedule extends PO implements I_DS_CouponSchedule, I_Pe
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Amortization Divided Over schedule.
+		@param DS_AmortizationAmt_OverSchedul Amortization Divided Over schedule	  */
+	public void setDS_AmortizationAmt_OverSchedul (BigDecimal DS_AmortizationAmt_OverSchedul)
+	{
+		set_Value (COLUMNNAME_DS_AmortizationAmt_OverSchedul, DS_AmortizationAmt_OverSchedul);
+	}
+
+	/** Get Amortization Divided Over schedule.
+		@return Amortization Divided Over schedule	  */
+	public BigDecimal getDS_AmortizationAmt_OverSchedul () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_DS_AmortizationAmt_OverSchedul);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set Coupon Rate.
+		@param DS_CouponRate 
+		Coupon Rate
+	  */
+	public void setDS_CouponRate (BigDecimal DS_CouponRate)
+	{
+		set_Value (COLUMNNAME_DS_CouponRate, DS_CouponRate);
+	}
+
+	/** Get Coupon Rate.
+		@return Coupon Rate
+	  */
+	public BigDecimal getDS_CouponRate () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_DS_CouponRate);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	/** Set Coupon Schedule.
@@ -136,6 +257,34 @@ public class X_DS_CouponSchedule extends PO implements I_DS_CouponSchedule, I_Pe
 		return (String)get_Value(COLUMNNAME_DS_CouponSchedule_UU);
 	}
 
+	public org.compiere.model.I_GL_Journal getGL_Journal() throws RuntimeException
+    {
+		return (org.compiere.model.I_GL_Journal)MTable.get(getCtx(), org.compiere.model.I_GL_Journal.Table_Name)
+			.getPO(getGL_Journal_ID(), get_TrxName());	}
+
+	/** Set Journal.
+		@param GL_Journal_ID 
+		General Ledger Journal
+	  */
+	public void setGL_Journal_ID (int GL_Journal_ID)
+	{
+		if (GL_Journal_ID < 1) 
+			set_Value (COLUMNNAME_GL_Journal_ID, null);
+		else 
+			set_Value (COLUMNNAME_GL_Journal_ID, Integer.valueOf(GL_Journal_ID));
+	}
+
+	/** Get Journal.
+		@return General Ledger Journal
+	  */
+	public int getGL_Journal_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_GL_Journal_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
 	/** Set Coupon Amount.
 		@param GS_CouponAmount Coupon Amount	  */
 	public void setGS_CouponAmount (BigDecimal GS_CouponAmount)
@@ -165,5 +314,78 @@ public class X_DS_CouponSchedule extends PO implements I_DS_CouponSchedule, I_Pe
 	public Timestamp getGS_CouponDate () 
 	{
 		return (Timestamp)get_Value(COLUMNNAME_GS_CouponDate);
+	}
+
+	/** Set Line No.
+		@param Line 
+		Unique line for this document
+	  */
+	public void setLine (int Line)
+	{
+		set_Value (COLUMNNAME_Line, Integer.valueOf(Line));
+	}
+
+	/** Get Line No.
+		@return Unique line for this document
+	  */
+	public int getLine () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_Line);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public org.compiere.model.I_M_Product getM_Product() throws RuntimeException
+    {
+		return (org.compiere.model.I_M_Product)MTable.get(getCtx(), org.compiere.model.I_M_Product.Table_Name)
+			.getPO(getM_Product_ID(), get_TrxName());	}
+
+	/** Set Product.
+		@param M_Product_ID 
+		Product, Service, Item
+	  */
+	public void setM_Product_ID (int M_Product_ID)
+	{
+		if (M_Product_ID < 1) 
+			set_Value (COLUMNNAME_M_Product_ID, null);
+		else 
+			set_Value (COLUMNNAME_M_Product_ID, Integer.valueOf(M_Product_ID));
+	}
+
+	/** Get Product.
+		@return Product, Service, Item
+	  */
+	public int getM_Product_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_M_Product_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public org.compiere.model.I_C_Invoice getRef_Invoice() throws RuntimeException
+    {
+		return (org.compiere.model.I_C_Invoice)MTable.get(getCtx(), org.compiere.model.I_C_Invoice.Table_Name)
+			.getPO(getRef_Invoice_ID(), get_TrxName());	}
+
+	/** Set Referenced Invoice.
+		@param Ref_Invoice_ID Referenced Invoice	  */
+	public void setRef_Invoice_ID (int Ref_Invoice_ID)
+	{
+		if (Ref_Invoice_ID < 1) 
+			set_Value (COLUMNNAME_Ref_Invoice_ID, null);
+		else 
+			set_Value (COLUMNNAME_Ref_Invoice_ID, Integer.valueOf(Ref_Invoice_ID));
+	}
+
+	/** Get Referenced Invoice.
+		@return Referenced Invoice	  */
+	public int getRef_Invoice_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_Ref_Invoice_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 }

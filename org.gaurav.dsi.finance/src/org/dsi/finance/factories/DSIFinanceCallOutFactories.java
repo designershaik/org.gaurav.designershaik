@@ -16,6 +16,7 @@ import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MPayment;
 import org.compiere.model.MRequest;
+import org.dsi.finance.callouts.CalculateAmmortizationAmt;
 import org.dsi.finance.callouts.CallOutCalculateBaseAmt;
 import org.dsi.finance.callouts.CallOutCalculateInterestAmtForFD;
 import org.dsi.finance.callouts.CallOutCashJounrGetBPartnerOfInvoice;
@@ -176,6 +177,18 @@ public class DSIFinanceCallOutFactories implements IColumnCalloutFactory{
 				&& columnName.equalsIgnoreCase(I_C_Payment.COLUMNNAME_C_Order_ID))
 			list.add(new CallOutSetIsPOPMandatory());
 		
+		if(tableName.equalsIgnoreCase(MInvoiceLine.Table_Name) 
+				&& columnName.equalsIgnoreCase(MInvoiceLine.COLUMNNAME_QtyInvoiced))
+			list.add(new CalculateAmmortizationAmt());
+		
+		if(tableName.equalsIgnoreCase(MInvoiceLine.Table_Name) 
+				&& columnName.equalsIgnoreCase(MInvoiceLine.COLUMNNAME_PriceEntered))
+			list.add(new CalculateAmmortizationAmt());
+		
+		if(tableName.equalsIgnoreCase(MInvoiceLine.Table_Name) 
+				&& columnName.equalsIgnoreCase(MInvoiceLine.COLUMNNAME_PriceList))
+			list.add(new CalculateAmmortizationAmt());
+				
 		return list!=null ? list.toArray(new IColumnCallout[0]): new IColumnCallout[0];
 	}
 

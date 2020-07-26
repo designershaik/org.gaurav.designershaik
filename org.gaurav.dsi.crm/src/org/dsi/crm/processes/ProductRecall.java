@@ -1,5 +1,6 @@
 package org.dsi.crm.processes;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.compiere.model.MAttributeSetInstance;
@@ -8,6 +9,7 @@ import org.compiere.model.Query;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
+import org.compiere.util.Env;
 import org.gaurav.dsi.model.MDSISerialNoTrx;
 import org.gaurav.dsi.model.MDSITRecallProducts;
 import org.gaurav.dsi.model.MDSITrackProductBatch;
@@ -18,6 +20,7 @@ public class ProductRecall extends SvrProcess {
 	int DSI_SerialNoTrx_ID = 0 ;
 	int p_M_Product_ID = 0 ;
 	int p_M_AttributeSetInstance_ID = 0 ;
+	BigDecimal productionQty = Env.ZERO;
 	@Override
 	protected void prepare() 
 	{
@@ -53,7 +56,12 @@ public class ProductRecall extends SvrProcess {
 			}
 		}
 		else
+		{
 			recallProductFromThisBatch(p_M_AttributeSetInstance_ID,p_M_Product_ID);
+			
+			if(p_M_Product_ID>0)
+				DB.executeUpdate("Update DSI_T_RecallProducts set Recall_RawMaterial_ID =? ,Recall_QtyAffected= ? ", new Object[]{p_M_Product_ID,productionQty}, false, get_TrxName());
+		}
 		return null;
 	}
 
@@ -66,6 +74,11 @@ public class ProductRecall extends SvrProcess {
 				.list();
 		for(MAttributeSetInstance instance : instances)
 		{
+			BigDecimal qty = DB.getSQLValueBD(get_TrxName(), "Select coalesce(sum(MovementQty),0) from M_Transaction "
+					+ "Where M_Product_ID = ? "
+					+ "and M_AttributeSetInstance_ID = ? "
+					+ "and MovementType='W+' ", M_Product_ID,instance.getM_AttributeSetInstance_ID());
+			productionQty = productionQty.add(qty);
 			loopOnTheASI(instance.getM_AttributeSetInstance_ID(),M_Product_ID);
 		}
 	}
@@ -81,39 +94,46 @@ public class ProductRecall extends SvrProcess {
 		for(int pp_order_id : orderIds)
 		{
 			MPPOrder order = new MPPOrder(getCtx(), pp_order_id, get_TrxName());
-			System.out.println("Product Name: "+order.getM_Product().getValue());
 			updateSerialNumber(pp_order_id, order.getM_Product_ID());
 			loopOnTheASI(order.getM_AttributeSetInstance_ID(), order.getM_Product_ID());
-			
 		}
 	}
 	
 	public void updateSerialNumber(int pp_order_id,int m_Product_ID)
 	{
-		String sql = " Select DSI_SerialNoTrx_ID FROM DSI_SerialNoTrx " + 
-				"Where dsi_srno in (select dsi_srno from DSI_SerialNoTrx where PP_ORDER_ID = ? ) " + 
-				"and m_inoutline_id  is not null " + 
-				"and M_Product_ID = ? ";
-		int[] trxIds = DB.getIDsEx(get_TrxName(), sql, pp_order_id,m_Product_ID);
+		String sql = " Select distinct trx.DSI_SerialNoTrx_ID "
+				+ "FROM DSI_SerialNoTrx trx,PP_Order pp " + 
+				"Where trx.PP_Order_ID=pp.PP_Order_ID " +
+				"and pp.M_Product_ID = ? "+
+				"and pp.PP_Order_ID = ? ";
+		int[] trxIds = DB.getIDsEx(get_TrxName(), sql, m_Product_ID,pp_order_id);
 		for(Integer id : trxIds)
 		{
 			MDSISerialNoTrx trx = new MDSISerialNoTrx(getCtx(), id, get_TrxName());
-			int M_InOutLine_ID = trx.getM_InOutLine_ID();
-			if(M_InOutLine_ID>0)
+			int serialNumber = trx.getDSI_SrNo();
+			String finalSerialNumber = trx.getDS_SerialNumberFinal();
+			int count = DB.getSQLValue(get_TrxName(), "select count(*) From DSI_T_RecallProducts where M_Product_ID = ? and DS_SerialNumberFinal like ? ",m_Product_ID,finalSerialNumber);
+			if(count<=0)
 			{
-				MInOutLine line = new MInOutLine(getCtx(), M_InOutLine_ID, get_TrxName());
+				int M_InOutLine_ID = DB.getSQLValue(get_TrxName(), "Select M_InOutLine_ID from DSI_SerialNoTrx "
+						+ "where M_Product_ID = ? and DSI_SrNo = ? and M_InOutLine_ID is not null ",m_Product_ID,serialNumber);
 				MDSITRecallProducts recall = new MDSITRecallProducts(getCtx(), 0, get_TrxName());
-				recall.setC_OrderLine_ID(line.getC_OrderLine_ID());
-				recall.setM_InOutLine_ID(M_InOutLine_ID);
 				recall.setDS_SerialNumberFinal(trx.getDS_SerialNumberFinal());
 				recall.setM_Product_ID(trx.getM_Product_ID());
-				recall.setM_AttributeSetInstance_ID(line.getM_AttributeSetInstance_ID());
 				if(DSI_SerialNoTrx_ID>0)
 					recall.setDSI_SerialNoTrx_ID(DSI_SerialNoTrx_ID);
-				recall.setMovementDate(line.getM_InOut().getMovementDate());
-				recall.set_ValueNoCheck("C_BPartner_ID", line.getM_InOut().getC_BPartner_ID());
-				recall.set_ValueNoCheck("C_BPartner_Location_ID", line.getM_InOut().getC_BPartner_Location_ID());
 				recall.setPP_Order_ID(pp_order_id);
+				if(M_InOutLine_ID>0)
+				{
+					MInOutLine line = new MInOutLine(getCtx(), M_InOutLine_ID, get_TrxName());
+					recall.setC_OrderLine_ID(line.getC_OrderLine_ID());
+					recall.setM_InOutLine_ID(M_InOutLine_ID);
+					recall.setM_AttributeSetInstance_ID(line.getM_AttributeSetInstance_ID());
+					recall.setMovementDate(line.getM_InOut().getMovementDate());
+					recall.set_ValueNoCheck("Qty", line.getMovementQty());
+					recall.set_ValueNoCheck("C_BPartner_ID", line.getM_InOut().getC_BPartner_ID());
+					recall.set_ValueNoCheck("C_BPartner_Location_ID", line.getM_InOut().getC_BPartner_Location_ID());
+				}
 				recall.saveEx();	
 			}
 		}

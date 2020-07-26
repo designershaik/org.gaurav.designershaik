@@ -1,12 +1,16 @@
 package com.gaurav.dsi.purchase.events;
 
 import java.math.BigDecimal;
+import java.util.Properties;
 
 import org.adempiere.base.event.AbstractEventHandler;
 import org.adempiere.base.event.IEventTopics;
 import org.adempiere.exceptions.AdempiereException;
+import org.compiere.model.MBankAccount;
+import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
+import org.compiere.model.MPayment;
 import org.compiere.model.MRequest;
 import org.compiere.model.PO;
 import org.compiere.util.DB;
@@ -17,7 +21,7 @@ import org.osgi.service.event.Event;
 
 public class DSPurchaseEventHandler extends AbstractEventHandler {
 	String trxName = null;
-	
+	Properties ctx = Env.getCtx();
 	@Override
 	protected void doHandleEvent(Event event) 
 	{
@@ -61,6 +65,40 @@ public class DSPurchaseEventHandler extends AbstractEventHandler {
 						verifyIfThePOReferenceAlreadyExists(invoice);
 				}
 			}
+			if(event.getTopic().equals(IEventTopics.DOC_AFTER_COMPLETE))
+			{
+				int C_BankAccount_ID = invoice.get_ValueAsInt("C_BankAccount_ID");
+				if(C_BankAccount_ID>0)
+				{
+					MBankAccount account = new MBankAccount(ctx, C_BankAccount_ID, trxName);
+					if(!account.get_ValueAsBoolean("DS_AllowDifferentCurrency") && invoice.getC_Currency_ID()!=account.getC_Currency_ID())
+						throw new AdempiereException("Not allowed to pay in different currency with this bank account.");
+					
+					String docBaseType = invoice.isSOTrx() ? MDocType.DOCBASETYPE_ARReceipt:MDocType.DOCBASETYPE_APPayment;
+					int C_DocType_ID = DB.getSQLValue(trxName, "Select C_DocType_ID From C_DocType Where AD_Client_ID = ? "
+							+ "and DocBaseType = ? and BankAccountType = ? ",invoice.getAD_Client_ID(),docBaseType,account.getBankAccountType());
+					
+					MPayment payment = new MPayment(ctx, 0, trxName);
+					payment.setAD_Org_ID(invoice.getAD_Org_ID());
+					payment.setC_DocType_ID(C_DocType_ID);
+					payment.setTenderType(MPayment.TENDERTYPE_CreditCard);
+					payment.setC_BankAccount_ID(C_BankAccount_ID);
+					payment.setC_BPartner_ID(invoice.getC_BPartner_ID());
+					payment.setC_Invoice_ID(invoice.getC_Invoice_ID());
+					payment.setC_Currency_ID(invoice.getC_Currency_ID());			
+					payment.setDescription(invoice.getDescription());
+					if (invoice.isCreditMemo())
+						payment.setPayAmt(invoice.getGrandTotal().negate());
+					else
+						payment.setPayAmt(invoice.getGrandTotal());
+					payment.setIsPrepayment(false);					
+					payment.setDateAcct(invoice.getDateAcct());
+					payment.setDateTrx(invoice.getDateInvoiced());
+
+					//	Save payment
+					payment.saveEx();
+				}
+			}
 		}
 	}
 	
@@ -68,13 +106,10 @@ public class DSPurchaseEventHandler extends AbstractEventHandler {
 
 	private void verifyIfThePOReferenceAlreadyExists(MInvoice invoice) 
 	{
-		int count = DB.getSQLValue(trxName, "SELECT count(*) FROM C_Invoice "
-											+ "WHERE trim(POReference) like ? "
-											+ "AND AD_Client_ID = ? "
-											+ "AND C_BPartner_ID = ? "
-											+ "AND C_BPartner_Location_ID = ? "
-											+ "AND DocStatus in ('CO','DR','IP') ",
-				invoice.getPOReference(),invoice.getAD_Client_ID(),invoice.getC_BPartner_ID(),invoice.getC_BPartner_Location_ID());
+		int count = DB.getSQLValue(trxName, "SELECT count(*) FROM C_Invoice ci WHERE trim(ci.POReference) like ? AND ci.AD_Client_ID = ? "
+											+ "AND ci.C_BPartner_ID = ? AND ci.C_BPartner_Location_ID = ? AND ci.DocStatus in ('CO','DR','IP') "
+											+ "and ci.C_Order_ID is null ",invoice.getPOReference(),invoice.getAD_Client_ID(),
+											invoice.getC_BPartner_ID(),invoice.getC_BPartner_Location_ID());
 		if(count>1)
 			throw new AdempiereException("Invoice with same PO reference already exist: "+invoice.getPOReference());
 	}
@@ -90,6 +125,7 @@ public class DSPurchaseEventHandler extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, MInvoice.Table_Name);
 		registerTableEvent(IEventTopics.PO_BEFORE_NEW, MInvoice.Table_Name);
 		
+		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, MInvoice.Table_Name);		
 	}
 
 }

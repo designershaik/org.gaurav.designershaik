@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for DS_CouponSchedule
  *  @author iDempiere (generated) 
- *  @version Release 5.1
+ *  @version Release 7.1
  */
 @SuppressWarnings("all")
 public interface I_DS_CouponSchedule 
@@ -64,6 +64,51 @@ public interface I_DS_CouponSchedule
 	  */
 	public int getAD_Org_ID();
 
+    /** Column name C_BPartner_ID */
+    public static final String COLUMNNAME_C_BPartner_ID = "C_BPartner_ID";
+
+	/** Set Business Partner .
+	  * Identifies a Business Partner
+	  */
+	public void setC_BPartner_ID (int C_BPartner_ID);
+
+	/** Get Business Partner .
+	  * Identifies a Business Partner
+	  */
+	public int getC_BPartner_ID();
+
+	public org.compiere.model.I_C_BPartner getC_BPartner() throws RuntimeException;
+
+    /** Column name C_Currency_ID */
+    public static final String COLUMNNAME_C_Currency_ID = "C_Currency_ID";
+
+	/** Set Currency.
+	  * The Currency for this record
+	  */
+	public void setC_Currency_ID (int C_Currency_ID);
+
+	/** Get Currency.
+	  * The Currency for this record
+	  */
+	public int getC_Currency_ID();
+
+	public org.compiere.model.I_C_Currency getC_Currency() throws RuntimeException;
+
+    /** Column name C_InvoiceLine_ID */
+    public static final String COLUMNNAME_C_InvoiceLine_ID = "C_InvoiceLine_ID";
+
+	/** Set Invoice Line.
+	  * Invoice Detail Line
+	  */
+	public void setC_InvoiceLine_ID (int C_InvoiceLine_ID);
+
+	/** Get Invoice Line.
+	  * Invoice Detail Line
+	  */
+	public int getC_InvoiceLine_ID();
+
+	public org.compiere.model.I_C_InvoiceLine getC_InvoiceLine() throws RuntimeException;
+
     /** Column name C_Invoice_ID */
     public static final String COLUMNNAME_C_Invoice_ID = "C_Invoice_ID";
 
@@ -95,6 +140,28 @@ public interface I_DS_CouponSchedule
 	  */
 	public int getCreatedBy();
 
+    /** Column name DS_AmortizationAmt_OverSchedul */
+    public static final String COLUMNNAME_DS_AmortizationAmt_OverSchedul = "DS_AmortizationAmt_OverSchedul";
+
+	/** Set Amortization Divided Over schedule	  */
+	public void setDS_AmortizationAmt_OverSchedul (BigDecimal DS_AmortizationAmt_OverSchedul);
+
+	/** Get Amortization Divided Over schedule	  */
+	public BigDecimal getDS_AmortizationAmt_OverSchedul();
+
+    /** Column name DS_CouponRate */
+    public static final String COLUMNNAME_DS_CouponRate = "DS_CouponRate";
+
+	/** Set Coupon Rate.
+	  * Coupon Rate
+	  */
+	public void setDS_CouponRate (BigDecimal DS_CouponRate);
+
+	/** Get Coupon Rate.
+	  * Coupon Rate
+	  */
+	public BigDecimal getDS_CouponRate();
+
     /** Column name DS_CouponSchedule_ID */
     public static final String COLUMNNAME_DS_CouponSchedule_ID = "DS_CouponSchedule_ID";
 
@@ -112,6 +179,21 @@ public interface I_DS_CouponSchedule
 
 	/** Get DS_CouponSchedule_UU	  */
 	public String getDS_CouponSchedule_UU();
+
+    /** Column name GL_Journal_ID */
+    public static final String COLUMNNAME_GL_Journal_ID = "GL_Journal_ID";
+
+	/** Set Journal.
+	  * General Ledger Journal
+	  */
+	public void setGL_Journal_ID (int GL_Journal_ID);
+
+	/** Get Journal.
+	  * General Ledger Journal
+	  */
+	public int getGL_Journal_ID();
+
+	public org.compiere.model.I_GL_Journal getGL_Journal() throws RuntimeException;
 
     /** Column name GS_CouponAmount */
     public static final String COLUMNNAME_GS_CouponAmount = "GS_CouponAmount";
@@ -143,6 +225,45 @@ public interface I_DS_CouponSchedule
 	  * The record is active in the system
 	  */
 	public boolean isActive();
+
+    /** Column name Line */
+    public static final String COLUMNNAME_Line = "Line";
+
+	/** Set Line No.
+	  * Unique line for this document
+	  */
+	public void setLine (int Line);
+
+	/** Get Line No.
+	  * Unique line for this document
+	  */
+	public int getLine();
+
+    /** Column name M_Product_ID */
+    public static final String COLUMNNAME_M_Product_ID = "M_Product_ID";
+
+	/** Set Product.
+	  * Product, Service, Item
+	  */
+	public void setM_Product_ID (int M_Product_ID);
+
+	/** Get Product.
+	  * Product, Service, Item
+	  */
+	public int getM_Product_ID();
+
+	public org.compiere.model.I_M_Product getM_Product() throws RuntimeException;
+
+    /** Column name Ref_Invoice_ID */
+    public static final String COLUMNNAME_Ref_Invoice_ID = "Ref_Invoice_ID";
+
+	/** Set Referenced Invoice	  */
+	public void setRef_Invoice_ID (int Ref_Invoice_ID);
+
+	/** Get Referenced Invoice	  */
+	public int getRef_Invoice_ID();
+
+	public org.compiere.model.I_C_Invoice getRef_Invoice() throws RuntimeException;
 
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";

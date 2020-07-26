@@ -123,6 +123,7 @@ public class mainProgram {
 ////		 totalPenaltyAmt = totalPenaltyAmt.add(penalty);
 //		 System.out.println("Opent Amt: "+openAmt+" penalty Rate: "+penaltyRate+" Aging in months: "+months+" Actual Penalty: "+penalty.setScale(2, RoundingMode.HALF_UP));
 		 System.out.println(abc.abs()+" "+ss.abs()+" "+abc.abs().subtract(ss.abs()));
+		 System.out.println(0%2+" remainder "+1%2+" remainder "+4%2);
 		 
 	   }
 	}

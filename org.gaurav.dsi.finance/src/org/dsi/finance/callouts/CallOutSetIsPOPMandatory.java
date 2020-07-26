@@ -7,6 +7,7 @@ import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
 import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MCountry;
+import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
 
@@ -17,10 +18,13 @@ public class CallOutSetIsPOPMandatory implements IColumnCallout{
 			GridField mField, Object value, Object oldValue) 
 	{
 		if(value==null)
+		{
+			mTab.setValue("DS_IsPOPCodeMandatory", false);
 			return null;
-		
-		boolean isReceipt = mTab.getValueAsBoolean("IsReceipt");
-		if(!isReceipt)
+		}
+		int C_DocType_ID = (Integer)mTab.getValue("C_DocType_ID");
+		MDocType type = new MDocType(ctx, C_DocType_ID, null);
+		if(!type.getDocBaseType().contentEquals(MDocType.DOCBASETYPE_ARReceipt))
 		{
 			int C_BPartner_Location_ID = 0 ; 
 			if(mField.getColumnName().equalsIgnoreCase("C_Invoice_ID"))

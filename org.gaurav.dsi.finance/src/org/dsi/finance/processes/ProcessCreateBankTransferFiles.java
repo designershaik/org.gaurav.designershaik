@@ -636,22 +636,32 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 		        channelSftp = (ChannelSftp) channel;
 		        channelSftp.cd(SFTPWORKINGDIR);
 		        channelSftp.put(new FileInputStream(MainFile), MainFile.getName());
-		        channelSftp.put(new FileInputStream(eAdviceFile), eAdviceFile.getName());
+		        if(eAdviceFile!=null)
+		        	channelSftp.put(new FileInputStream(eAdviceFile), eAdviceFile.getName());
 		        log.info("File transfered successfully to host.");
 			} 
 			catch (Exception ex) 
 			{
-				 log.warning("Exception found while tranfer the response.");
+				 throw new AdempiereException("Exception found while tranfer the response.");
 		    }
 	    
 			finally
 			{
-		        channelSftp.exit();
-		        log.info("sftp Channel exited.");
-		        channel.disconnect();
-		        log.info("Channel disconnected.");
-		        session.disconnect();
-		        log.info("Host Session disconnected.");
+				if(channelSftp!=null)
+				{
+					channelSftp.exit();
+		        	log.info("sftp Channel exited.");
+				}
+				if(channel!=null)
+				{
+			        channel.disconnect();
+			        log.info("Channel disconnected.");
+				}
+				if(session!=null)
+				{
+			        session.disconnect();
+			        log.info("Host Session disconnected.");
+				}
 		    }
 			if(!isSalary)
 				sendUploadEmail(conf);

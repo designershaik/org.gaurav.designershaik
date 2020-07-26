@@ -7,6 +7,7 @@ import com.gaurav.dsi.purchase.processes.ApprovePurchaseRequest;
 import com.gaurav.dsi.purchase.processes.CreateCashRequestFromPurchaseRequest;
 import com.gaurav.dsi.purchase.processes.CreatePurchaseRequestFromFacilityRequest;
 import com.gaurav.dsi.purchase.processes.CreateVendorInvoiceFromPurchaseRequest;
+import com.gaurav.dsi.purchase.processes.DSInOutCreateInvoice;
 import com.gaurav.dsi.purchase.processes.ForwardRequest;
 import com.gaurav.dsi.purchase.processes.GenerateAttributes;
 
@@ -33,6 +34,8 @@ public class DSIPurchaseProcessFactory implements IProcessFactory{
 		if(className.equals(CreatePurchaseRequestFromFacilityRequest.class.getName()))
 			return new CreatePurchaseRequestFromFacilityRequest();
 		
+		if(className.equals(DSInOutCreateInvoice.class.getName()))
+			return new DSInOutCreateInvoice();
 		
 		
 		return null;
