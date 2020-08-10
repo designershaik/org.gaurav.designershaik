@@ -345,10 +345,10 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 	
 	private void createFiles(boolean isSalary) throws IOException 
 	{
-		String FilePath="C:" + File.separator+"VendorPayemts";
+		String FilePath=System.getProperty("java.io.tmpdir");
 		directory = new File(FilePath);
 		if(isSalary)
-			FilePath = FilePath+File.separator+"hello" + File.separator + orgName+"_SAL";
+			FilePath = FilePath+orgName+"_SAL";
 		else
 			FilePath = FilePath + File.separator +"DS_PAY";
 		String eAdvicePath=directory+File.separator+"DS_EADVICE";

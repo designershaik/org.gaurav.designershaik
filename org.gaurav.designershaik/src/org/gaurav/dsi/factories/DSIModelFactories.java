@@ -40,6 +40,7 @@ import org.gaurav.dsi.model.MDSFinReportslevel4;
 import org.gaurav.dsi.model.MDSFinReportslevel5;
 import org.gaurav.dsi.model.MDSFinReportslevel6;
 import org.gaurav.dsi.model.MDSFixedDeposit;
+import org.gaurav.dsi.model.MDSFundMovement;
 import org.gaurav.dsi.model.MDSIBoxLabelsT;
 import org.gaurav.dsi.model.MDSIExportPayments;
 import org.gaurav.dsi.model.MDSIExportPaymentsLine;
@@ -307,6 +308,9 @@ public class DSIModelFactories implements IModelFactory{
 		
 		if(tableName.equals(MDSCouponSchedule.Table_Name))
 			return MDSCouponSchedule.class;
+		
+		if(tableName.equals(MDSFundMovement.Table_Name))
+			return MDSFundMovement.class;
 			
 		return null;
 	}
@@ -533,6 +537,9 @@ public class DSIModelFactories implements IModelFactory{
 		if(tableName.equals(MDSCouponSchedule.Table_Name))
 			return new MDSCouponSchedule(Env.getCtx(), Record_ID, trxName);
 		
+		if(tableName.equals(MDSFundMovement.Table_Name))
+			return new MDSFundMovement(Env.getCtx(), Record_ID, trxName);
+		
 		return null;
 	}
 
@@ -757,6 +764,9 @@ public class DSIModelFactories implements IModelFactory{
 		
 		if(tableName.equals(MDSCouponSchedule.Table_Name))
 			return new MDSCouponSchedule(Env.getCtx(), rs, trxName);
+		
+		if(tableName.equals(MDSFundMovement.Table_Name))
+			return new MDSFundMovement(Env.getCtx(), rs, trxName);
 		
 		return null;
 	}

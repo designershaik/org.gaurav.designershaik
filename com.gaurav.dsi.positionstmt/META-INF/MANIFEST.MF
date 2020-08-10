@@ -9,4 +9,5 @@ Require-Bundle: org.adempiere.base;bundle-version="5.1.0",
  org.adempiere.plugin.utils;bundle-version="5.1.0",
  org.gaurav.designershaik;bundle-version="1.0.0",
  joda-time
-Service-Component: OSGI-INF/InvestmentProcessFactory.xml
+Service-Component: OSGI-INF/InvestmentProcessFactory.xml,
+ OSGI-INF/InvestmentCallOutFactory.xml

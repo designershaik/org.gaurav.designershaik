@@ -81,12 +81,21 @@ public class DSPurchaseEventHandler extends AbstractEventHandler {
 					MPayment payment = new MPayment(ctx, 0, trxName);
 					payment.setAD_Org_ID(invoice.getAD_Org_ID());
 					payment.setC_DocType_ID(C_DocType_ID);
-					payment.setTenderType(MPayment.TENDERTYPE_CreditCard);
+					if(MInvoice.PAYMENTRULE_Cash.equalsIgnoreCase(invoice.getPaymentRule()))
+						payment.setTenderType(MPayment.TENDERTYPE_Cash);
+					if(MInvoice.PAYMENTRULE_CreditCard.equalsIgnoreCase(invoice.getPaymentRule()))
+						payment.setTenderType(MPayment.TENDERTYPE_CreditCard);
+					if(MInvoice.PAYMENTRULE_DirectDebit.equalsIgnoreCase(invoice.getPaymentRule()))
+						payment.setTenderType(MPayment.TENDERTYPE_DirectDebit);
+					if(MInvoice.PAYMENTRULE_DirectDeposit.equalsIgnoreCase(invoice.getPaymentRule()))
+						payment.setTenderType(MPayment.TENDERTYPE_DirectDeposit);
+					
 					payment.setC_BankAccount_ID(C_BankAccount_ID);
 					payment.setC_BPartner_ID(invoice.getC_BPartner_ID());
 					payment.setC_Invoice_ID(invoice.getC_Invoice_ID());
 					payment.setC_Currency_ID(invoice.getC_Currency_ID());			
 					payment.setDescription(invoice.getDescription());
+					payment.setCheckNo(invoice.getPOReference());
 					if (invoice.isCreditMemo())
 						payment.setPayAmt(invoice.getGrandTotal().negate());
 					else
