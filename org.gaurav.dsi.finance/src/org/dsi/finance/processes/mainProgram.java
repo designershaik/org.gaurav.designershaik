@@ -126,7 +126,8 @@ public class mainProgram {
 //		 System.out.println(0%2+" remainder "+1%2+" remainder "+4%2);
 		BigDecimal zero =new BigDecimal(0);
 		System.out.println(zero.toEngineeringString());
-		
+		System.out.println(1==2
+				&& 2==2 ? 1:0);
 		 
 	   }
 	}

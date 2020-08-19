@@ -64,45 +64,111 @@ public class DSPurchaseEventHandler extends AbstractEventHandler {
 					if(invoice.getPOReference()!=null)
 						verifyIfThePOReferenceAlreadyExists(invoice);
 				}
+				if(event.getTopic().equals(IEventTopics.PO_BEFORE_NEW) || 
+						(event.getTopic().equals(IEventTopics.PO_BEFORE_CHANGE)&& invoice.is_ValueChanged(MOrder.COLUMNNAME_C_Order_ID)))
+				{
+					if(invoice.getC_Order_ID()>0)
+					{
+						MOrder order = (MOrder)invoice.getC_Order();
+						if(order.get_ValueAsInt("C_BankAccount_ID")>0)
+							invoice.set_ValueNoCheck("C_BankAccount_ID", order.get_ValueAsInt("C_BankAccount_ID"));
+					}
+						
+				}
 			}
 			if(event.getTopic().equals(IEventTopics.DOC_AFTER_COMPLETE))
 			{
 				int C_BankAccount_ID = invoice.get_ValueAsInt("C_BankAccount_ID");
 				if(C_BankAccount_ID>0)
 				{
+					int C_Order_ID = invoice.getC_Order_ID();
+					int C_Payment_ID = DB.getSQLValue(trxName, "Select C_Payment_ID From C_Payment Where C_Order_ID = ? ",C_Order_ID);
+					if(C_Payment_ID<=0)
+					{
+						MBankAccount account = new MBankAccount(ctx, C_BankAccount_ID, trxName);
+						if(!account.get_ValueAsBoolean("DS_AllowDifferentCurrency") && invoice.getC_Currency_ID()!=account.getC_Currency_ID())
+							throw new AdempiereException("Not allowed to pay in different currency with this bank account.");
+						
+						String docBaseType = invoice.isSOTrx() ? MDocType.DOCBASETYPE_ARReceipt:MDocType.DOCBASETYPE_APPayment;
+						int C_DocType_ID = DB.getSQLValue(trxName, "Select C_DocType_ID From C_DocType Where AD_Client_ID = ? "
+								+ "and DocBaseType = ? and BankAccountType LIKE (?) ",invoice.getAD_Client_ID(),docBaseType,"%"+account.getBankAccountType()+"%");
+						
+						MPayment payment = new MPayment(ctx, 0, trxName);
+						payment.setAD_Org_ID(invoice.getAD_Org_ID());
+						payment.setC_DocType_ID(C_DocType_ID);
+						if("X".equalsIgnoreCase(invoice.getPaymentRule()))
+							payment.setTenderType(MPayment.TENDERTYPE_Cash);
+						if(MInvoice.PAYMENTRULE_CreditCard.equalsIgnoreCase(invoice.getPaymentRule()))
+							payment.setTenderType(MPayment.TENDERTYPE_CreditCard);
+						if(MInvoice.PAYMENTRULE_DirectDebit.equalsIgnoreCase(invoice.getPaymentRule()))
+							payment.setTenderType(MPayment.TENDERTYPE_DirectDebit);
+						if(MInvoice.PAYMENTRULE_DirectDeposit.equalsIgnoreCase(invoice.getPaymentRule()))
+							payment.setTenderType(MPayment.TENDERTYPE_DirectDeposit);
+						if(MInvoice.PAYMENTRULE_Check.equalsIgnoreCase(invoice.getPaymentRule()))
+							payment.setTenderType(MPayment.TENDERTYPE_Check);
+						
+						payment.setC_BankAccount_ID(C_BankAccount_ID);
+						payment.setC_BPartner_ID(invoice.getC_BPartner_ID());
+						payment.setC_Invoice_ID(invoice.getC_Invoice_ID());
+						payment.setC_Currency_ID(invoice.getC_Currency_ID());			
+						payment.setDescription(invoice.getDescription());
+						payment.setCheckNo(invoice.getPOReference());
+						if (invoice.isCreditMemo())
+							payment.setPayAmt(invoice.getGrandTotal().negate());
+						else
+							payment.setPayAmt(invoice.getGrandTotal());
+						payment.setIsPrepayment(false);					
+						payment.setDateAcct(invoice.getDateAcct());
+						payment.setDateTrx(invoice.getDateInvoiced());
+	
+						//	Save payment
+						payment.saveEx();
+					}
+				}
+			}
+		}
+		
+		
+		if(po instanceof MOrder)
+		{
+			MOrder order = (MOrder)po;
+			if(event.getTopic().equals(IEventTopics.DOC_AFTER_COMPLETE))
+			{
+				int C_BankAccount_ID = order.get_ValueAsInt("C_BankAccount_ID");
+				if(C_BankAccount_ID>0)
+				{
 					MBankAccount account = new MBankAccount(ctx, C_BankAccount_ID, trxName);
-					if(!account.get_ValueAsBoolean("DS_AllowDifferentCurrency") && invoice.getC_Currency_ID()!=account.getC_Currency_ID())
+					if(!account.get_ValueAsBoolean("DS_AllowDifferentCurrency") && order.getC_Currency_ID()!=account.getC_Currency_ID())
 						throw new AdempiereException("Not allowed to pay in different currency with this bank account.");
 					
-					String docBaseType = invoice.isSOTrx() ? MDocType.DOCBASETYPE_ARReceipt:MDocType.DOCBASETYPE_APPayment;
+					String docBaseType = order.isSOTrx() ? MDocType.DOCBASETYPE_ARReceipt:MDocType.DOCBASETYPE_APPayment;
 					int C_DocType_ID = DB.getSQLValue(trxName, "Select C_DocType_ID From C_DocType Where AD_Client_ID = ? "
-							+ "and DocBaseType = ? and BankAccountType = ? ",invoice.getAD_Client_ID(),docBaseType,account.getBankAccountType());
+							+ "and DocBaseType = ? and BankAccountType LIKE (?) ",order.getAD_Client_ID(),docBaseType,"%"+account.getBankAccountType()+"%");
 					
 					MPayment payment = new MPayment(ctx, 0, trxName);
-					payment.setAD_Org_ID(invoice.getAD_Org_ID());
+					payment.setAD_Org_ID(order.getAD_Org_ID());
 					payment.setC_DocType_ID(C_DocType_ID);
-					if(MInvoice.PAYMENTRULE_Cash.equalsIgnoreCase(invoice.getPaymentRule()))
+					if("X".equalsIgnoreCase(order.getPaymentRule()))
 						payment.setTenderType(MPayment.TENDERTYPE_Cash);
-					if(MInvoice.PAYMENTRULE_CreditCard.equalsIgnoreCase(invoice.getPaymentRule()))
+					if(MOrder.PAYMENTRULE_CreditCard.equalsIgnoreCase(order.getPaymentRule()))
 						payment.setTenderType(MPayment.TENDERTYPE_CreditCard);
-					if(MInvoice.PAYMENTRULE_DirectDebit.equalsIgnoreCase(invoice.getPaymentRule()))
+					if(MOrder.PAYMENTRULE_DirectDebit.equalsIgnoreCase(order.getPaymentRule()))
 						payment.setTenderType(MPayment.TENDERTYPE_DirectDebit);
-					if(MInvoice.PAYMENTRULE_DirectDeposit.equalsIgnoreCase(invoice.getPaymentRule()))
+					if(MOrder.PAYMENTRULE_DirectDeposit.equalsIgnoreCase(order.getPaymentRule()))
 						payment.setTenderType(MPayment.TENDERTYPE_DirectDeposit);
+					if(MOrder.PAYMENTRULE_Check.equalsIgnoreCase(order.getPaymentRule()))
+						payment.setTenderType(MPayment.TENDERTYPE_Check);
 					
 					payment.setC_BankAccount_ID(C_BankAccount_ID);
-					payment.setC_BPartner_ID(invoice.getC_BPartner_ID());
-					payment.setC_Invoice_ID(invoice.getC_Invoice_ID());
-					payment.setC_Currency_ID(invoice.getC_Currency_ID());			
-					payment.setDescription(invoice.getDescription());
-					payment.setCheckNo(invoice.getPOReference());
-					if (invoice.isCreditMemo())
-						payment.setPayAmt(invoice.getGrandTotal().negate());
-					else
-						payment.setPayAmt(invoice.getGrandTotal());
-					payment.setIsPrepayment(false);					
-					payment.setDateAcct(invoice.getDateAcct());
-					payment.setDateTrx(invoice.getDateInvoiced());
+					payment.setC_BPartner_ID(order.getC_BPartner_ID());
+					payment.setC_Order_ID(order.getC_Order_ID());
+					payment.setC_Currency_ID(order.getC_Currency_ID());			
+					payment.setDescription(order.getDescription());
+					payment.setCheckNo(order.getPOReference());
+					payment.setPayAmt(order.getGrandTotal());
+					payment.setIsPrepayment(true);					
+					payment.setDateAcct(order.getDateAcct());
+					payment.setDateTrx(order.getDateOrdered());
 
 					//	Save payment
 					payment.saveEx();
@@ -134,7 +200,9 @@ public class DSPurchaseEventHandler extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, MInvoice.Table_Name);
 		registerTableEvent(IEventTopics.PO_BEFORE_NEW, MInvoice.Table_Name);
 		
-		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, MInvoice.Table_Name);		
+		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, MInvoice.Table_Name);	
+		
+		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, MOrder.Table_Name);
 	}
 
 }

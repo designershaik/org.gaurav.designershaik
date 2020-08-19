@@ -3,6 +3,7 @@ package com.gaurav.dsi.process;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.adempiere.exceptions.AdempiereException;
@@ -10,12 +11,14 @@ import org.compiere.model.MAttributeSetInstance;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MProduct;
+import org.compiere.model.Query;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.TimeUtil;
 import org.gaurav.dsi.model.MDSCouponSchedule;
+import org.gaurav.dsi.model.X_DS_CouponSchedule;
 
 public class ProcessCouponPayoutSchedule extends SvrProcess{
 	
@@ -69,43 +72,32 @@ public class ProcessCouponPayoutSchedule extends SvrProcess{
 		if(M_Product_ID>0)
 		{
 			MInvoice invoice = new MInvoice(getCtx(), line.getC_Invoice_ID(), get_TrxName());
-			Timestamp dateAcct = invoice.getDateAcct();
-			MProduct investment = new MProduct(getCtx(), M_Product_ID, get_TrxName());
-			Integer payOutPeriod = (Integer)investment.get_ValueAsInt("DS_PayOutPeriod");
-			BigDecimal couponRate = (BigDecimal)investment.get_Value("DS_CouponRate");
-			int M_AttributeSetInstance_ID = line.getM_AttributeSetInstance_ID();
-			MAttributeSetInstance msi = new MAttributeSetInstance(getCtx(), M_AttributeSetInstance_ID, get_TrxName());
-			if(msi.getGuaranteeDate()!=null)
+			boolean isSOTrx = invoice.isSOTrx();
+			if(!isSOTrx)
 			{
-				int daysBetween = TimeUtil.getDaysBetween(dateAcct,msi.getGuaranteeDate());
-				int totalPayouts = (new BigDecimal(daysBetween).divide(new BigDecimal(payOutPeriod),0,RoundingMode.HALF_UP)).intValue();
-				BigDecimal annualReturn = p_amortization.add(p_NominalValue).multiply(couponRate).divide(Env.ONEHUNDRED, invoice.getC_Currency().getStdPrecision(), RoundingMode.CEILING);
-				BigDecimal payoutPeriodBasedCoupon = annualReturn.divide(new BigDecimal(365/payOutPeriod), invoice.getC_Currency().getStdPrecision(), RoundingMode.CEILING);
-				BigDecimal amortizationAmtOverPeriod = Env.ZERO;
-				if(p_amortization.compareTo(Env.ZERO)!=0)
-					amortizationAmtOverPeriod = p_amortization.divide(new BigDecimal(totalPayouts), invoice.getC_Currency().getStdPrecision(), RoundingMode.CEILING);
-				for(int i=0 ; i<totalPayouts ; i++)
+				Timestamp dateAcct = invoice.getDateAcct();
+				MProduct investment = new MProduct(getCtx(), M_Product_ID, get_TrxName());
+				Integer payOutPeriod = (Integer)investment.get_ValueAsInt("DS_PayOutPeriod");
+				BigDecimal couponRate = (BigDecimal)investment.get_Value("DS_CouponRate");
+				int M_AttributeSetInstance_ID = line.getM_AttributeSetInstance_ID();
+				MAttributeSetInstance msi = new MAttributeSetInstance(getCtx(), M_AttributeSetInstance_ID, get_TrxName());
+				if(msi.getGuaranteeDate()!=null)
 				{
-					Timestamp couponPayOutDate = TimeUtil.addDays(p_firstPayoutDate, payOutPeriod*i);
-					MDSCouponSchedule sc = new MDSCouponSchedule(getCtx(), 0, get_TrxName());
-					sc.setGS_CouponAmount(payoutPeriodBasedCoupon);
-					sc.setLine(i+1);
-					sc.setDS_CouponRate(couponRate);
-					sc.setGS_CouponDate(couponPayOutDate);
-					sc.setC_Invoice_ID(invoice.getC_Invoice_ID());
-					sc.setM_Product_ID(M_Product_ID);
-					sc.setC_InvoiceLine_ID(line.getC_InvoiceLine_ID());
-					sc.setDS_AmortizationAmt_OverSchedul(amortizationAmtOverPeriod);
-					sc.setC_BPartner_ID(invoice.getC_BPartner_ID());
-					sc.setC_Currency_ID(invoice.getC_Currency_ID());
-					sc.saveEx();
-					if(i==totalPayouts-1 && couponPayOutDate.before(msi.getGuaranteeDate()))
+					int daysBetween = TimeUtil.getDaysBetween(dateAcct,msi.getGuaranteeDate());
+					int totalPayouts = (new BigDecimal(daysBetween).divide(new BigDecimal(payOutPeriod),0,RoundingMode.HALF_UP)).intValue();
+					BigDecimal annualReturn = p_amortization.add(p_NominalValue).multiply(couponRate).divide(Env.ONEHUNDRED, invoice.getC_Currency().getStdPrecision(), RoundingMode.CEILING);
+					BigDecimal payoutPeriodBasedCoupon = annualReturn.divide(new BigDecimal(365/payOutPeriod), invoice.getC_Currency().getStdPrecision(), RoundingMode.CEILING);
+					BigDecimal amortizationAmtOverPeriod = Env.ZERO;
+					if(p_amortization.compareTo(Env.ZERO)!=0)
+						amortizationAmtOverPeriod = p_amortization.divide(new BigDecimal(totalPayouts), invoice.getC_Currency().getStdPrecision(), RoundingMode.CEILING);
+					for(int i=0 ; i<totalPayouts ; i++)
 					{
-						sc = new MDSCouponSchedule(getCtx(), 0, get_TrxName());
+						Timestamp couponPayOutDate = TimeUtil.addDays(p_firstPayoutDate, payOutPeriod*i);
+						MDSCouponSchedule sc = new MDSCouponSchedule(getCtx(), 0, get_TrxName());
 						sc.setGS_CouponAmount(payoutPeriodBasedCoupon);
-						sc.setLine(i+2);
+						sc.setLine(i+1);
 						sc.setDS_CouponRate(couponRate);
-						sc.setGS_CouponDate(msi.getGuaranteeDate());
+						sc.setGS_CouponDate(couponPayOutDate);
 						sc.setC_Invoice_ID(invoice.getC_Invoice_ID());
 						sc.setM_Product_ID(M_Product_ID);
 						sc.setC_InvoiceLine_ID(line.getC_InvoiceLine_ID());
@@ -113,9 +105,27 @@ public class ProcessCouponPayoutSchedule extends SvrProcess{
 						sc.setC_BPartner_ID(invoice.getC_BPartner_ID());
 						sc.setC_Currency_ID(invoice.getC_Currency_ID());
 						sc.saveEx();
+						if(i==totalPayouts-1 && couponPayOutDate.before(msi.getGuaranteeDate()))
+						{
+							sc = new MDSCouponSchedule(getCtx(), 0, get_TrxName());
+							sc.setGS_CouponAmount(payoutPeriodBasedCoupon);
+							sc.setLine(i+2);
+							sc.setDS_CouponRate(couponRate);
+							sc.setGS_CouponDate(msi.getGuaranteeDate());
+							sc.setC_Invoice_ID(invoice.getC_Invoice_ID());
+							sc.setM_Product_ID(M_Product_ID);
+							sc.setC_InvoiceLine_ID(line.getC_InvoiceLine_ID());
+							sc.setDS_AmortizationAmt_OverSchedul(amortizationAmtOverPeriod);
+							sc.setC_BPartner_ID(invoice.getC_BPartner_ID());
+							sc.setC_Currency_ID(invoice.getC_Currency_ID());
+							sc.saveEx();
+						}
 					}
 				}
-				
+			}
+			if(!isSOTrx)
+			{
+				List<MDSCouponSchedule> schedueles = new Query(getCtx(), MDSCouponSchedule.Table_Name, " M_Product_ID = ? and M_AttributeSetInstance_ID = ? and Ref_Invoice_ID is null and GL_Journal_ID is null ", get_TrxName()).list();
 			}
 		}
 		return "@Processed@";
