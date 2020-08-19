@@ -90,8 +90,8 @@ public class CreateFD extends SvrProcess
 		if(actionWithFD.equalsIgnoreCase("NE"))
 		{
 			int C_DocTypePayment_ID = DB.getSQLValue(get_TrxName(), "SELECT C_DocType_ID FROM C_DocType "
-					+ "Where BankAccountType like ? and AD_Client_ID = ? AND DocBaseType = ? ", 
-					deposit.getC_BankAccount().getBankAccountType(),getAD_Client_ID(),X_C_DocType.DOCBASETYPE_APPayment);
+					+ "Where BankAccountType LIKE ( ? ) and AD_Client_ID = ? AND DocBaseType = ? ", 
+					"%"+deposit.getC_BankAccount().getBankAccountType()+"%",getAD_Client_ID(),X_C_DocType.DOCBASETYPE_APPayment);
 			
 			MPayment newDeposit = CreatePayment(deposit.getDS_PrincipalAmtCharge_ID(),deposit.getDS_PrincipalAmount(),deposit.getC_Currency_ID(),false,C_DocTypePayment_ID);
 			addLog(newDeposit.getC_Payment_ID(),newDeposit.getDateAcct(),newDeposit.getPayAmt(),newDeposit.getDocumentNo(),I_C_Payment.Table_ID,newDeposit.getC_Payment_ID());
@@ -174,8 +174,8 @@ public class CreateFD extends SvrProcess
 			else
 			{
 				int C_DocTypePayment_ID = DB.getSQLValue(get_TrxName(), "SELECT C_DocType_ID FROM C_DocType "
-						+ "Where BankAccountType like ? and AD_Client_ID = ? AND DocBaseType = ? ", 
-						deposit.getC_BankAccount().getBankAccountType(),getAD_Client_ID(),X_C_DocType.DOCBASETYPE_ARReceipt);
+						+ "Where BankAccountType LIKE ( ? ) and AD_Client_ID = ? AND DocBaseType = ? ", 
+						"%"+deposit.getC_BankAccount().getBankAccountType()+"%",getAD_Client_ID(),X_C_DocType.DOCBASETYPE_ARReceipt);
 				
 				MPayment InterestReceived = CreatePayment(deposit.getDS_InterestAmtCharge_ID(),deposit.getInterestAmt(),deposit.getC_Currency_ID(),true,C_DocTypePayment_ID);
 				addLog(InterestReceived.getC_Payment_ID(),InterestReceived.getDateAcct(),InterestReceived.getPayAmt(),InterestReceived.getDocumentNo(),I_C_Payment.Table_ID,InterestReceived.getC_Payment_ID());
@@ -184,8 +184,8 @@ public class CreateFD extends SvrProcess
 		else if(actionWithFD.equalsIgnoreCase("TE"))
 		{
 			int C_DocTypePayment_ID = DB.getSQLValue(get_TrxName(), "SELECT C_DocType_ID FROM C_DocType "
-					+ "Where BankAccountType like ? and AD_Client_ID = ? AND DocBaseType = ? ", 
-					deposit.getC_BankAccount().getBankAccountType(),getAD_Client_ID(),X_C_DocType.DOCBASETYPE_ARReceipt);
+					+ "Where BankAccountType LIKE ( ? ) and AD_Client_ID = ? AND DocBaseType = ? ", 
+					"%"+deposit.getC_BankAccount().getBankAccountType()+"%",getAD_Client_ID(),X_C_DocType.DOCBASETYPE_ARReceipt);
 			
 			Timestamp today = Env.getContextAsDate(getCtx(), "#Date");
 			MPayment interestReceiptEntry = CreatePayment(deposit.getDS_InterestAmtCharge_ID(),deposit.getInterestAmt(),deposit.getC_Currency_ID(),true,C_DocTypePayment_ID);

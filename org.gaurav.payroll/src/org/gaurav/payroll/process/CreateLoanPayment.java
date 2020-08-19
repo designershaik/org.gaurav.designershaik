@@ -57,8 +57,8 @@ public class CreateLoanPayment extends SvrProcess{
 			throw new AdempiereException("Bank account mandatory");
 		
 		int C_DocTypePayment_ID = DB.getSQLValue(get_TrxName(), "SELECT C_DocType_ID FROM C_DocType "
-				+ "Where BankAccountType like ? and AD_Client_ID = ? AND DocBaseType = ? ", 
-				advance.getC_BankAccount().getBankAccountType(),getAD_Client_ID(),X_C_DocType.DOCBASETYPE_APPayment);
+				+ "Where BankAccountType LIKE ( ? ) and AD_Client_ID = ? AND DocBaseType = ? ", 
+				"%"+advance.getC_BankAccount().getBankAccountType()+"%",getAD_Client_ID(),X_C_DocType.DOCBASETYPE_APPayment);
 		
 		MGSHRCompensationMaster compensation = new MGSHRCompensationMaster(getCtx(), advance.getGS_HR_Compensation_Master_ID(), get_TrxName());
 		MPayment payment = new MPayment(getCtx(), 0, get_TrxName());

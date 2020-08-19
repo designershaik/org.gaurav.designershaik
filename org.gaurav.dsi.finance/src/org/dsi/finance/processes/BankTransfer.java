@@ -152,10 +152,10 @@ public class BankTransfer extends SvrProcess
 
 		MBankAccount mBankFrom = new MBankAccount(getCtx(),p_From_C_BankAccount_ID, get_TrxName());
 		MBankAccount mBankTo = new MBankAccount(getCtx(),p_To_C_BankAccount_ID, get_TrxName());
-		
+	
 		int C_DocTypePayment_ID = DB.getSQLValue(get_TrxName(), "SELECT C_DocType_ID FROM C_DocType "
-				+ "Where BankAccountType like ? and AD_Client_ID = ? AND DocBaseType = ? ", 
-				mBankFrom.getBankAccountType(),getAD_Client_ID(),X_C_DocType.DOCBASETYPE_APPayment);
+				+ "Where BankAccountType LIKE ( ? ) and AD_Client_ID = ? AND DocBaseType = ? ", 
+				"%"+mBankFrom.getBankAccountType()+"%",getAD_Client_ID(),X_C_DocType.DOCBASETYPE_APPayment);
 		
 		MPayment paymentBankFrom = new MPayment(getCtx(), 0 ,  get_TrxName());
 		paymentBankFrom.setC_BankAccount_ID(mBankFrom.getC_BankAccount_ID());
@@ -187,8 +187,8 @@ public class BankTransfer extends SvrProcess
 		m_created++;
 
 		int C_DocTypeReceipt_ID = DB.getSQLValue(get_TrxName(), "SELECT C_DocType_ID FROM C_DocType "
-				+ "Where BankAccountType like ? and AD_Client_ID = ? AND DocBaseType = ? ", 
-				mBankTo.getBankAccountType(),getAD_Client_ID(),X_C_DocType.DOCBASETYPE_ARReceipt);
+				+ "Where BankAccountType LIKE ( ? ) and AD_Client_ID = ? AND DocBaseType = ? ", 
+				"%"+mBankTo.getBankAccountType()+"%",getAD_Client_ID(),X_C_DocType.DOCBASETYPE_ARReceipt);
 		
 		MPayment paymentBankTo = new MPayment(getCtx(), 0 ,  get_TrxName());
 		paymentBankTo.setC_BankAccount_ID(mBankTo.getC_BankAccount_ID());
