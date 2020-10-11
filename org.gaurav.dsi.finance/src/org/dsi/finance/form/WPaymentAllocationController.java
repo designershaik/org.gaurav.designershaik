@@ -123,7 +123,7 @@ implements IFormController,EventListener<Event>, WTableModelListener, ValueChang
 	private WTableDirEditor organizationPick;
 	
 	private Panel southPanel = new Panel();
-
+	protected Button selectButton = new Button();
 	/**
 	 *  Static Init
 	 *  @throws Exception
@@ -165,6 +165,8 @@ implements IFormController,EventListener<Event>, WTableModelListener, ValueChang
 		allocCurrencyLabel.setText(".");
 		
 		organizationLabel.setText(Msg.translate(Env.getCtx(), "AD_Org_ID"));
+		selectButton.setLabel("Select All");
+		selectButton.addActionListener(this);
 		
 		North north = new North();
 		north.setStyle("border: none");
@@ -208,6 +210,7 @@ implements IFormController,EventListener<Event>, WTableModelListener, ValueChang
 		ZKUpdateUtil.setHflex(allocationLayout, "min");
 		rows = allocationLayout.newRows();
 		row = rows.newRow();
+		row.appendChild(selectButton);
 		row.appendCellChild(differenceLabel.rightAlign());
 		row.appendCellChild(allocCurrencyLabel.rightAlign());
 		ZKUpdateUtil.setHflex(differenceField, "true");
@@ -257,6 +260,8 @@ implements IFormController,EventListener<Event>, WTableModelListener, ValueChang
 		north.setStyle("border: none");
 		invoiceLayout.appendChild(north);
 		north.appendChild(invoiceLabel);
+		
+		
 		south = new South();
 		south.setStyle("border: none");
 		invoiceLayout.appendChild(south);
@@ -342,11 +347,11 @@ implements IFormController,EventListener<Event>, WTableModelListener, ValueChang
 		chargePick.addValueChangeListener(this);
 		
 	//  Charge
-			AD_Column_ID = 212213;    //  C_AllocationLine.C_Charge_ID
-			MLookup lookupDocType = MLookupFactory.get (Env.getCtx(), form.getWindowNo(), 0, AD_Column_ID, DisplayType.TableDir);
-			DocTypePick = new WTableDirEditor("C_DocType_ID", false, false, true, lookupDocType);
-			DocTypePick.setValue(new Integer(m_C_DocType_ID));
-			DocTypePick.addValueChangeListener(this);
+		AD_Column_ID = 212213;    //  C_AllocationLine.C_Charge_ID
+		MLookup lookupDocType = MLookupFactory.get (Env.getCtx(), form.getWindowNo(), 0, AD_Column_ID, DisplayType.TableDir);
+		DocTypePick = new WTableDirEditor("C_DocType_ID", false, false, true, lookupDocType);
+		DocTypePick.setValue(new Integer(m_C_DocType_ID));
+		DocTypePick.addValueChangeListener(this);
 			
 //			loadBPartner();
 	}   //  dynInit
@@ -374,6 +379,13 @@ implements IFormController,EventListener<Event>, WTableModelListener, ValueChang
 		else if (e.getTarget().equals(refreshButton))
 		{
 			loadBPartner();
+		}
+		else if(e.getTarget().equals(selectButton))
+		{
+			for(int i=0; i < invoiceTable.getRowCount(); i++)
+			{
+				invoiceTable.getModel().setDataAt(true, i, 0);
+			}
 		}
 	}
 

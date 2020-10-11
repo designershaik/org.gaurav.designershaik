@@ -118,11 +118,33 @@ public class CreateAveragePORecordAndCorrectCurrentQty extends SvrProcess
 				+ "and line.M_Product_ID = ? "
 				+ "and type.docsubtypeinv='PI' ", M_Product_ID);
 		
+		BigDecimal issuedToProjectQty = DB.getSQLValueBD(get_TrxName(), "select coalesce(sum(movementqty),0) "
+				+ "from C_ProjectIssue "
+				+ "where Processed='Y'"
+				+ "and Posted='E' "
+				+ "and M_Product_ID = ? ", M_Product_ID);
+		
+		BigDecimal qtyProduction = DB.getSQLValueBD(get_TrxName(), "select abs(coalesce(sum(l.movementqty),0)) "
+				+ "from M_ProductionLine l,M_Production p "
+				+ "where l.M_Production_ID =p.M_Production_ID "
+				+ "and p.docstatus not in ('DR','IN')"
+				+ "and p.posted='E'"
+				+ "and l.IsEndProduct='N' "
+				+ "and l.M_Product_ID = ? ", M_Product_ID);
+		
+		BigDecimal qtyProductionEndProduct = DB.getSQLValueBD(get_TrxName(), "select abs(coalesce(sum(l.movementqty),0)) "
+				+ "from M_ProductionLine l,M_Production p "
+				+ "where l.M_Production_ID =p.M_Production_ID "
+				+ "and p.docstatus not in ('DR','IN')"
+				+ "and p.posted='E'"
+				+ "and l.IsEndProduct='Y' "
+				+ "and l.M_Product_ID = ? ", M_Product_ID);
+		
 		BigDecimal QtyOnHand = DB.getSQLValueBD(get_TrxName(), "select coalesce(sum(qtyonhand),0) from m_storageonhand where m_product_id= ? ", M_Product_ID);
 		if(QtyOnHand.compareTo(Env.ZERO)<0)
 			QtyOnHand = Env.ZERO;
 		
-		return shipmentQty.add(internalUseQty).add(QtyOnHand).add(physicalQty);
+		return shipmentQty.add(internalUseQty).add(QtyOnHand).add(physicalQty).add(issuedToProjectQty).add(qtyProduction).add(qtyProductionEndProduct);
 	}
 	
 

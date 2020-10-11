@@ -5,7 +5,7 @@ import org.compiere.process.ProcessCall;
 
 import com.gaurav.dsi.process.DistributeAmountWithinPortfolio;
 import com.gaurav.dsi.process.FundMovement;
-import com.gaurav.dsi.process.GenerateFDBankBalances;
+import com.gaurav.dsi.process.GenerateCashPositions;
 import com.gaurav.dsi.process.ProcessCouponPayoutSchedule;
 import com.gaurav.dsi.process.ProcessCouponReceiptAndAdjustAmortization;
 
@@ -17,8 +17,8 @@ public class InvestmentProcessFactories implements IProcessFactory{
 		if(ProcessCouponPayoutSchedule.class.getName().equalsIgnoreCase(className))
 			return new ProcessCouponPayoutSchedule();
 		
-		if(GenerateFDBankBalances.class.getName().equalsIgnoreCase(className))
-			return new GenerateFDBankBalances();
+		if(GenerateCashPositions.class.getName().equalsIgnoreCase(className))
+			return new GenerateCashPositions();
 		
 		if(ProcessCouponReceiptAndAdjustAmortization.class.getName().equalsIgnoreCase(className))
 			return new ProcessCouponReceiptAndAdjustAmortization();

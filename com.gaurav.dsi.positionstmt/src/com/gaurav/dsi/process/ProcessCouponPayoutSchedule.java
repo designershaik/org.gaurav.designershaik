@@ -3,7 +3,6 @@ package com.gaurav.dsi.process;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.logging.Level;
 
 import org.adempiere.exceptions.AdempiereException;
@@ -11,14 +10,12 @@ import org.compiere.model.MAttributeSetInstance;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MProduct;
-import org.compiere.model.Query;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.TimeUtil;
 import org.gaurav.dsi.model.MDSCouponSchedule;
-import org.gaurav.dsi.model.X_DS_CouponSchedule;
 
 public class ProcessCouponPayoutSchedule extends SvrProcess{
 	
@@ -123,10 +120,10 @@ public class ProcessCouponPayoutSchedule extends SvrProcess{
 					}
 				}
 			}
-			if(!isSOTrx)
-			{
-				List<MDSCouponSchedule> schedueles = new Query(getCtx(), MDSCouponSchedule.Table_Name, " M_Product_ID = ? and M_AttributeSetInstance_ID = ? and Ref_Invoice_ID is null and GL_Journal_ID is null ", get_TrxName()).list();
-			}
+//			if(!isSOTrx)
+//			{
+//				List<MDSCouponSchedule> schedueles = new Query(getCtx(), MDSCouponSchedule.Table_Name, " M_Product_ID = ? and M_AttributeSetInstance_ID = ? and Ref_Invoice_ID is null and GL_Journal_ID is null ", get_TrxName()).list();
+//			}
 		}
 		return "@Processed@";
 	}

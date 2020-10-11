@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Myappsheet
+Bundle-SymbolicName: com.gaurav.myappsheet
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: GAURAV
+Automatic-Module-Name: com.gaurav.myappsheet
+Bundle-RequiredExecutionEnvironment: JavaSE-11

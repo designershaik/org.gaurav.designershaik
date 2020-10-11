@@ -51,11 +51,12 @@ public class FundMovement extends SvrProcess
 				MDSFundMovement yearMov = new MDSFundMovement(getCtx(),dsYearMovementFromSectionA_ID, get_TrxName());
 				String colYear0 = yearMov.getCol_0();
 				String colYear4 = yearMov.getCol_4();
-				String colYear8 = yearMov.getCol_8();
-				String colYear12 = yearMov.getCol_12();
-				String colYear16 = yearMov.getCol_16();
-				String colYear20 = yearMov.getCol_20();
-				String colYear24 = yearMov.getCol_24();
+//				String colYear8 = yearMov.getCol_8();
+//				String colYear12 = yearMov.getCol_12();
+//				String colYear16 = yearMov.getCol_16();
+//				String colYear20 = yearMov.getCol_20();
+//				String colYear24 = yearMov.getCol_24();
+				log.info("Column year 4: "+colYear4);
 				if(DS_FundMovement_ID<=0 && colYear0.equalsIgnoreCase(year))
 				{
 					invMov = new MDSFundMovement(getCtx(), 0, get_TrxName());

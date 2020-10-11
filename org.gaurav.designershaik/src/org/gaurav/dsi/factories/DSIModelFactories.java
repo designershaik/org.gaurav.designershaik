@@ -18,6 +18,7 @@ import org.gaurav.dsi.model.MDSAvailEmployee;
 import org.gaurav.dsi.model.MDSB2BConfiguration;
 import org.gaurav.dsi.model.MDSB2BEmailConf;
 import org.gaurav.dsi.model.MDSBankBalancesFD;
+import org.gaurav.dsi.model.MDSCashPositionSetup;
 import org.gaurav.dsi.model.MDSContactMaster;
 import org.gaurav.dsi.model.MDSContactMasterLocation;
 import org.gaurav.dsi.model.MDSContactRelation;
@@ -311,6 +312,9 @@ public class DSIModelFactories implements IModelFactory{
 		
 		if(tableName.equals(MDSFundMovement.Table_Name))
 			return MDSFundMovement.class;
+		
+		if(tableName.equals(MDSCashPositionSetup.Table_Name))
+			return MDSCashPositionSetup.class;
 			
 		return null;
 	}
@@ -540,6 +544,9 @@ public class DSIModelFactories implements IModelFactory{
 		if(tableName.equals(MDSFundMovement.Table_Name))
 			return new MDSFundMovement(Env.getCtx(), Record_ID, trxName);
 		
+		if(tableName.equals(MDSCashPositionSetup.Table_Name))
+			return new MDSCashPositionSetup(Env.getCtx(), Record_ID, trxName);
+		
 		return null;
 	}
 
@@ -767,6 +774,9 @@ public class DSIModelFactories implements IModelFactory{
 		
 		if(tableName.equals(MDSFundMovement.Table_Name))
 			return new MDSFundMovement(Env.getCtx(), rs, trxName);
+		
+		if(tableName.equals(MDSCashPositionSetup.Table_Name))
+			return new MDSCashPositionSetup(Env.getCtx(), rs, trxName);
 		
 		return null;
 	}

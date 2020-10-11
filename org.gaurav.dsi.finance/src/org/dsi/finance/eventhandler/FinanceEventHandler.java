@@ -414,7 +414,7 @@ public class FinanceEventHandler extends AbstractEventHandler
 			{
 				MOrder order = (MOrder)po;
 				if (order.getGrandTotal().signum() != 0
-						&& (MOrder.PAYMENTRULE_OnCredit.equals(order.getPaymentRule()) || MOrder.PAYMENTRULE_DirectDebit.equals(order.getPaymentRule())))
+						&& (MOrder.PAYMENTRULE_OnCredit.equals(order.getPaymentRule()) || MOrder.PAYMENTRULE_DirectDebit.equals(order.getPaymentRule())) && !order.isSOTrx())
 				{
 					int C_PaymentTerm_ID = order.getC_PaymentTerm_ID();
 					MPaymentTerm term = new MPaymentTerm(ctx, C_PaymentTerm_ID, trxName);
