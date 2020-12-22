@@ -19,5 +19,4 @@ public class MDSImportInvoicesFiling extends X_DS_ImportInvoices_Filing {
 		super(ctx, rs, trxName);
 		
 	}
-
 }

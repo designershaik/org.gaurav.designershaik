@@ -10,6 +10,8 @@ import org.compiere.model.MCountry;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
+import org.compiere.model.MPayment;
+import org.compiere.util.DB;
 
 public class CallOutSetIsPOPMandatory implements IColumnCallout{
 
@@ -32,6 +34,12 @@ public class CallOutSetIsPOPMandatory implements IColumnCallout{
 				Integer C_Invoice_ID = (Integer)value;
 				MInvoice inv = new MInvoice(ctx, C_Invoice_ID, null);
 				C_BPartner_Location_ID = inv.getC_BPartner_Location_ID();
+				int C_Payment_ID = DB.getSQLValue(null, "Select C_Payment_ID From C_Payment Where C_Invoice_ID = ? and Processed='Y'",C_Invoice_ID);
+				if(C_Payment_ID>0)
+				{
+					MPayment payment = new MPayment(ctx, C_Payment_ID, null);
+					mTab.fireDataStatusEEvent("", "Invoice is already has a drafted payment: "+payment.getDocumentNo(), false);
+				}
 			}
 			if(mField.getColumnName().equalsIgnoreCase("C_Order_ID"))
 			{

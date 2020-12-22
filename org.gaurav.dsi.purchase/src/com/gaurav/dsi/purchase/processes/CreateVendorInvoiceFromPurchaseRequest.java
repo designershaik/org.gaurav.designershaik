@@ -124,6 +124,10 @@ public class CreateVendorInvoiceFromPurchaseRequest extends SvrProcess{
 						line.setC_Activity_ID(product.getC_Activity_ID());
 						line.setC_ProjectPhase_ID(product.getC_ProjectPhase_ID());
 						line.setC_ProjectTask_ID(product.getC_ProjectTask_ID());
+						
+						if(product.get_ValueAsInt("RelatedProduct_ID")>0)
+							line.set_ValueNoCheck("RelatedProduct_ID", product.get_Value("RelatedProduct_ID"));
+						
 						if(product.getC_Charge_ID()!=0)
 						{
 							C_Charge_ID = product.getC_Charge_ID();

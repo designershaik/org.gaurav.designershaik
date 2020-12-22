@@ -20,6 +20,7 @@ import org.gaurav.payroll.model.MGSContractCalendar;
 import org.gaurav.payroll.model.MGSContractPeriod;
 import org.gaurav.payroll.model.MGSHREmployee;
 import org.gaurav.payroll.model.MGSHREmployeeAdvance;
+import org.gaurav.payroll.model.MGSHRLeaveApplication;
 import org.gaurav.payroll.model.MGSHRLeaveMaster;
 import org.gaurav.payroll.model.MGSHRLogsImported;
 import org.gaurav.payroll.model.MGSHRMonthlyAttendance;
@@ -112,6 +113,9 @@ public class PayrollModelFactories implements IModelFactory{
 		if(tableName.equalsIgnoreCase(MHRContract.Table_Name))
 			return MHRContract.class;
 		
+		if(tableName.equalsIgnoreCase(MGSHRLeaveApplication.Table_Name))
+			return MGSHRLeaveApplication.class;
+
 		return null;
 	}
 
@@ -190,6 +194,9 @@ public class PayrollModelFactories implements IModelFactory{
 		if(tableName.equalsIgnoreCase(MHRContract.Table_Name))
 			return new MHRContract(Env.getCtx(), Record_ID, trxName);
 		
+		if(tableName.equalsIgnoreCase(MGSHRLeaveApplication.Table_Name))
+			return new MGSHRLeaveApplication(Env.getCtx(), Record_ID, trxName);
+		
 		return null;
 	}
 
@@ -267,6 +274,9 @@ public class PayrollModelFactories implements IModelFactory{
 		
 		if(tableName.equalsIgnoreCase(MHRContract.Table_Name))
 			return new MHRContract(Env.getCtx(), rs, trxName);
+		
+		if(tableName.equalsIgnoreCase(MGSHRLeaveApplication.Table_Name))
+			return new MGSHRLeaveApplication(Env.getCtx(), rs, trxName);
 		
 		return null;
 	}

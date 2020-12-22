@@ -12,12 +12,10 @@ import org.compiere.util.CLogger;
 import com.logilite.cms.managealfrescodir.CreateDirectoryStructure;
 import com.logilite.cms.managealfrescodir.TestDirCreation;
 
-import compiere.model.MyValidator;
-
 public class ProjectValidator implements ModelValidator{
 
 	/**	Logger			*/
-	private static CLogger log = CLogger.getCLogger(MyValidator.class);
+	private static CLogger log = CLogger.getCLogger(ProjectValidator.class);
 	/** Client			*/
 	private int		m_AD_Client_ID = -1;
 	/** User	*/

@@ -6,6 +6,7 @@ import java.util.Properties;
 import org.adempiere.base.IColumnCallout;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
+import org.compiere.model.MProduct;
 
 public class CalculateAmmortizationAmt implements IColumnCallout{
 
@@ -14,13 +15,18 @@ public class CalculateAmmortizationAmt implements IColumnCallout{
 		if(value==null)
 			return null;
 		
-		BigDecimal qtyInvoiced = (BigDecimal)mTab.getValue("QtyInvoiced");
-		BigDecimal listPrice = (BigDecimal)mTab.getValue("PriceList");
-		BigDecimal standardPrice = (BigDecimal)mTab.getValue("PriceActual");
-		if(qtyInvoiced!=null && listPrice!=null && standardPrice!=null)
+		Integer M_Product_ID = (Integer)mTab.getValue("M_Product_ID");
+		if(M_Product_ID!=null)
 		{
-			BigDecimal amortizationAmt = (qtyInvoiced.multiply(listPrice)).subtract(qtyInvoiced.multiply(standardPrice));
-			mTab.setValue("DS_Amortization_Amt", amortizationAmt);
+			BigDecimal qtyInvoiced = (BigDecimal)mTab.getValue("QtyInvoiced");
+			BigDecimal listPrice = (BigDecimal)mTab.getValue("PriceList");
+			BigDecimal standardPrice = (BigDecimal)mTab.getValue("PriceActual");
+			MProduct product = new MProduct(ctx, M_Product_ID, null);
+			if(product.get_ValueAsBoolean("DS_IsInvestmentRelated") && qtyInvoiced!=null && listPrice!=null && standardPrice!=null)
+			{
+				BigDecimal amortizationAmt = (qtyInvoiced.multiply(listPrice)).subtract(qtyInvoiced.multiply(standardPrice));
+				mTab.setValue("DS_Amortization_Amt", amortizationAmt);
+			}
 		}
 		return null;
 	}

@@ -41,6 +41,7 @@ import org.compiere.model.MMovement;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MOrderPaySchedule;
+import org.compiere.model.MPaySchedule;
 import org.compiere.model.MPayment;
 import org.compiere.model.MPaymentTerm;
 import org.compiere.model.MPeriod;
@@ -245,13 +246,11 @@ public class FinanceEventHandler extends AbstractEventHandler
 			}
 			if(event.getTopic().equalsIgnoreCase(IEventTopics.DOC_BEFORE_COMPLETE))
 			{
-				if(payment.getC_BankAccount().getBankAccountType().equalsIgnoreCase(MBankAccount.BANKACCOUNTTYPE_Cash) && !payment.isSelfService() && !payment.isReceipt())
+				if(!payment.isReceipt() && payment.getC_Invoice_ID()>0)
 				{
-//					BigDecimal totalCashBillPayment = (BigDecimal)payment.get_Value("DS_TotalCashBillAmt");
-//					BigDecimal totalDenominationTotal = DB.getSQLValueBD(trxName, "Select coalesce(sum(DS_DenominationType::numeric*Qty),0) "
-//							+ "From DS_DenomiationDet_Trans where C_Payment_ID = ? ", payment.getC_Payment_ID());
-////					if(totalCashBillPayment.compareTo(totalDenominationTotal)!=0)
-//						throw new AdempiereException(Msg.getMsg(ctx, "DS_WrongDenomination"));
+					MInvoice invoice = (MInvoice)payment.getC_Invoice();
+					if(invoice.isPaid())
+						throw new AdempiereException("Invoice is already paid: "+invoice.getDocumentNo());
 				}
 			}
 			if(event.getTopic().equalsIgnoreCase(IEventTopics.DOC_AFTER_COMPLETE))
@@ -424,10 +423,30 @@ public class FinanceEventHandler extends AbstractEventHandler
 								+ "Where C_Order_ID = ? and DueDate < ? Order by dueDate desc",order.getC_Order_ID(),order.getDatePromised());
 						if(C_OrderPaySchedule_ID>0)
 						{
-							MOrderPaySchedule schedule = new MOrderPaySchedule(ctx,C_OrderPaySchedule_ID,trxName);
-							schedule.setDueDate(order.getDatePromised());
-							schedule.saveEx();
+							MOrderPaySchedule payscheduleInOrder = new MOrderPaySchedule(ctx,C_OrderPaySchedule_ID,trxName);
+							payscheduleInOrder.setDueDate(order.getDatePromised());
+							payscheduleInOrder.saveEx();
 						}
+					}
+				}
+			}
+			if(event.getTopic().equalsIgnoreCase(IEventTopics.DOC_BEFORE_PREPARE))
+			{
+				MOrder order = (MOrder)po;
+				if (order.getGrandTotal().signum() != 0 && order.isSOTrx())
+				{
+					int C_PaymentTerm_ID = order.getC_PaymentTerm_ID();
+					MPaymentTerm term = new MPaymentTerm(ctx, C_PaymentTerm_ID, trxName);
+					MPaySchedule[] schedule = term.getSchedule(true);
+					int C_OrderPaySchedule_ID = DB.getSQLValue(trxName, "Select C_OrderPaySchedule_ID From C_OrderPaySchedule "
+								+ "Where C_Order_ID = ? and DueDate < ? Order by dueDate desc",order.getC_Order_ID(),order.getDatePromised());
+					if(C_OrderPaySchedule_ID>0)
+					{
+						MOrderPaySchedule payscheduleInOrder = new MOrderPaySchedule(ctx,C_OrderPaySchedule_ID,trxName);
+						payscheduleInOrder.setDueDate(order.getDatePromised());
+						if(schedule.length==1 && payscheduleInOrder.getDueAmt().compareTo(order.getGrandTotal())!=0)
+							payscheduleInOrder.setDueAmt(order.getGrandTotal());
+						payscheduleInOrder.saveEx();
 					}
 				}
 			}
@@ -490,6 +509,7 @@ public class FinanceEventHandler extends AbstractEventHandler
 		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, MOrder.Table_Name);
 		
 		registerTableEvent(IEventTopics.DOC_AFTER_PREPARE, MOrder.Table_Name);
+		registerTableEvent(IEventTopics.DOC_BEFORE_PREPARE, MOrder.Table_Name);
 		
 		registerTableEvent(IEventTopics.PO_BEFORE_NEW, I_C_Cash.Table_Name);
 		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, I_C_Cash.Table_Name);
@@ -517,7 +537,7 @@ public class FinanceEventHandler extends AbstractEventHandler
 		
 		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_C_Payment.Table_Name);
 		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, I_C_Payment.Table_Name);
-		
+				
 		registerTableEvent(IEventTopics.DOC_BEFORE_COMPLETE, MPayment.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, MPayment.Table_Name);
 		

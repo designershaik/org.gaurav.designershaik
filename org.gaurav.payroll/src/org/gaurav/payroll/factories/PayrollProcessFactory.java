@@ -6,7 +6,7 @@ import org.gaurav.payroll.process.AttendanceLogSheet;
 import org.gaurav.payroll.process.CreateLoanPayment;
 import org.gaurav.payroll.process.GenerateAttendance;
 import org.gaurav.payroll.process.GenerateInstallments;
-import org.gaurav.payroll.process.SubmitLoanForApproval;
+import org.gaurav.payroll.process.SubmitForApproval;
 import org.gaurav.payroll.process.YearCreateSalaryPeriods;
 
 public class PayrollProcessFactory implements IProcessFactory{
@@ -17,8 +17,8 @@ public class PayrollProcessFactory implements IProcessFactory{
 		if(className.equals(AttendanceLogSheet.class.getName()))
 			return new AttendanceLogSheet();
 		
-		if(className.equals(SubmitLoanForApproval.class.getName()))
-			return new SubmitLoanForApproval();
+		if(className.equals(SubmitForApproval.class.getName()))
+			return new SubmitForApproval();
 		
 		if(className.equals(GenerateAttendance.class.getName()))
 			return new GenerateAttendance();

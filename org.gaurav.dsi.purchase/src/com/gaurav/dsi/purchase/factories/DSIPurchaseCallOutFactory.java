@@ -12,13 +12,14 @@ import org.compiere.model.MOrderLine;
 import org.compiere.model.MRequest;
 import org.compiere.model.MUser;
 import org.gaurav.dsi.model.MDSOrgMaster;
-
 import com.gaurav.dsi.purchase.callout.CallOutApprovedPurchaseRequest;
 import com.gaurav.dsi.purchase.callout.CallOutCopyPRDetailsToInvoice;
 import com.gaurav.dsi.purchase.callout.CallOutPurchaseRequestDetails;
 import com.gaurav.dsi.purchase.callout.CallOutRequest;
 import com.gaurav.dsi.purchase.callout.CallOutSetBPartnerLocation;
 import com.gaurav.dsi.purchase.callout.CallOutSetDefautlSubGroup;
+import com.gaurav.dsi.purchase.callout.CallOutSetPriceListForInvoiceRelatedProduct;
+import com.gaurav.dsi.purchase.callout.CallOutSetPriceListForOrderRelatedProduct;
 import com.gaurav.dsi.purchase.callout.CallOutTags;
 import com.gaurav.dsi.purchase.callout.CallOutVerifyPaymentAmt;
 import com.gaurav.dsi.purchase.callout.SetSalesRepInRequest;
@@ -74,6 +75,14 @@ public class DSIPurchaseCallOutFactory implements IColumnCalloutFactory{
 		if(tableName.equalsIgnoreCase(MRequest.Table_Name) 
 				&& columnName.equalsIgnoreCase(MRequest.COLUMNNAME_R_Group_ID))
 			list.add(new CallOutSetDefautlSubGroup());
+		
+		if(tableName.equalsIgnoreCase(MInvoiceLine.Table_Name) 
+				&& columnName.equalsIgnoreCase("RelatedProduct_ID"))
+			list.add(new CallOutSetPriceListForInvoiceRelatedProduct());
+		
+		if(tableName.equalsIgnoreCase(MOrderLine.Table_Name) 
+				&& columnName.equalsIgnoreCase("RelatedProduct_ID"))
+			list.add(new CallOutSetPriceListForOrderRelatedProduct());
 		
 		return list!=null ? list.toArray(new IColumnCallout[0]): new IColumnCallout[0];
 	}

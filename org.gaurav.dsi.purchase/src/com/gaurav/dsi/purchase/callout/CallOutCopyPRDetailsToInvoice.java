@@ -60,7 +60,7 @@ public class CallOutCopyPRDetailsToInvoice implements IColumnCallout{
 		mTab.setValue("C_ProjectTask_ID", mo.getC_ProjectTask_ID()==0 ? null:mo.getC_ProjectTask_ID());
 		mTab.setValue("PriceEntered", mo.getDS_Budget());
 		mTab.setValue("PriceActual", mo.getDS_Budget());
-	
+		mTab.setValue("RelatedProduct_ID", mo.get_Value("RelatedProduct_ID"));
 		return null;
 	}
 

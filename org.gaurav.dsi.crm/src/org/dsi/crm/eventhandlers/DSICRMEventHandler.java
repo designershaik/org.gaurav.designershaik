@@ -647,8 +647,8 @@ public class DSICRMEventHandler extends AbstractEventHandler{
 	private void verifyIfThePOReferenceAlreadyExists(MOrder order) 
 	{
 		int count = DB.getSQLValue(trxName, "select count(*) from C_Order where trim(POReference) "
-				+ "like ? and ad_client_id = ? and C_BPartner_ID = ? and c_bpartner_location_ID = ? and DocStatus in ('CO','DR','IP') ",
-				order.getPOReference(),order.getAD_Client_ID(),order.getC_BPartner_ID(),order.getC_BPartner_Location_ID());
+				+ "like ? and ad_client_id = ? and C_BPartner_ID = ? and c_bpartner_location_ID = ? and DocStatus in ('CO','DR','IP') and C_DocTypeTarget_ID = ? ",
+				order.getPOReference(),order.getAD_Client_ID(),order.getC_BPartner_ID(),order.getC_BPartner_Location_ID(),order.getC_DocTypeTarget_ID());
 		if(count>1)
 			throw new AdempiereException("Sales Order for this PO Reference is already created");
 	}

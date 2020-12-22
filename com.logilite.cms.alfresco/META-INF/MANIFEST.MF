@@ -6,8 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.adempiere.plugin.utils.AdempiereActivator
 Bundle-Vendor: Logilite
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: compiere.model,
- org.adempiere.exceptions,
+Import-Package: org.adempiere.exceptions,
  org.adempiere.plugin.utils,
  org.apache.commons.logging;version="1.1.1",
  org.compiere.model,
@@ -24,3 +23,4 @@ Bundle-ClassPath: lib/alfresco-opencmis-extension-0.2.jar,
  lib/chemistry-opencmis-server-bindings-0.6.0.jar,
  lib/chemistry-opencmis-server-support-0.6.0.jar,
  .
+Require-Bundle: org.adempiere.base;bundle-version="7.1.0"

@@ -6,8 +6,6 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.logging.Level;
-
-import org.compiere.acct.Fact.Balance;
 import org.compiere.model.MAcctSchema;
 import org.compiere.model.MBankAccount;
 import org.compiere.model.MClient;
@@ -31,7 +29,6 @@ public class GenerateCashPositions extends SvrProcess
 	Timestamp p_DateTo = null;
 	MAcctSchema as = null;
 	boolean p_DoNotRegenerate = false;
-	int currentMonth = 0;
 	@Override
 	protected void prepare() 
 	{
@@ -51,10 +48,7 @@ public class GenerateCashPositions extends SvrProcess
 				p_DoNotRegenerate = "Y".equals(para[i].getParameter());
 			else
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);		
-		}	
-		currentMonth = DB.getSQLValue(get_TrxName(), "Select to_Char(now(),'MM')::numeric ");
-		if(currentMonth+1>12)
-			currentMonth = 1;
+		}		
 	}
 
 	@Override
@@ -63,407 +57,23 @@ public class GenerateCashPositions extends SvrProcess
 		MClient client = MClient.get(getCtx());
 		as = client.getAcctSchema();
 		DB.executeUpdateEx("Delete from DS_BankBalancesFD ", get_TrxName());
-		
-		
 		createBankBalancesAndNonReconciledBalance();
 		createFixedDeposits();
-
 		if(p_DoNotRegenerate)
-			return "@OK@";
+			return "Showing report without regenerating. ";
 
 		createCashReceipts();
+		updateMonthsForCashProjection("Investment",0);	
 		
-		createProjections();
-		
-		return null;
-	}
-
-	private void createProjections() 
-	{
-		updateMonthsForCashProjection("Investment",0);
-		updateCashProjection("Investment","Coupons",1);
-		updateFixedDepositsInterestsAndMaturityAmts("Investment","Interests (Bank Accts,FD)",2);
-		updateFixedDepositsInterestsAndMaturityAmts("Investment","Maturity & Sell-out Amounts",3);
-		updateAgingForCreditAccounts("Operations Business","Collection from Credit Accounts",4);
-		updateAgingForCreditAccounts("Operations Business","Collection from Overdue Accounts",5);
-		updateAgingForCreditAccounts("Operations Business","Total Overdue",6);
-	}
-
-	private void updateAgingForCreditAccounts(String type,String value,int sequence) 
-	{		
-		String sql = "";
-		MDSFundMovement movement = null;
-
-		if(value.equalsIgnoreCase("Collection from Credit Accounts"))
-			sql = "with t1 as (select invoiceopentodate(ci.c_invoice_id,0,now())*multiplier,c_currency_id ,paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct) as DueDate, " + 
-					"to_Char(paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct),'MM') as MM,to_Char(paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct),'YYYY') as YYYY, " + 
-					"currencybase(invoiceopentodate(ci.c_invoice_id,0,now())*multiplier,ci.c_currency_id ,ci.dateacct ,ci.ad_client_id ,ci.ad_org_id ) as BaseAmt " + 
-					"from c_invoice_v ci ,c_bpartner bp " + 
-					"where ci.c_bpartner_id = bp.c_bpartner_id  " + 
-					"and invoiceopen(ci.c_invoice_id ,0)<>0  " + 
-					"and issotrx ='Y'  " + 
-					"and posted='Y' " + 
-					"and ispaid ='N' " + 
-					"and paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct) > ? " + 
-					"and bp.c_bp_group_id in (select c_bp_group_id from DS_CashPosition_Setup where categorytype ='P' and ElementValue is null) " + 
-					"order by to_Char(paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct),'YYYY')::numeric,to_Char(paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct),'MM')::numeric " + 
-					") " + 
-					"select sum(BaseAmt) as Balance,MM as MonthNo,YYYY " + 
-					"from t1 " + 
-					"group by YYYY,MM";
-		else
-			sql ="with t1 as (select invoiceopentodate(ci.c_invoice_id,0,now())*multiplier,c_currency_id ,paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct) as DueDate, " + 
-					"to_Char(?::timestamp,'MM') as MM,to_Char(?::timestamp,'YYYY') as YYYY, " + 
-					"currencybase(invoiceopentodate(ci.c_invoice_id,0,now())*multiplier,ci.c_currency_id ,ci.dateacct ,ci.ad_client_id ,ci.ad_org_id ) as BaseAmt " + 
-					"from c_invoice_v ci ,c_bpartner bp " + 
-					"where ci.c_bpartner_id = bp.c_bpartner_id  " + 
-					"and invoiceopen(ci.c_invoice_id ,0)<>0  " + 
-					"and issotrx ='Y'  " + 
-					"and posted='Y' " + 
-					"and ispaid ='N' " + 
-					"and paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct) > ? " + 
-					"and bp.c_bp_group_id in (select c_bp_group_id from DS_CashPosition_Setup where categorytype ='P' and ElementValue is null) " + 
-					"order by to_Char(paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct),'YYYY')::numeric,to_Char(paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct),'MM')::numeric " + 
-					") " + 
-					"select sum(BaseAmt) as Balance,MM as MonthNo,YYYY " + 
-					"from t1 " + 
-					"group by YYYY,MM ";
-			
-		
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		try
-		{
-			pstmt = DB.prepareStatement(sql.toString(), get_TrxName());
-			pstmt.setTimestamp(1, p_DateTo);
-			if(!value.equalsIgnoreCase("Collection from Credit Accounts"))
-			{
-				pstmt.setTimestamp(2, p_DateTo);
-				pstmt.setTimestamp(3, p_DateTo);
-			}
-			rs = pstmt.executeQuery();
-			while(rs.next())
-			{
-				boolean isAdded = false;
-				int monthNo = rs.getInt("MonthNo"); // Col2 has january , col3 as february and so on.
-				BigDecimal BHDAmt = rs.getBigDecimal("Balance");
-				String balance = BHDAmt.toString();
-				if(value.equalsIgnoreCase("Total Overdue"))
-					balance  = BHDAmt.negate().toString();
-				
-				int FundMovement_ID = DB.getSQLValue(get_TrxName(), "Select DS_FundMovement_ID from DS_FundMovement Where Col_1 like ? and DS_Section='C' and AD_PInstance_ID=? and Col_26='P' ",value,getAD_PInstance_ID());
-				if(FundMovement_ID<=0)
-				{
-					movement = new MDSFundMovement(getCtx(), 0, get_TrxName());
-					movement.setCol_0(type);
-					movement.setCol_1(value);
-					movement.setSeqNo(sequence);
-					movement.setDS_Section("C");
-					movement.setCol_26("P");
-					isAdded = true;
-					if(monthNo==1)
-						movement.setCol_2(balance);
-					if(monthNo==2)
-						movement.setCol_3(balance);
-					if(monthNo==3)
-						movement.setCol_4(balance);
-					if(monthNo==4)
-						movement.setCol_5(balance);
-					if(monthNo==5)
-						movement.setCol_6(balance);
-					if(monthNo==6)
-						movement.setCol_7(balance);
-					if(monthNo==7)
-						movement.setCol_8(balance);
-					if(monthNo==8)
-						movement.setCol_9(balance);
-					if(monthNo==9)
-						movement.setCol_10(balance);
-					if(monthNo==10)
-						movement.setCol_11(balance);
-					if(monthNo==11)
-						movement.setCol_12(balance);
-					if(monthNo==12)
-						movement.setCol_13(balance);
-					
-					movement.setAD_PInstance_ID(getAD_PInstance_ID());
-				}
-				else
-				{
-					movement = new MDSFundMovement(getCtx(), FundMovement_ID, get_TrxName());
-					if(!isAdded && movement.getCol_2()==null && monthNo==1)
-					{
-						movement.setCol_2(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_3()==null && monthNo==2)
-					{
-						movement.setCol_3(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_4()==null && monthNo==3)
-					{
-						movement.setCol_4(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_5()==null && monthNo==4)
-					{
-						movement.setCol_5(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_6()==null && monthNo==5)
-					{
-						movement.setCol_6(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_7()==null && monthNo==6)
-					{
-						movement.setCol_7(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_8()==null && monthNo==7)
-					{
-						movement.setCol_8(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_9()==null && monthNo==8)
-					{
-						movement.setCol_9(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_10()==null && monthNo==9)
-					{
-						movement.setCol_10(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_11()==null && monthNo==10)
-					{
-						movement.setCol_11(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_12()==null && monthNo==11)
-					{
-						movement.setCol_12(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_13()==null && monthNo==12)
-					{
-						movement.setCol_13(balance);
-						isAdded = true;
-					}
-				}
-				movement.saveEx();
-			}
-			
-		}
-		catch(Exception e)
-		{
-			log.severe("Error running cash receipt query. "+sql.toString());
-		}
-		finally
-		{
-			DB.close(rs, pstmt);
-		}
-		 
-	}
-
-	private void updateFixedDepositsInterestsAndMaturityAmts(String type,String value,int sequence) 
-	{
-		MDSFundMovement movement = null;
-		String sql = "";
-		if(value.equalsIgnoreCase("Interests (Bank Accts,FD)"))
-			sql = "select FDYear,InterestAmtBHD as Balance,FDMonth as MonthNo,MaturityDate,AD_Org_ID from cashposition_fixeddepositprojection where MaturityDate between ? and ? order by MaturityDate";
-		else
-			sql = "select FDYear,PrincipalAmtBHD as Balance,FDMonth as MonthNo,MaturityDate,AD_Org_ID from cashposition_fixeddepositprojection where MaturityDate between ? and ? order by MaturityDate";
-		
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		try
-		{
-			pstmt = DB.prepareStatement(sql.toString(), get_TrxName());
-			pstmt.setTimestamp(1, TimeUtil.addDays(p_DateTo, 1));
-			pstmt.setTimestamp(2, TimeUtil.addDays(p_DateTo, 366));
-			rs = pstmt.executeQuery();
-			while(rs.next())
-			{
-				boolean isAdded = false;
-				int monthNo = rs.getInt("MonthNo"); // Col2 has january , col3 as february and so on.
-				BigDecimal BHDAmt = rs.getBigDecimal("Balance");
-				String balance = BHDAmt.toString();
-				int FundMovement_ID = DB.getSQLValue(get_TrxName(), "Select DS_FundMovement_ID from DS_FundMovement Where Col_1 like ? and DS_Section='C' and AD_PInstance_ID=? and Col_26='P' ",value,getAD_PInstance_ID());
-				if(FundMovement_ID<=0)
-				{
-					movement = new MDSFundMovement(getCtx(), 0, get_TrxName());
-					movement.setCol_0(type);
-					movement.setCol_1(value);
-					movement.setSeqNo(sequence);
-					movement.setDS_Section("C");
-					movement.setCol_26("P");
-					isAdded = true;
-					if(monthNo==1)
-						movement.setCol_2(balance);
-					if(monthNo==2)
-						movement.setCol_3(balance);
-					if(monthNo==3)
-						movement.setCol_4(balance);
-					if(monthNo==4)
-						movement.setCol_5(balance);
-					if(monthNo==5)
-						movement.setCol_6(balance);
-					if(monthNo==6)
-						movement.setCol_7(balance);
-					if(monthNo==7)
-						movement.setCol_8(balance);
-					if(monthNo==8)
-						movement.setCol_9(balance);
-					if(monthNo==9)
-						movement.setCol_10(balance);
-					if(monthNo==10)
-						movement.setCol_11(balance);
-					if(monthNo==11)
-						movement.setCol_12(balance);
-					if(monthNo==12)
-						movement.setCol_13(balance);
-					
-					movement.setAD_PInstance_ID(getAD_PInstance_ID());
-				}
-				else
-				{
-					movement = new MDSFundMovement(getCtx(), FundMovement_ID, get_TrxName());
-					if(!isAdded && movement.getCol_2()==null && monthNo==1)
-					{
-						movement.setCol_2(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_3()==null && monthNo==2)
-					{
-						movement.setCol_3(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_4()==null && monthNo==3)
-					{
-						movement.setCol_4(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_5()==null && monthNo==4)
-					{
-						movement.setCol_5(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_6()==null && monthNo==5)
-					{
-						movement.setCol_6(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_7()==null && monthNo==6)
-					{
-						movement.setCol_7(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_8()==null && monthNo==7)
-					{
-						movement.setCol_8(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_9()==null && monthNo==8)
-					{
-						movement.setCol_9(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_10()==null && monthNo==9)
-					{
-						movement.setCol_10(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_11()==null && monthNo==10)
-					{
-						movement.setCol_11(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_12()==null && monthNo==11)
-					{
-						movement.setCol_12(balance);
-						isAdded = true;
-					}
-					if(!isAdded && movement.getCol_13()==null && monthNo==12)
-					{
-						movement.setCol_13(balance);
-						isAdded = true;
-					}
-				}
-				movement.saveEx();
-			}
-			
-		}
-		catch(Exception e)
-		{
-			log.severe("Error running cash receipt query. "+sql.toString());
-		}
-		finally
-		{
-			DB.close(rs, pstmt);
-		}
-	}
-
-	private void updateCashProjection(String type, String value, int seqNo) 
-	{
-		MDSFundMovement movement = null;
-		String sql = "select to_char(gs_coupondate ,'MM')::numeric as MonthNo,to_char(gs_coupondate ,'YYYY')::numeric ,C_Currency_ID ,gs_couponamount as CouponAmt,AD_Org_ID, "
-				+ "to_char(gs_coupondate ,'Month') from DS_CouponSchedule where gs_coupondate between ? and ? order by to_char(gs_coupondate ,'YYYY')::numeric,to_char(gs_coupondate ,'MM')::numeric ";	
-		
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		try
-		{
-			pstmt = DB.prepareStatement(sql.toString(), get_TrxName());
-			pstmt.setTimestamp(1, TimeUtil.addDays(p_DateTo, 1));
-			pstmt.setTimestamp(2, TimeUtil.addDays(p_DateTo, 366));
-			rs = pstmt.executeQuery();
-			while(rs.next())
-			{
-				BigDecimal couponAmt = rs.getBigDecimal("CouponAmt");
-				int CurFrom_ID = rs.getInt("C_Currency_ID");
-				int AD_Org_ID = rs.getInt("AD_Org_ID");
-				BigDecimal bhdAmt = MConversionRate.convertBase(getCtx(),couponAmt, CurFrom_ID, p_DateTo, 0, getAD_Client_ID(), AD_Org_ID);
-				String balance = bhdAmt.toString();
-				int FundMovement_ID = DB.getSQLValue(get_TrxName(), "Select DS_FundMovement_ID from DS_FundMovement Where Col_1 like ? and DS_Section='C' and AD_PInstance_ID=? and Col_26='P' ",value,getAD_PInstance_ID());
-				if(FundMovement_ID<=0)
-				{
-					movement = new MDSFundMovement(getCtx(), 0, get_TrxName());
-					movement.setCol_0(type);
-					movement.setCol_1(value);
-					movement.setSeqNo(seqNo);
-					movement.setDS_Section("C");
-					movement.setCol_26("P");
-					movement.set_ValueNoCheck("Col_"+currentMonth+1, balance);	
-					movement.setAD_PInstance_ID(getAD_PInstance_ID());
-				}
-				else
-				{
-					movement = new MDSFundMovement(getCtx(), FundMovement_ID, get_TrxName());
-					
-					movement.set_ValueNoCheck("Col_"+currentMonth+1, balance);
-				}
-				movement.saveEx();
-			}
-			
-		}
-		catch(Exception e)
-		{
-			log.severe("Error running cash receipt query. "+sql.toString());
-		}
-		finally
-		{
-			DB.close(rs, pstmt);
-		}
+		return "@OK@";
 	}
 
 	private void updateMonthsForCashProjection(String type,int sequence) 
 	{
-		
 		MDSFundMovement movement = null;
 		for(int i=0;i<12;i++)
 		{
+			String columnName = "";
 			boolean isAdded = false;
 			String MonthName = DB.getSQLValueString(get_TrxName(), "select replace(to_char(?::timestamp ,'Month')||'-'||to_char(?::timestamp ,'YYYY'),' ','')", TimeUtil.addMonths(p_DateTo, i),TimeUtil.addMonths(p_DateTo, i));
 			int FundMovement_ID = DB.getSQLValue(get_TrxName(), "Select DS_FundMovement_ID from DS_FundMovement Where DS_Section='M' and AD_PInstance_ID=? and Col_26='P' ",getAD_PInstance_ID());
@@ -477,6 +87,7 @@ public class GenerateCashPositions extends SvrProcess
 				movement.setSeqNo(0);
 				movement.setAD_PInstance_ID(getAD_PInstance_ID());
 				movement.setAD_Org_ID(Env.getAD_Org_ID(getCtx()));
+				columnName = "Col_2";
 			}
 			else
 			{
@@ -485,62 +96,264 @@ public class GenerateCashPositions extends SvrProcess
 				{
 					movement.setCol_3(MonthName);
 					isAdded = true;
+					columnName = "Col_3";
 				}
 				if(!isAdded && movement.getCol_4()==null)
 				{
 					movement.setCol_4(MonthName);
 					isAdded = true;
+					columnName = "Col_4";
 				}
 				if(!isAdded && movement.getCol_5()==null)
 				{
 					movement.setCol_5(MonthName);
 					isAdded = true;
+					columnName = "Col_5";
 				}
 				if(!isAdded && movement.getCol_6()==null)
 				{
 					movement.setCol_6(MonthName);
 					isAdded = true;
+					columnName = "Col_6";
 				}
 				if(!isAdded && movement.getCol_7()==null)
 				{
 					movement.setCol_7(MonthName);
 					isAdded = true;
+					columnName = "Col_7";
 				}
 				if(!isAdded && movement.getCol_8()==null)
 				{
 					movement.setCol_8(MonthName);
 					isAdded = true;
+					columnName = "Col_8";
 				}
 				if(!isAdded && movement.getCol_9()==null)
 				{
 					movement.setCol_9(MonthName);
 					isAdded = true;
+					columnName = "Col_9";
 				}
 				if(!isAdded && movement.getCol_10()==null)
 				{
 					movement.setCol_10(MonthName);
 					isAdded = true;
+					columnName = "Col_10";
 				}
 				if(!isAdded && movement.getCol_11()==null)
 				{
 					movement.setCol_11(MonthName);
 					isAdded = true;
+					columnName = "Col_11";
 				}
 				if(!isAdded && movement.getCol_12()==null)
 				{
 					movement.setCol_12(MonthName);
 					isAdded = true;
+					columnName = "Col_12";
 				}
 				if(!isAdded && movement.getCol_13()==null)
 				{
 					movement.setCol_13(MonthName);
 					isAdded = true;
+					columnName = "Col_13";
 				}
 			}
 			movement.saveEx();
+			updateCashProjection("Investment","Coupons",1,MonthName,columnName);
+			updateFixedDepositsInterestsAndMaturityAmts("Investment","Interests Bank Accts & FD",2,MonthName,columnName);
+			updateFixedDepositsInterestsAndMaturityAmts("Investment","Maturity & Sell-out Amounts",3,MonthName,columnName);
+			updateAgingForCreditAccounts("Operations Business","Collection from Credit Accounts",4,MonthName,columnName);
+			if(i==0)
+				updateAgingForCreditAccounts("Operations Business","Collection from Overdue Accounts",5,MonthName,columnName);
 		}
 	}
 
+	private void updateCashProjection(String type, String value, int sequence, String monthName, String columnName) 
+	{
+		String sql = "select to_char(gs_coupondate ,'MM')::numeric as MonthNo,to_char(gs_coupondate ,'YYYY')::numeric ,C_Currency_ID ,gs_couponamount as CouponAmt,AD_Org_ID, "
+				+ "to_char(gs_coupondate ,'Month') "
+				+ "from DS_CouponSchedule "
+				+ "where replace(to_char(gs_coupondate::timestamp ,'Month')||'-'||to_char(gs_coupondate::timestamp ,'YYYY'),' ','') like ? "
+				+ "order by to_char(gs_coupondate ,'YYYY')::numeric,to_char(gs_coupondate ,'MM')::numeric ";	
+		
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try
+		{
+			pstmt = DB.prepareStatement(sql.toString(), get_TrxName());
+			pstmt.setString(1, monthName);
+			rs = pstmt.executeQuery();
+			while(rs.next())
+			{
+				BigDecimal couponAmt = rs.getBigDecimal("CouponAmt");
+				int CurFrom_ID = rs.getInt("C_Currency_ID");
+				int AD_Org_ID = rs.getInt("AD_Org_ID");
+				BigDecimal bhdAmt = MConversionRate.convertBase(getCtx(),couponAmt, CurFrom_ID, p_DateTo, 0, getAD_Client_ID(), AD_Org_ID);
+				if(bhdAmt.compareTo(Env.ZERO)!=0)
+				{
+					createFundMovementEntry(value, bhdAmt, type, columnName, sequence);
+				}
+			}
+			
+		}
+		catch(Exception e)
+		{
+			log.severe("Error running cash receipt query. "+sql.toString());
+		}
+		finally
+		{
+			DB.close(rs, pstmt);
+		}
+	}
+	
+	private void updateFixedDepositsInterestsAndMaturityAmts(String type,String value,int sequence, String monthName, String columnName) 
+	{
+		String sql = "";
+		if(value.equalsIgnoreCase("Interests Bank Accts & FD"))
+			sql = "with t1 as (select FDYear,InterestAmtBHD as Balance,FDMonth as MonthNo,MaturityDate,AD_Org_ID "
+					+ "from cashposition_fixeddepositprojection "
+					+ "where replace(to_char(MaturityDate::timestamp ,'Month')||'-'||to_char(MaturityDate::timestamp ,'YYYY'),' ','') like ? order by MaturityDate) "
+					+ "select coalesce(sum(Balance),0) as Balance From t1 ";
+		else
+			sql = "with t1 as (select mp.value ,mp.name ,mp.sku ,msi.description ,msi.guaranteedate ,"+ 
+					"coalesce(ds_lastsellingprice(mp.m_product_id),ds_getcostoftheproductwithASI(mp.m_product_id,hnd.m_attributesetinstance_id))*sum(hnd.qtyonhand) as CurrentValuation, " + 
+					"mp.m_product_id ,replace(to_char(msi.guaranteedate::timestamp ,'Month')||'-'||to_char(msi.guaranteedate::timestamp ,'YYYY'),' ','') as YearMonth " + 
+					"from  M_Product mp, M_StorageOnHand hnd,m_attributesetinstance msi " + 
+					"where mp.m_product_id=hnd.m_product_id  " + 
+					"and hnd.m_attributesetinstance_id = msi.m_attributesetinstance_id  " + 
+					"and mp.ds_isinvestmentrelated='Y' " + 
+					"and mp.ds_investment_term is not null " + 
+					"and replace(to_char(msi.guaranteedate::timestamp ,'Month')||'-'||to_char(msi.guaranteedate::timestamp ,'YYYY'),' ','') like ? " +
+					"group by mp.value ,mp.name ,mp.sku ,msi.description ,msi.guaranteedate,mp.m_product_id,hnd.m_attributesetinstance_id,mp.ad_client_id ,mp.ad_org_id,mp.ds_investment_term " + 
+					"having sum(hnd.qtyonhand)>0) " + 
+					"select sum(CurrentValuation) as Balance,YearMonth from t1 group by YearMonth ";
+		
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try
+		{
+			pstmt = DB.prepareStatement(sql.toString(), get_TrxName());
+			pstmt.setString(1, monthName);
+			rs = pstmt.executeQuery();
+			while(rs.next())
+			{
+				BigDecimal BHDAmt = rs.getBigDecimal("Balance");
+				if(BHDAmt.compareTo(Env.ZERO)!=0)
+				{
+					createFundMovementEntry(value, BHDAmt, type, columnName, sequence);
+				}
+			}
+			
+		}
+		catch(Exception e)
+		{
+			log.severe("Error running cash receipt query. "+sql.toString());
+		}
+		finally
+		{
+			DB.close(rs, pstmt);
+		}
+	}
+	
+	private void updateAgingForCreditAccounts(String type,String value,int sequence, String monthName, String columnName) 
+	{		
+		String sql = "";
+		
+		if(value.equalsIgnoreCase("Collection from Credit Accounts"))
+			sql = "with t1 as (select invoiceopentodate(ci.c_invoice_id,0,now())*multiplier,c_currency_id ,paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct) as DueDate, " + 
+					"to_Char(paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct),'Month') as MM,to_Char(paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct),'YYYY') as YYYY, " + 
+					"currencybase(invoiceopentodate(ci.c_invoice_id,0,now())*multiplier,ci.c_currency_id ,ci.dateacct ,ci.ad_client_id ,ci.ad_org_id ) as BaseAmt " + 
+					"from c_invoice_v ci ,c_bpartner bp " + 
+					"where ci.c_bpartner_id = bp.c_bpartner_id  " + 
+					"and invoiceopen(ci.c_invoice_id ,0)<>0  " + 
+					"and issotrx ='Y'  " + 
+					"and posted='Y' " + 
+					"and ispaid ='N' " + 
+					"and paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct) > ? " + 
+					"and bp.c_bp_group_id in (select c_bp_group_id from DS_CashPosition_Setup where categorytype ='P' and ElementValue is null) "+ 
+					"order by to_Char(paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct),'YYYY')::numeric,to_Char(paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct),'MM')::numeric " + 
+					") " + 
+					"select sum(BaseAmt) as Balance,MM as MonthNo,YYYY " + 
+					"from t1  " + 
+					"where replace(MM||'-'||YYYY,' ','') like ? " +
+					"group by YYYY,MM";
+		else
+			sql ="with t1 as (select invoiceopentodate(ci.c_invoice_id,0,now())*multiplier,c_currency_id ,paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct) as DueDate, " +
+					"currencybase(invoiceopentodate(ci.c_invoice_id,0,now())*multiplier,ci.c_currency_id ,ci.dateacct ,ci.ad_client_id ,ci.ad_org_id ) as BaseAmt " + 
+					"from c_invoice_v ci ,c_bpartner bp " + 
+					"where ci.c_bpartner_id = bp.c_bpartner_id  " + 
+					"and invoiceopen(ci.c_invoice_id ,0)<>0  " + 
+					"and issotrx ='Y'  " + 
+					"and posted='Y' " + 
+					"and ispaid ='N' " + 
+					"and paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct) > ? " + 
+					"and bp.c_bp_group_id in (select c_bp_group_id from DS_CashPosition_Setup where categorytype ='P' and ElementValue is null) " + 
+					"order by to_Char(paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct),'YYYY')::numeric,to_Char(paymenttermduedate(ci.c_paymentterm_id ,ci.dateacct),'MM')::numeric " + 
+					") " + 
+					"select coalesce(sum(BaseAmt),0) as Balance " + 
+					"from t1 " ;
+			
+		
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try
+		{
+			pstmt = DB.prepareStatement(sql.toString(), get_TrxName());
+			pstmt.setTimestamp(1, p_DateTo);
+			if(value.equalsIgnoreCase("Collection from Credit Accounts"))
+			{
+				pstmt.setString(2, monthName);
+			}
+			rs = pstmt.executeQuery();
+			while(rs.next())
+			{
+				BigDecimal BHDAmt = rs.getBigDecimal("Balance");
+				if(BHDAmt.compareTo(Env.ZERO)!=0)
+				{
+					createFundMovementEntry(value, BHDAmt, type, columnName, sequence);
+				}
+			}
+			
+		}
+		catch(Exception e)
+		{
+			log.severe("Error running cash receipt query. "+sql.toString());
+		}
+		finally
+		{
+			DB.close(rs, pstmt);
+		}
+		 
+	}
+	
+	private void createFundMovementEntry(String value,BigDecimal BHDAmt,String type,String columnName,int sequence) 
+	{
+		MDSFundMovement movement = null;
+		if(value.equalsIgnoreCase("Total Overdue"))
+			BHDAmt  = BHDAmt.negate();
+		String balance = BHDAmt.toString();
+		int FundMovement_ID = DB.getSQLValue(get_TrxName(), "Select DS_FundMovement_ID from DS_FundMovement Where Col_1 like ? and DS_Section='C' and AD_PInstance_ID=? and Col_26='P' ",value,getAD_PInstance_ID());
+		if(FundMovement_ID<=0)
+		{
+			movement = new MDSFundMovement(getCtx(), 0, get_TrxName());
+			movement.setCol_0(type);
+			movement.setCol_1(value);
+			movement.setSeqNo(sequence);
+			movement.setDS_Section("C");
+			movement.setCol_26("P");
+			movement.set_ValueNoCheck(columnName, balance);
+			movement.setAD_PInstance_ID(getAD_PInstance_ID());
+		}
+		else
+		{
+			movement = new MDSFundMovement(getCtx(), FundMovement_ID, get_TrxName());
+			movement.set_ValueNoCheck(columnName, balance);
+		}
+		movement.saveEx();
+		
+	}
+	
 	private void createCashReceipts() 
 	{
 		DB.executeUpdateEx("Delete from DS_FundMovement",get_TrxName());
