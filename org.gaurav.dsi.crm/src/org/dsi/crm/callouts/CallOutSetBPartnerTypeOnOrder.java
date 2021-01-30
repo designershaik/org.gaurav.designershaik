@@ -18,27 +18,32 @@ public class CallOutSetBPartnerTypeOnOrder implements IColumnCallout{
 		
 		if(value==null)
 			return null;
-		if(mField.getColumnName().equalsIgnoreCase(MOrder.COLUMNNAME_Bill_BPartner_ID))
+		
+		boolean isSOTrx = mTab.getValueAsBoolean("IsSOTrx");
+		if(isSOTrx)
 		{
-			int C_BPartner_ID = (Integer)value;
-			MBPartner bp = new MBPartner(ctx, C_BPartner_ID, null);
-			if(bp.isSendEMail())
+			if(mField.getColumnName().equalsIgnoreCase(MOrder.COLUMNNAME_Bill_BPartner_ID))
 			{
-				int C_DocType_ID = DB.getSQLValue(null, "Select C_DocType_ID From C_DocType "
-						+ "Where AD_Client_ID = ? and DocSubTypeSO='SO' and DocBaseType='SOO' and IsDefault='Y' ", Env.getAD_Client_ID(ctx));
-				if(bp.get_Value("C_DocType_ID")==null)
-					mTab.setValue("C_DocTypeTarget_ID", C_DocType_ID);
-				else
-					mTab.setValue("C_DocTypeTarget_ID", bp.get_Value("C_DocType_ID"));
+				int C_BPartner_ID = (Integer)value;
+				MBPartner bp = new MBPartner(ctx, C_BPartner_ID, null);
+				if(bp.isSendEMail())
+				{
+					int C_DocType_ID = DB.getSQLValue(null, "Select C_DocType_ID From C_DocType "
+							+ "Where AD_Client_ID = ? and DocSubTypeSO='SO' and DocBaseType='SOO' and IsDefault='Y' ", Env.getAD_Client_ID(ctx));
+					if(bp.get_Value("C_DocType_ID")==null)
+						mTab.setValue("C_DocTypeTarget_ID", C_DocType_ID);
+					else
+						mTab.setValue("C_DocTypeTarget_ID", bp.get_Value("C_DocType_ID"));
+				}
+				
+				mTab.setValue("DS_ShippingTerms", bp.get_Value("DS_ShippingTerms"));
 			}
-			
-			mTab.setValue("DS_ShippingTerms", bp.get_Value("DS_ShippingTerms"));
-		}
-		if(mField.getColumnName().equalsIgnoreCase(MOrder.COLUMNNAME_C_BPartner_ID))
-		{
-			int C_BPartner_ID = (Integer)value;
-			MBPartner bp = new MBPartner(ctx, C_BPartner_ID, null);
-			mTab.setValue("C_OrderSource_ID", bp.get_Value("C_OrderSource_ID"));
+			if(mField.getColumnName().equalsIgnoreCase(MOrder.COLUMNNAME_C_BPartner_ID))
+			{
+				int C_BPartner_ID = (Integer)value;
+				MBPartner bp = new MBPartner(ctx, C_BPartner_ID, null);
+				mTab.setValue("C_OrderSource_ID", bp.get_Value("C_OrderSource_ID"));
+			}
 		}
 		return null;
 	}

@@ -1,10 +1,6 @@
 package org.dsi.crm.form;
 
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
 
@@ -17,10 +13,7 @@ import org.adempiere.webui.component.ConfirmPanel;
 import org.adempiere.webui.component.Grid;
 import org.adempiere.webui.component.GridFactory;
 import org.adempiere.webui.component.Label;
-import org.adempiere.webui.component.ListItem;
 import org.adempiere.webui.component.ListModelTable;
-import org.adempiere.webui.component.Listbox;
-import org.adempiere.webui.component.ListboxFactory;
 import org.adempiere.webui.component.Panel;
 import org.adempiere.webui.component.Row;
 import org.adempiere.webui.component.Rows;
@@ -31,15 +24,12 @@ import org.adempiere.webui.util.ZKUpdateUtil;
 import org.compiere.model.GridTab;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MColumn;
+import org.compiere.model.MInOut;
 import org.compiere.model.MLookup;
 import org.compiere.model.MLookupFactory;
-import org.compiere.model.MOrder;
 import org.compiere.util.CLogger;
-import org.compiere.util.DB;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
-import org.compiere.util.KeyNamePair;
-import org.compiere.util.Language;
 import org.compiere.util.Msg;
 import org.compiere.util.Util;
 import org.zkoss.zk.ui.event.Event;
@@ -81,27 +71,15 @@ public class WCreateFromPackageUI extends WCreateFromPackage implements EventLis
 		if (log.isLoggable(Level.CONFIG)) log.config("Action=" + e.getTarget().getId());
 		if(e.getTarget().equals(window.getConfirmPanel().getButton(ConfirmPanel.A_REFRESH)))
 		{
-			loadOrderLines(0);
+			getShippableLinesForPackage();
 			window.tableChanged(null);
-		}
-		if (e.getTarget().equals(orderField))
-		{
-			ListItem li = orderField.getSelectedItem();
-			int C_Order_ID = 0;
-			if (li != null && li.getValue() != null)
-				C_Order_ID = ((Integer) li.getValue()).intValue();
-			//  set Invoice, RMA and Shipment to Null
-			loadOrderLines(C_Order_ID);
 		}
 		else if(e.getTarget().equals(confirm))
 		{
 			getGridTab();
 		}
 	}
-	
 	private WCreateFromWindow window;
-
-
 
 	/** Window No               */
 	private int p_WindowNo;
@@ -111,12 +89,6 @@ public class WCreateFromPackageUI extends WCreateFromPackage implements EventLis
 
 	protected Label bpartnerLabel = new Label();
 	protected WTableDirEditor bpartnerField;
-	
-	protected Label subBPartnerLabel = new Label();
-	protected WTableDirEditor subBPartnerField;
-	
-	protected Label orderLabel = new Label();
-	protected Listbox orderField = ListboxFactory.newDropdownListbox();
 	
 	protected Label l_confirmButtn = new Label();
 	private Button confirm = new Button();
@@ -129,9 +101,9 @@ public class WCreateFromPackageUI extends WCreateFromPackage implements EventLis
 	public boolean dynInit() throws Exception
 	{
 		log.config("");
-		
+		String masterShipment_ID = Env.getContext(Env.getCtx(), p_WindowNo, "M_InOut_ID");
+		MInOut inout = new MInOut(Env.getCtx(), Integer.parseInt(masterShipment_ID), null);
 		super.dynInit();
-		Language language = Language.getLoginLanguage(); // Base Language
 		//Refresh button
 		Button refreshButton = window.getConfirmPanel().createButton(ConfirmPanel.A_REFRESH);
 		refreshButton.addEventListener(Events.ON_CLICK, this);
@@ -142,101 +114,24 @@ public class WCreateFromPackageUI extends WCreateFromPackage implements EventLis
 		confirm.setAutodisable("self");
 		
 		window.setTitle(getTitle());
-		m_C_BPartner_ID = Env.getContextAsInt(Env.getCtx(), p_WindowNo, "C_BPartner_ID");
 
-		MLookup lookupbp =  MLookupFactory.get(Env.getCtx(), p_WindowNo,MColumn.getColumn_ID(MBPartner.Table_Name,MBPartner.COLUMNNAME_C_BPartner_ID),DisplayType.TableDir, language, MOrder.COLUMNNAME_C_BPartner_ID, 0, false,
-																							"C_BPartner.C_BPartner_ID = "+m_C_BPartner_ID+"");
-		
-		MLookup lookupSubBPartner =  MLookupFactory.get (Env.getCtx(), p_WindowNo, 0, MColumn.getColumn_ID(MOrder.Table_Name, "C_BPartner_ID"),DisplayType.Table);
-		
+		MLookup lookupbp =  MLookupFactory.get(Env.getCtx(), p_WindowNo,0,MColumn.getColumn_ID(MBPartner.Table_Name,MBPartner.COLUMNNAME_C_BPartner_ID),DisplayType.TableDir);		
 		bpartnerField = new WTableDirEditor("C_BPartner_ID", true, false, false, lookupbp);
 		
-		subBPartnerField = new WTableDirEditor("C_BPartner_ID", false, false, true, lookupSubBPartner);
 		//  Set Default
-	
-		bpartnerField.setValue(new Integer(m_C_BPartner_ID));
-		bpartnerField.addValueChangeListener(this);
-		subBPartnerField.addValueChangeListener(this);
-		//  initial Loading
-		
-		initOrder(m_C_BPartner_ID,m_FIL_Sub_BPartner_ID);
-		
-		
+		bpartnerField.setValue(inout.getC_BPartner_ID());
+		getShippableLinesForPackage();
 		return true;
 	}   //  dynInit
 	
-	private void initOrder(int C_BPartner_ID, int m_FIL_Sub_BPartner_ID) throws Exception 
-	{
-		if (log.isLoggable(Level.CONFIG)) log.config("C_BPartner_ID=" + C_BPartner_ID);
-		KeyNamePair pp = new KeyNamePair(0,"");
-		orderField.removeActionListener(this);
-		orderField.removeAllItems();
-		orderField.addItem(pp);
-		
-		ArrayList<KeyNamePair> list = loadOrderData(C_BPartner_ID, m_FIL_Sub_BPartner_ID);
-		for(KeyNamePair knp : list)
-			orderField.addItem(knp);
-		
-		orderField.setSelectedIndex(0);
-		orderField.addActionListener(this);
-	}
-
-	private ArrayList<KeyNamePair> loadOrderData(int C_BPartner_ID, int m_FIL_Sub_BPartner_ID) 
-	{
-		ArrayList<KeyNamePair> list = new ArrayList<KeyNamePair>();
-
-		//	Display
-		StringBuffer display = new StringBuffer("o.DocumentNo||' - ' ||")
-			.append(DB.TO_CHAR("o.DateOrdered", DisplayType.Date, Env.getAD_Language(Env.getCtx())))
-			.append("||' - '||")
-			.append(DB.TO_CHAR("o.GrandTotal", DisplayType.Amount, Env.getAD_Language(Env.getCtx())));
-	
-		StringBuffer sql = new StringBuffer("SELECT o.C_Order_ID,").append(display)
-			.append(" FROM C_Order o "
-			+ "WHERE o.C_BPartner_ID in (?,?) AND o.IsSOTrx='Y' AND o.DocStatus IN ('CL','CO')"
-			+ " AND o.C_Order_ID IN (select line.C_Order_ID From C_OrderLine line,C_Order co "
-			+ "Where line.C_Order_ID = co.C_Order_ID "
-			+ "and line.qtyDelivered<>line.qtyordered  group by line.C_Order_ID having count(*)>0) ");
-	
-		sql = sql.append("ORDER BY o.DateOrdered,o.DocumentNo");
-		//
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		try
-		{
-			pstmt = DB.prepareStatement(sql.toString(), null);
-			pstmt.setInt(1, C_BPartner_ID);
-			pstmt.setInt(2, m_FIL_Sub_BPartner_ID);
-			
-			rs = pstmt.executeQuery();
-			while (rs.next())
-			{
-				list.add(new KeyNamePair(rs.getInt(1), rs.getString(2)));
-			}
-		}
-		catch (SQLException e)
-		{
-			log.log(Level.SEVERE, sql.toString(), e);
-		}
-		finally
-		{
-			DB.close(rs, pstmt);
-			rs = null; pstmt = null;
-		}
-
-		return list;
-	}
 
 	protected void zkInit() throws Exception
 	{
 		bpartnerLabel.setText(Msg.translate(Env.getCtx(), "C_BPartner_ID"));
-		subBPartnerLabel.setText(Msg.translate(Env.getCtx(), "FIL_Sub_BPartner_ID"));
-		
-		orderLabel.setText(Msg.translate(Env.getCtx(), "C_Order_ID"));
-    		Borderlayout parameterLayout = new Borderlayout();
-    		ZKUpdateUtil.setHeight(parameterLayout, "110px");
-    		ZKUpdateUtil.setWidth(parameterLayout, "100%");
-    		Panel parameterPanel = window.getParameterPanel();
+		Borderlayout parameterLayout = new Borderlayout();
+		ZKUpdateUtil.setHeight(parameterLayout, "110px");
+		ZKUpdateUtil.setWidth(parameterLayout, "100%");
+		Panel parameterPanel = window.getParameterPanel();
 		parameterPanel.appendChild(parameterLayout);
 		
 		Grid paremeterLayout = GridFactory.newGridLayout();
@@ -267,19 +162,11 @@ public class WCreateFromPackageUI extends WCreateFromPackage implements EventLis
 		Row row = rows.newRow();
 		row.appendChild(bpartnerLabel.rightAlign());
 		row.appendChild(bpartnerField.getComponent());
-		
-		row = rows.newRow();
-		row.appendChild(subBPartnerLabel.rightAlign());
-		row.appendChild(subBPartnerField.getComponent());
-		
-		row = rows.newRow();
-		row.appendChild(orderLabel.rightAlign());
-		row.appendChild(orderField);		
 	}
 	
-	protected void loadOrderLines(int C_Order_ID)
+	protected void getShippableLinesForPackage()
 	{
-		loadTableOIS(getOrderLines(C_Order_ID));
+		loadTableOIS(getShipmentLines());
 	}
 	
 
@@ -313,55 +200,11 @@ public class WCreateFromPackageUI extends WCreateFromPackage implements EventLis
 	{
 		return window;
 	}
-	
-	/**
-	 *  Change Listener
-	 *  @param e event
-	 */
-	public void valueChange (ValueChangeEvent e)
-	{
-		if (log.isLoggable(Level.CONFIG)) log.config(e.getPropertyName() + "=" + e.getNewValue());
 
+	@Override
+	public void valueChange(ValueChangeEvent evt) {
+		// TODO Auto-generated method stub
 		
-		//  BPartner - load Order/Invoice/Shipment
-		if (e.getPropertyName().equals("C_BPartner_ID"))
-		{
-			m_C_BPartner_ID = ((Integer)e.getNewValue()).intValue();
-			try
-			{
-				orderField.setSelectedIndex(-1);
-				initBPOrderDetails (m_C_BPartner_ID,m_FIL_Sub_BPartner_ID);
-			} 
-			catch (Exception e1) 
-			{
-				e1.printStackTrace();
-			}
-		}
-		if (e.getPropertyName().equals("FIL_Sub_BPartner_ID"))
-		{
-			if(e.getNewValue()!=null)
-			{
-				m_FIL_Sub_BPartner_ID = ((Integer)e.getNewValue()).intValue();
-				try
-				{
-					orderField.setSelectedIndex(-1);
-					initBPOrderDetails (m_C_BPartner_ID,m_FIL_Sub_BPartner_ID);
-				} 
-				catch (Exception e1) 
-				{
-					e1.printStackTrace();
-				}
-			}
-		}		
-		window.tableChanged(null);
-	}   //  vetoableChange
-
-	private void initBPOrderDetails(int C_BPartner_ID, int m_FIL_Sub_BPartner_ID) throws Exception 
-	{
-		if (log.isLoggable(Level.CONFIG)) log.config("C_BPartner_ID=" + C_BPartner_ID+" Sub BPartner: "+m_FIL_Sub_BPartner_ID);
-		orderField.removeActionListener(this);
-		initOrder(C_BPartner_ID,m_FIL_Sub_BPartner_ID);
 	}
-	
 
 }

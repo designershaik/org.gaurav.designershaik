@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for GS_HR_Compensation_Acct
  *  @author iDempiere (generated) 
- *  @version Release 5.1
+ *  @version Release 7.1
  */
 @SuppressWarnings("all")
 public interface I_GS_HR_Compensation_Acct 
@@ -122,10 +122,10 @@ public interface I_GS_HR_Compensation_Acct
     /** Column name GS_HR_Compensation_Master_ID */
     public static final String COLUMNNAME_GS_HR_Compensation_Master_ID = "GS_HR_Compensation_Master_ID";
 
-	/** Set Compensation Type	  */
+	/** Set Compensation	  */
 	public void setGS_HR_Compensation_Master_ID (int GS_HR_Compensation_Master_ID);
 
-	/** Get Compensation Type	  */
+	/** Get Compensation	  */
 	public int getGS_HR_Compensation_Master_ID();
 
     /** Column name IsActive */

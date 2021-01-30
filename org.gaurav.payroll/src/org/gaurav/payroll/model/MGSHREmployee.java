@@ -57,4 +57,9 @@ public class MGSHREmployee extends X_GS_HR_Employee {
 		
 		return compensations;
 	}
+
+	public BigDecimal getAverageWorkingHour() 
+	{
+		return getGS_HR_TimeSlot_Group().getGS_HR_AverageWorkingHours();
+	}
 }

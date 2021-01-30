@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for GS_HR_Compensation_Master
  *  @author iDempiere (generated) 
- *  @version Release 5.1
+ *  @version Release 7.1
  */
 @SuppressWarnings("all")
 public interface I_GS_HR_Compensation_Master 
@@ -95,6 +95,32 @@ public interface I_GS_HR_Compensation_Master
 	  */
 	public int getCreatedBy();
 
+    /** Column name DS_OvertimePercentage */
+    public static final String COLUMNNAME_DS_OvertimePercentage = "DS_OvertimePercentage";
+
+	/** Set Overtime Percent.
+	  * Overtime Percent
+	  */
+	public void setDS_OvertimePercentage (BigDecimal DS_OvertimePercentage);
+
+	/** Get Overtime Percent.
+	  * Overtime Percent
+	  */
+	public BigDecimal getDS_OvertimePercentage();
+
+    /** Column name DS_OvertimeType */
+    public static final String COLUMNNAME_DS_OvertimeType = "DS_OvertimeType";
+
+	/** Set Overtime Type.
+	  * Overtime Type
+	  */
+	public void setDS_OvertimeType (String DS_OvertimeType);
+
+	/** Get Overtime Type.
+	  * Overtime Type
+	  */
+	public String getDS_OvertimeType();
+
     /** Column name Description */
     public static final String COLUMNNAME_Description = "Description";
 
@@ -108,22 +134,48 @@ public interface I_GS_HR_Compensation_Master
 	  */
 	public String getDescription();
 
-    /** Column name GS_HR_Advance */
-    public static final String COLUMNNAME_GS_HR_Advance = "GS_HR_Advance";
+    /** Column name GS_HR_CalculateOnActuals */
+    public static final String COLUMNNAME_GS_HR_CalculateOnActuals = "GS_HR_CalculateOnActuals";
 
-	/** Set Advance/Loan	  */
-	public void setGS_HR_Advance (boolean GS_HR_Advance);
+	/** Set Calculate On Actuals	  */
+	public void setGS_HR_CalculateOnActuals (boolean GS_HR_CalculateOnActuals);
 
-	/** Get Advance/Loan	  */
-	public boolean isGS_HR_Advance();
+	/** Get Calculate On Actuals	  */
+	public boolean isGS_HR_CalculateOnActuals();
+
+    /** Column name GS_HR_CompDependantOn */
+    public static final String COLUMNNAME_GS_HR_CompDependantOn = "GS_HR_CompDependantOn";
+
+	/** Set Compensation Dependent On.
+	  * Compensation Dependent On
+	  */
+	public void setGS_HR_CompDependantOn (String GS_HR_CompDependantOn);
+
+	/** Get Compensation Dependent On.
+	  * Compensation Dependent On
+	  */
+	public String getGS_HR_CompDependantOn();
+
+    /** Column name GS_HR_CompensationType */
+    public static final String COLUMNNAME_GS_HR_CompensationType = "GS_HR_CompensationType";
+
+	/** Set Compensation Type.
+	  * Compensation Type
+	  */
+	public void setGS_HR_CompensationType (String GS_HR_CompensationType);
+
+	/** Get Compensation Type.
+	  * Compensation Type
+	  */
+	public String getGS_HR_CompensationType();
 
     /** Column name GS_HR_Compensation_Master_ID */
     public static final String COLUMNNAME_GS_HR_Compensation_Master_ID = "GS_HR_Compensation_Master_ID";
 
-	/** Set Compensation Type	  */
+	/** Set Compensation	  */
 	public void setGS_HR_Compensation_Master_ID (int GS_HR_Compensation_Master_ID);
 
-	/** Get Compensation Type	  */
+	/** Get Compensation	  */
 	public int getGS_HR_Compensation_Master_ID();
 
     /** Column name GS_HR_Compensation_Master_UU */
@@ -134,19 +186,6 @@ public interface I_GS_HR_Compensation_Master
 
 	/** Get GS_HR_Compensation_Master_UU	  */
 	public String getGS_HR_Compensation_Master_UU();
-
-    /** Column name GS_HR_IsBasic */
-    public static final String COLUMNNAME_GS_HR_IsBasic = "GS_HR_IsBasic";
-
-	/** Set Basic Salary.
-	  * Basic salary
-	  */
-	public void setGS_HR_IsBasic (boolean GS_HR_IsBasic);
-
-	/** Get Basic Salary.
-	  * Basic salary
-	  */
-	public boolean isGS_HR_IsBasic();
 
     /** Column name GS_HR_IsEarning */
     public static final String COLUMNNAME_GS_HR_IsEarning = "GS_HR_IsEarning";
@@ -173,6 +212,19 @@ public interface I_GS_HR_Compensation_Master
 	  * Percent
 	  */
 	public boolean isGS_HR_IsPercent();
+
+    /** Column name GS_HR_PerHour */
+    public static final String COLUMNNAME_GS_HR_PerHour = "GS_HR_PerHour";
+
+	/** Set Per Hour.
+	  * Per Hour
+	  */
+	public void setGS_HR_PerHour (boolean GS_HR_PerHour);
+
+	/** Get Per Hour.
+	  * Per Hour
+	  */
+	public boolean isGS_HR_PerHour();
 
     /** Column name IsActive */
     public static final String COLUMNNAME_IsActive = "IsActive";

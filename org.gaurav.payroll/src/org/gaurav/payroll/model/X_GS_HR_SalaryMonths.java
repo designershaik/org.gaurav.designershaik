@@ -21,17 +21,18 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Properties;
 import org.compiere.model.*;
+import org.compiere.util.KeyNamePair;
 
 /** Generated Model for GS_HR_SalaryMonths
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_SalaryMonths extends PO implements I_GS_HR_SalaryMonths, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_SalaryMonths (Properties ctx, int GS_HR_SalaryMonths_ID, String trxName)
@@ -234,4 +235,12 @@ public class X_GS_HR_SalaryMonths extends PO implements I_GS_HR_SalaryMonths, I_
 	{
 		return (Timestamp)get_Value(COLUMNNAME_StartDate);
 	}
+
+    /** Get Record ID/ColumnName
+        @return ID/ColumnName pair
+      */
+    public KeyNamePair getKeyNamePair() 
+    {
+        return new KeyNamePair(get_ID(), String.valueOf(getStartDate()));
+    }
 }

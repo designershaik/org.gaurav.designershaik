@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Timestamp;
 
+import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
 import org.compiere.util.TimeUtil;
@@ -16,9 +17,19 @@ public class GenerateInstallments extends SvrProcess{
 	int p_emp_Advance_ID = 0;
 	
 	@Override
-	protected void prepare() {
-		
-		p_emp_Advance_ID = getRecord_ID();		
+	protected void prepare() 
+	{
+		ProcessInfoParameter[] para = getParameter();
+		for (int i = 0; i < para.length; i++)
+		{
+			String name = para[i].getParameterName();
+			if (para[i].getParameter() == null)
+				;
+			else if (name.equals("GS_HR_EmployeeAdvance_ID"))
+				p_emp_Advance_ID =para[i].getParameterAsInt();
+		}
+		if(p_emp_Advance_ID<=0)
+			p_emp_Advance_ID = getRecord_ID();		
 		advance = new MGSHREmployeeAdvance(getCtx(), p_emp_Advance_ID, get_TrxName());
 	}
 

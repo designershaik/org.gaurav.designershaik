@@ -24,14 +24,14 @@ import org.compiere.model.*;
 
 /** Generated Model for GS_HR_Approvals
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_Approvals extends PO implements I_GS_HR_Approvals, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_Approvals (Properties ctx, int GS_HR_Approvals_ID, String trxName)
@@ -71,23 +71,6 @@ public class X_GS_HR_Approvals extends PO implements I_GS_HR_Approvals, I_Persis
       return sb.toString();
     }
 
-	/** Set Date Approved/Submitted.
-		@param DS_DateApproved 
-		Date Approved/Submitted
-	  */
-	public void setDS_DateApproved (Timestamp DS_DateApproved)
-	{
-		set_Value (COLUMNNAME_DS_DateApproved, DS_DateApproved);
-	}
-
-	/** Get Date Approved/Submitted.
-		@return Date Approved/Submitted
-	  */
-	public Timestamp getDS_DateApproved () 
-	{
-		return (Timestamp)get_Value(COLUMNNAME_DS_DateApproved);
-	}
-
 	/** Set Approve.
 		@param DSI_IsApproved Approve	  */
 	public void setDSI_IsApproved (boolean DSI_IsApproved)
@@ -109,13 +92,30 @@ public class X_GS_HR_Approvals extends PO implements I_GS_HR_Approvals, I_Persis
 		return false;
 	}
 
+	/** Set Date Approved/Submitted.
+		@param DS_DateApproved 
+		Date Approved/Submitted
+	  */
+	public void setDS_DateApproved (Timestamp DS_DateApproved)
+	{
+		set_Value (COLUMNNAME_DS_DateApproved, DS_DateApproved);
+	}
+
+	/** Get Date Approved/Submitted.
+		@return Date Approved/Submitted
+	  */
+	public Timestamp getDS_DateApproved () 
+	{
+		return (Timestamp)get_Value(COLUMNNAME_DS_DateApproved);
+	}
+
 	public org.compiere.model.I_AD_User getGS_HR_Approval() throws RuntimeException
     {
 		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_Name)
 			.getPO(getGS_HR_Approval_ID(), get_TrxName());	}
 
-	/** Set Current Approval.
-		@param GS_HR_Approval_ID Current Approval	  */
+	/** Set Approved By.
+		@param GS_HR_Approval_ID Approved By	  */
 	public void setGS_HR_Approval_ID (int GS_HR_Approval_ID)
 	{
 		if (GS_HR_Approval_ID < 1) 
@@ -124,8 +124,8 @@ public class X_GS_HR_Approvals extends PO implements I_GS_HR_Approvals, I_Persis
 			set_Value (COLUMNNAME_GS_HR_Approval_ID, Integer.valueOf(GS_HR_Approval_ID));
 	}
 
-	/** Get Current Approval.
-		@return Current Approval	  */
+	/** Get Approved By.
+		@return Approved By	  */
 	public int getGS_HR_Approval_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_Approval_ID);

@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for GS_HR_Installments
  *  @author iDempiere (generated) 
- *  @version Release 5.1
+ *  @version Release 7.1
  */
 @SuppressWarnings("all")
 public interface I_GS_HR_Installments 
@@ -92,6 +92,19 @@ public interface I_GS_HR_Installments
 	  * Date when business is not conducted
 	  */
 	public Timestamp getDate1();
+
+    /** Column name Description */
+    public static final String COLUMNNAME_Description = "Description";
+
+	/** Set Description.
+	  * Optional short description of the record
+	  */
+	public void setDescription (String Description);
+
+	/** Get Description.
+	  * Optional short description of the record
+	  */
+	public String getDescription();
 
     /** Column name GS_HR_EmployeeAdvance_ID */
     public static final String COLUMNNAME_GS_HR_EmployeeAdvance_ID = "GS_HR_EmployeeAdvance_ID";
@@ -182,6 +195,15 @@ public interface I_GS_HR_Installments
 	  * Unique line for this document
 	  */
 	public int getLine();
+
+    /** Column name PaidAmt */
+    public static final String COLUMNNAME_PaidAmt = "PaidAmt";
+
+	/** Set Paid Amount	  */
+	public void setPaidAmt (BigDecimal PaidAmt);
+
+	/** Get Paid Amount	  */
+	public BigDecimal getPaidAmt();
 
     /** Column name PayDate */
     public static final String COLUMNNAME_PayDate = "PayDate";

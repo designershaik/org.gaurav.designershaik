@@ -75,7 +75,6 @@ public class GenerateAttendance extends SvrProcess{
 		}
 		List<MGSHRDailyAttendanceLog> logs = new Query(getCtx(), MGSHRDailyAttendanceLog.Table_Name, whereClause.toString(), get_TrxName())
 										.setParameters(p_StartDate,p_EndDate)
-//										.setOrderBy("GS_HR_Employee_ID , GS_Year,GS_Month,GS_Day,GS_AMPM,GS_Hour,GS_Minutes,GS_Seconds ")
 										.setOrderBy("GS_HR_Employee_ID , GS_PunchTime Asc ")
 										.list();
 		for(MGSHRDailyAttendanceLog log : logs)
@@ -93,10 +92,6 @@ public class GenerateAttendance extends SvrProcess{
 		
 				t.save();
 			}
-//			{
-//				log.setProcessed(true);
-//				log.saveEx();
-//			}
 		}
 		return "@Formatted@";
 	}

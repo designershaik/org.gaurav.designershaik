@@ -24,14 +24,14 @@ import org.compiere.model.*;
 
 /** Generated Model for GS_HR_Attendance_T
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_Attendance_T extends PO implements I_GS_HR_Attendance_T, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_Attendance_T (Properties ctx, int GS_HR_Attendance_T_ID, String trxName)
@@ -444,23 +444,6 @@ public class X_GS_HR_Attendance_T extends PO implements I_GS_HR_Attendance_T, I_
 		return (Timestamp)get_Value(COLUMNNAME_EndDate);
 	}
 
-	/** Set Generate List.
-		@param GenerateList 
-		Generate List
-	  */
-	public void setGenerateList (String GenerateList)
-	{
-		set_Value (COLUMNNAME_GenerateList, GenerateList);
-	}
-
-	/** Get Generate List.
-		@return Generate List
-	  */
-	public String getGenerateList () 
-	{
-		return (String)get_Value(COLUMNNAME_GenerateList);
-	}
-
 	/** Set AM/PM.
 		@param GS_AMPM 
 		AM/PM
@@ -501,12 +484,27 @@ public class X_GS_HR_Attendance_T extends PO implements I_GS_HR_Attendance_T, I_
 		return ii.intValue();
 	}
 
+	/** Sunday = Sunday */
+	public static final String GS_DAYOFTHEWEEK_Sunday = "Sunday";
+	/** Monday = Monday */
+	public static final String GS_DAYOFTHEWEEK_Monday = "Monday";
+	/** Tuesday = Tuesday */
+	public static final String GS_DAYOFTHEWEEK_Tuesday = "Tuesday";
+	/** Wednesday = Wednesday */
+	public static final String GS_DAYOFTHEWEEK_Wednesday = "Wednesday";
+	/** Thursday = Thursday */
+	public static final String GS_DAYOFTHEWEEK_Thursday = "Thursday";
+	/** Friday = Friday */
+	public static final String GS_DAYOFTHEWEEK_Friday = "Friday";
+	/** Saturday = Saturday */
+	public static final String GS_DAYOFTHEWEEK_Saturday = "Saturday";
 	/** Set Day of the Week.
 		@param GS_DayOfTheWeek 
 		Day of the Week
 	  */
 	public void setGS_DayOfTheWeek (String GS_DayOfTheWeek)
 	{
+
 		set_Value (COLUMNNAME_GS_DayOfTheWeek, GS_DayOfTheWeek);
 	}
 
@@ -632,6 +630,23 @@ public class X_GS_HR_Attendance_T extends PO implements I_GS_HR_Attendance_T, I_
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Generate List.
+		@param GenerateList 
+		Generate List
+	  */
+	public void setGenerateList (String GenerateList)
+	{
+		set_Value (COLUMNNAME_GenerateList, GenerateList);
+	}
+
+	/** Get Generate List.
+		@return Generate List
+	  */
+	public String getGenerateList () 
+	{
+		return (String)get_Value(COLUMNNAME_GenerateList);
 	}
 
 	public org.eevolution.model.I_HR_Department getHR_Department() throws RuntimeException

@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for GS_HR_EmpCompensation
  *  @author iDempiere (generated) 
- *  @version Release 5.1
+ *  @version Release 7.1
  */
 @SuppressWarnings("all")
 public interface I_GS_HR_EmpCompensation 
@@ -77,6 +77,21 @@ public interface I_GS_HR_EmpCompensation
 	  */
 	public BigDecimal getAmt();
 
+    /** Column name C_Charge_ID */
+    public static final String COLUMNNAME_C_Charge_ID = "C_Charge_ID";
+
+	/** Set Charge.
+	  * Additional document charges
+	  */
+	public void setC_Charge_ID (int C_Charge_ID);
+
+	/** Get Charge.
+	  * Additional document charges
+	  */
+	public int getC_Charge_ID();
+
+	public org.compiere.model.I_C_Charge getC_Charge() throws RuntimeException;
+
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
 
@@ -106,13 +121,26 @@ public interface I_GS_HR_EmpCompensation
 	  */
 	public String getDescription();
 
+    /** Column name GS_HR_CompDependantOn */
+    public static final String COLUMNNAME_GS_HR_CompDependantOn = "GS_HR_CompDependantOn";
+
+	/** Set Compensation Dependent On.
+	  * Compensation Dependent On
+	  */
+	public void setGS_HR_CompDependantOn (String GS_HR_CompDependantOn);
+
+	/** Get Compensation Dependent On.
+	  * Compensation Dependent On
+	  */
+	public String getGS_HR_CompDependantOn();
+
     /** Column name GS_HR_Compensation_Master_ID */
     public static final String COLUMNNAME_GS_HR_Compensation_Master_ID = "GS_HR_Compensation_Master_ID";
 
-	/** Set Compensation Type	  */
+	/** Set Compensation	  */
 	public void setGS_HR_Compensation_Master_ID (int GS_HR_Compensation_Master_ID);
 
-	/** Get Compensation Type	  */
+	/** Get Compensation	  */
 	public int getGS_HR_Compensation_Master_ID();
 
 	public I_GS_HR_Compensation_Master getGS_HR_Compensation_Master() throws RuntimeException;
@@ -197,6 +225,21 @@ public interface I_GS_HR_EmpCompensation
 	  * Percentage
 	  */
 	public BigDecimal getPercent();
+
+    /** Column name SeqNo */
+    public static final String COLUMNNAME_SeqNo = "SeqNo";
+
+	/** Set Sequence.
+	  * Method of ordering records;
+ lowest number comes first
+	  */
+	public void setSeqNo (int SeqNo);
+
+	/** Get Sequence.
+	  * Method of ordering records;
+ lowest number comes first
+	  */
+	public int getSeqNo();
 
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";

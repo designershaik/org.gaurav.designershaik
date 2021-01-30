@@ -25,14 +25,14 @@ import org.compiere.util.Env;
 
 /** Generated Model for GS_HR_EmpSkills
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_EmpSkills extends PO implements I_GS_HR_EmpSkills, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_EmpSkills (Properties ctx, int GS_HR_EmpSkills_ID, String trxName)
@@ -72,31 +72,6 @@ public class X_GS_HR_EmpSkills extends PO implements I_GS_HR_EmpSkills, I_Persis
       return sb.toString();
     }
 
-	public I_GS_HR_Employee getGS_HR_Employee() throws RuntimeException
-    {
-		return (I_GS_HR_Employee)MTable.get(getCtx(), I_GS_HR_Employee.Table_Name)
-			.getPO(getGS_HR_Employee_ID(), get_TrxName());	}
-
-	/** Set Employee Details.
-		@param GS_HR_Employee_ID Employee Details	  */
-	public void setGS_HR_Employee_ID (int GS_HR_Employee_ID)
-	{
-		if (GS_HR_Employee_ID < 1) 
-			set_ValueNoCheck (COLUMNNAME_GS_HR_Employee_ID, null);
-		else 
-			set_ValueNoCheck (COLUMNNAME_GS_HR_Employee_ID, Integer.valueOf(GS_HR_Employee_ID));
-	}
-
-	/** Get Employee Details.
-		@return Employee Details	  */
-	public int getGS_HR_Employee_ID () 
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_Employee_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
-	}
-
 	/** Set Employee Skills.
 		@param GS_HR_EmpSkills_ID Employee Skills	  */
 	public void setGS_HR_EmpSkills_ID (int GS_HR_EmpSkills_ID)
@@ -129,6 +104,31 @@ public class X_GS_HR_EmpSkills extends PO implements I_GS_HR_EmpSkills, I_Persis
 	public String getGS_HR_EmpSkills_UU () 
 	{
 		return (String)get_Value(COLUMNNAME_GS_HR_EmpSkills_UU);
+	}
+
+	public I_GS_HR_Employee getGS_HR_Employee() throws RuntimeException
+    {
+		return (I_GS_HR_Employee)MTable.get(getCtx(), I_GS_HR_Employee.Table_Name)
+			.getPO(getGS_HR_Employee_ID(), get_TrxName());	}
+
+	/** Set Employee Details.
+		@param GS_HR_Employee_ID Employee Details	  */
+	public void setGS_HR_Employee_ID (int GS_HR_Employee_ID)
+	{
+		if (GS_HR_Employee_ID < 1) 
+			set_ValueNoCheck (COLUMNNAME_GS_HR_Employee_ID, null);
+		else 
+			set_ValueNoCheck (COLUMNNAME_GS_HR_Employee_ID, Integer.valueOf(GS_HR_Employee_ID));
+	}
+
+	/** Get Employee Details.
+		@return Employee Details	  */
+	public int getGS_HR_Employee_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_Employee_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	public I_GS_HR_Skills getGS_HR_Skills() throws RuntimeException

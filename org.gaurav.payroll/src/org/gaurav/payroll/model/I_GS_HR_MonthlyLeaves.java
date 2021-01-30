@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for GS_HR_MonthlyLeaves
  *  @author iDempiere (generated) 
- *  @version Release 5.1
+ *  @version Release 7.1
  */
 @SuppressWarnings("all")
 public interface I_GS_HR_MonthlyLeaves 
@@ -80,6 +80,17 @@ public interface I_GS_HR_MonthlyLeaves
 	  */
 	public int getCreatedBy();
 
+    /** Column name GS_HR_Attendance_Det_ID */
+    public static final String COLUMNNAME_GS_HR_Attendance_Det_ID = "GS_HR_Attendance_Det_ID";
+
+	/** Set Attendance Details	  */
+	public void setGS_HR_Attendance_Det_ID (int GS_HR_Attendance_Det_ID);
+
+	/** Get Attendance Details	  */
+	public int getGS_HR_Attendance_Det_ID();
+
+	public I_GS_HR_Attendance_Det getGS_HR_Attendance_Det() throws RuntimeException;
+
     /** Column name GS_HR_Leave_Master_ID */
     public static final String COLUMNNAME_GS_HR_Leave_Master_ID = "GS_HR_Leave_Master_ID";
 
@@ -132,17 +143,6 @@ public interface I_GS_HR_MonthlyLeaves
 
 	/** Get GS_HR_MonthlyLeaves_UU	  */
 	public String getGS_HR_MonthlyLeaves_UU();
-
-    /** Column name GS_HR_SalaryMonths_ID */
-    public static final String COLUMNNAME_GS_HR_SalaryMonths_ID = "GS_HR_SalaryMonths_ID";
-
-	/** Set Salary Months	  */
-	public void setGS_HR_SalaryMonths_ID (int GS_HR_SalaryMonths_ID);
-
-	/** Get Salary Months	  */
-	public int getGS_HR_SalaryMonths_ID();
-
-	public I_GS_HR_SalaryMonths getGS_HR_SalaryMonths() throws RuntimeException;
 
     /** Column name IsActive */
     public static final String COLUMNNAME_IsActive = "IsActive";

@@ -17,21 +17,23 @@
 /** Generated Model - DO NOT CHANGE */
 package org.gaurav.payroll.model;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.Properties;
 import org.compiere.model.*;
+import org.compiere.util.Env;
 import org.compiere.util.KeyNamePair;
 
 /** Generated Model for GS_HR_Compensation_Master
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_Compensation_Master extends PO implements I_GS_HR_Compensation_Master, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_Compensation_Master (Properties ctx, int GS_HR_Compensation_Master_ID, String trxName)
@@ -102,6 +104,54 @@ public class X_GS_HR_Compensation_Master extends PO implements I_GS_HR_Compensat
 		return ii.intValue();
 	}
 
+	/** Set Overtime Percent.
+		@param DS_OvertimePercentage 
+		Overtime Percent
+	  */
+	public void setDS_OvertimePercentage (BigDecimal DS_OvertimePercentage)
+	{
+		set_Value (COLUMNNAME_DS_OvertimePercentage, DS_OvertimePercentage);
+	}
+
+	/** Get Overtime Percent.
+		@return Overtime Percent
+	  */
+	public BigDecimal getDS_OvertimePercentage () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_DS_OvertimePercentage);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Overtime Regular 1 = Overtime Regular 1 */
+	public static final String DS_OVERTIMETYPE_OvertimeRegular1 = "Overtime Regular 1";
+	/** Overtime Premium 1 = Overtime Premium 1 */
+	public static final String DS_OVERTIMETYPE_OvertimePremium1 = "Overtime Premium 1";
+	/** Overtime Regular 2 = Overtime Regular 2 */
+	public static final String DS_OVERTIMETYPE_OvertimeRegular2 = "Overtime Regular 2";
+	/** Overtime Regular 3 = Overtime Regular 3 */
+	public static final String DS_OVERTIMETYPE_OvertimeRegular3 = "Overtime Regular 3";
+	/** Overtime Premium 2 = Overtime Premium 2 */
+	public static final String DS_OVERTIMETYPE_OvertimePremium2 = "Overtime Premium 2";
+	/** Set Overtime Type.
+		@param DS_OvertimeType 
+		Overtime Type
+	  */
+	public void setDS_OvertimeType (String DS_OvertimeType)
+	{
+
+		set_Value (COLUMNNAME_DS_OvertimeType, DS_OvertimeType);
+	}
+
+	/** Get Overtime Type.
+		@return Overtime Type
+	  */
+	public String getDS_OvertimeType () 
+	{
+		return (String)get_Value(COLUMNNAME_DS_OvertimeType);
+	}
+
 	/** Set Description.
 		@param Description 
 		Optional short description of the record
@@ -119,18 +169,18 @@ public class X_GS_HR_Compensation_Master extends PO implements I_GS_HR_Compensat
 		return (String)get_Value(COLUMNNAME_Description);
 	}
 
-	/** Set Advance/Loan.
-		@param GS_HR_Advance Advance/Loan	  */
-	public void setGS_HR_Advance (boolean GS_HR_Advance)
+	/** Set Calculate On Actuals.
+		@param GS_HR_CalculateOnActuals Calculate On Actuals	  */
+	public void setGS_HR_CalculateOnActuals (boolean GS_HR_CalculateOnActuals)
 	{
-		set_Value (COLUMNNAME_GS_HR_Advance, Boolean.valueOf(GS_HR_Advance));
+		set_Value (COLUMNNAME_GS_HR_CalculateOnActuals, Boolean.valueOf(GS_HR_CalculateOnActuals));
 	}
 
-	/** Get Advance/Loan.
-		@return Advance/Loan	  */
-	public boolean isGS_HR_Advance () 
+	/** Get Calculate On Actuals.
+		@return Calculate On Actuals	  */
+	public boolean isGS_HR_CalculateOnActuals () 
 	{
-		Object oo = get_Value(COLUMNNAME_GS_HR_Advance);
+		Object oo = get_Value(COLUMNNAME_GS_HR_CalculateOnActuals);
 		if (oo != null) 
 		{
 			 if (oo instanceof Boolean) 
@@ -140,8 +190,60 @@ public class X_GS_HR_Compensation_Master extends PO implements I_GS_HR_Compensat
 		return false;
 	}
 
+	/** Set Compensation Dependent On.
+		@param GS_HR_CompDependantOn 
+		Compensation Dependent On
+	  */
+	public void setGS_HR_CompDependantOn (String GS_HR_CompDependantOn)
+	{
+
+		set_Value (COLUMNNAME_GS_HR_CompDependantOn, GS_HR_CompDependantOn);
+	}
+
+	/** Get Compensation Dependent On.
+		@return Compensation Dependent On
+	  */
+	public String getGS_HR_CompDependantOn () 
+	{
+		return (String)get_Value(COLUMNNAME_GS_HR_CompDependantOn);
+	}
+
+	/** Annual Vacation Leave = AVL */
+	public static final String GS_HR_COMPENSATIONTYPE_AnnualVacationLeave = "AVL";
+	/** Basic Salary = BAS */
+	public static final String GS_HR_COMPENSATIONTYPE_BasicSalary = "BAS";
+	/** Over Time = OTI */
+	public static final String GS_HR_COMPENSATIONTYPE_OverTime = "OTI";
+	/** Loans/Advances = ADV */
+	public static final String GS_HR_COMPENSATIONTYPE_LoansAdvances = "ADV";
+	/** Allowances = ALL */
+	public static final String GS_HR_COMPENSATIONTYPE_Allowances = "ALL";
+	/** Other Leave Pays = OTL */
+	public static final String GS_HR_COMPENSATIONTYPE_OtherLeavePays = "OTL";
+	/** Indemnity = IND */
+	public static final String GS_HR_COMPENSATIONTYPE_Indemnity = "IND";
+	/** GOSI = GOS */
+	public static final String GS_HR_COMPENSATIONTYPE_GOSI = "GOS";
 	/** Set Compensation Type.
-		@param GS_HR_Compensation_Master_ID Compensation Type	  */
+		@param GS_HR_CompensationType 
+		Compensation Type
+	  */
+	public void setGS_HR_CompensationType (String GS_HR_CompensationType)
+	{
+
+		set_Value (COLUMNNAME_GS_HR_CompensationType, GS_HR_CompensationType);
+	}
+
+	/** Get Compensation Type.
+		@return Compensation Type
+	  */
+	public String getGS_HR_CompensationType () 
+	{
+		return (String)get_Value(COLUMNNAME_GS_HR_CompensationType);
+	}
+
+	/** Set Compensation.
+		@param GS_HR_Compensation_Master_ID Compensation	  */
 	public void setGS_HR_Compensation_Master_ID (int GS_HR_Compensation_Master_ID)
 	{
 		if (GS_HR_Compensation_Master_ID < 1) 
@@ -150,8 +252,8 @@ public class X_GS_HR_Compensation_Master extends PO implements I_GS_HR_Compensat
 			set_ValueNoCheck (COLUMNNAME_GS_HR_Compensation_Master_ID, Integer.valueOf(GS_HR_Compensation_Master_ID));
 	}
 
-	/** Get Compensation Type.
-		@return Compensation Type	  */
+	/** Get Compensation.
+		@return Compensation	  */
 	public int getGS_HR_Compensation_Master_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_Compensation_Master_ID);
@@ -172,30 +274,6 @@ public class X_GS_HR_Compensation_Master extends PO implements I_GS_HR_Compensat
 	public String getGS_HR_Compensation_Master_UU () 
 	{
 		return (String)get_Value(COLUMNNAME_GS_HR_Compensation_Master_UU);
-	}
-
-	/** Set Basic Salary.
-		@param GS_HR_IsBasic 
-		Basic salary
-	  */
-	public void setGS_HR_IsBasic (boolean GS_HR_IsBasic)
-	{
-		set_Value (COLUMNNAME_GS_HR_IsBasic, Boolean.valueOf(GS_HR_IsBasic));
-	}
-
-	/** Get Basic Salary.
-		@return Basic salary
-	  */
-	public boolean isGS_HR_IsBasic () 
-	{
-		Object oo = get_Value(COLUMNNAME_GS_HR_IsBasic);
-		if (oo != null) 
-		{
-			 if (oo instanceof Boolean) 
-				 return ((Boolean)oo).booleanValue(); 
-			return "Y".equals(oo);
-		}
-		return false;
 	}
 
 	/** Set Earning.
@@ -237,6 +315,30 @@ public class X_GS_HR_Compensation_Master extends PO implements I_GS_HR_Compensat
 	public boolean isGS_HR_IsPercent () 
 	{
 		Object oo = get_Value(COLUMNNAME_GS_HR_IsPercent);
+		if (oo != null) 
+		{
+			 if (oo instanceof Boolean) 
+				 return ((Boolean)oo).booleanValue(); 
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set Per Hour.
+		@param GS_HR_PerHour 
+		Per Hour
+	  */
+	public void setGS_HR_PerHour (boolean GS_HR_PerHour)
+	{
+		set_Value (COLUMNNAME_GS_HR_PerHour, Boolean.valueOf(GS_HR_PerHour));
+	}
+
+	/** Get Per Hour.
+		@return Per Hour
+	  */
+	public boolean isGS_HR_PerHour () 
+	{
+		Object oo = get_Value(COLUMNNAME_GS_HR_PerHour);
 		if (oo != null) 
 		{
 			 if (oo instanceof Boolean) 

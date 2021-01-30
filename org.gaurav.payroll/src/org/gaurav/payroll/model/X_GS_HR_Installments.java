@@ -26,14 +26,14 @@ import org.compiere.util.Env;
 
 /** Generated Model for GS_HR_Installments
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_Installments extends PO implements I_GS_HR_Installments, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_Installments (Properties ctx, int GS_HR_Installments_ID, String trxName)
@@ -88,6 +88,23 @@ public class X_GS_HR_Installments extends PO implements I_GS_HR_Installments, I_
 	public Timestamp getDate1 () 
 	{
 		return (Timestamp)get_Value(COLUMNNAME_Date1);
+	}
+
+	/** Set Description.
+		@param Description 
+		Optional short description of the record
+	  */
+	public void setDescription (String Description)
+	{
+		set_Value (COLUMNNAME_Description, Description);
+	}
+
+	/** Get Description.
+		@return Optional short description of the record
+	  */
+	public String getDescription () 
+	{
+		return (String)get_Value(COLUMNNAME_Description);
 	}
 
 	public I_GS_HR_EmployeeAdvance getGS_HR_EmployeeAdvance() throws RuntimeException
@@ -232,6 +249,23 @@ public class X_GS_HR_Installments extends PO implements I_GS_HR_Installments, I_
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Paid Amount.
+		@param PaidAmt Paid Amount	  */
+	public void setPaidAmt (BigDecimal PaidAmt)
+	{
+		set_Value (COLUMNNAME_PaidAmt, PaidAmt);
+	}
+
+	/** Get Paid Amount.
+		@return Paid Amount	  */
+	public BigDecimal getPaidAmt () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_PaidAmt);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	/** Set Payment date.

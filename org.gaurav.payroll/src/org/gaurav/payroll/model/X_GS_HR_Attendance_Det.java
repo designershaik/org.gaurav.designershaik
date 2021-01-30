@@ -25,14 +25,14 @@ import org.compiere.util.Env;
 
 /** Generated Model for GS_HR_Attendance_Det
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_Attendance_Det extends PO implements I_GS_HR_Attendance_Det, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_Attendance_Det (Properties ctx, int GS_HR_Attendance_Det_ID, String trxName)
@@ -121,6 +121,26 @@ public class X_GS_HR_Attendance_Det extends PO implements I_GS_HR_Attendance_Det
 	public String getGS_HR_Attendance_Det_UU () 
 	{
 		return (String)get_Value(COLUMNNAME_GS_HR_Attendance_Det_UU);
+	}
+
+	/** Set Consolidated Working Hours.
+		@param GS_HR_ConsolidateWorkingHours 
+		Consolidated Working Hours
+	  */
+	public void setGS_HR_ConsolidateWorkingHours (BigDecimal GS_HR_ConsolidateWorkingHours)
+	{
+		set_Value (COLUMNNAME_GS_HR_ConsolidateWorkingHours, GS_HR_ConsolidateWorkingHours);
+	}
+
+	/** Get Consolidated Working Hours.
+		@return Consolidated Working Hours
+	  */
+	public BigDecimal getGS_HR_ConsolidateWorkingHours () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_GS_HR_ConsolidateWorkingHours);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	public I_GS_HR_Employee getGS_HR_Employee() throws RuntimeException
@@ -315,6 +335,46 @@ public class X_GS_HR_Attendance_Det extends PO implements I_GS_HR_Attendance_Det
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Total Working Hours For Month.
+		@param GS_HR_TotalWorkingHours 
+		Total Working Hours For Month
+	  */
+	public void setGS_HR_TotalWorkingHours (BigDecimal GS_HR_TotalWorkingHours)
+	{
+		set_Value (COLUMNNAME_GS_HR_TotalWorkingHours, GS_HR_TotalWorkingHours);
+	}
+
+	/** Get Total Working Hours For Month.
+		@return Total Working Hours For Month
+	  */
+	public BigDecimal getGS_HR_TotalWorkingHours () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_GS_HR_TotalWorkingHours);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set Total Working Minutes.
+		@param GS_HR_TotalWorkingMinutes 
+		Total Working Minutes
+	  */
+	public void setGS_HR_TotalWorkingMinutes (BigDecimal GS_HR_TotalWorkingMinutes)
+	{
+		set_Value (COLUMNNAME_GS_HR_TotalWorkingMinutes, GS_HR_TotalWorkingMinutes);
+	}
+
+	/** Get Total Working Minutes.
+		@return Total Working Minutes
+	  */
+	public BigDecimal getGS_HR_TotalWorkingMinutes () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_GS_HR_TotalWorkingMinutes);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	/** Set Year.

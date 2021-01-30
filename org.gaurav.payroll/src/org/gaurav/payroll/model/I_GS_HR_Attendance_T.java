@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for GS_HR_Attendance_T
  *  @author iDempiere (generated) 
- *  @version Release 5.1
+ *  @version Release 7.1
  */
 @SuppressWarnings("all")
 public interface I_GS_HR_Attendance_T 
@@ -322,19 +322,6 @@ public interface I_GS_HR_Attendance_T
 	  */
 	public Timestamp getEndDate();
 
-    /** Column name GenerateList */
-    public static final String COLUMNNAME_GenerateList = "GenerateList";
-
-	/** Set Generate List.
-	  * Generate List
-	  */
-	public void setGenerateList (String GenerateList);
-
-	/** Get Generate List.
-	  * Generate List
-	  */
-	public String getGenerateList();
-
     /** Column name GS_AMPM */
     public static final String COLUMNNAME_GS_AMPM = "GS_AMPM";
 
@@ -441,6 +428,19 @@ public interface I_GS_HR_Attendance_T
 	  * Year
 	  */
 	public int getGS_Year();
+
+    /** Column name GenerateList */
+    public static final String COLUMNNAME_GenerateList = "GenerateList";
+
+	/** Set Generate List.
+	  * Generate List
+	  */
+	public void setGenerateList (String GenerateList);
+
+	/** Get Generate List.
+	  * Generate List
+	  */
+	public String getGenerateList();
 
     /** Column name HR_Department_ID */
     public static final String COLUMNNAME_HR_Department_ID = "HR_Department_ID";

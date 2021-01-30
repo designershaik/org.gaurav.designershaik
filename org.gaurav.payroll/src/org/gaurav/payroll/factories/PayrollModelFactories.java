@@ -7,11 +7,13 @@ import org.compiere.model.PO;
 import org.compiere.util.Env;
 import org.gaurav.payroll.model.MGSHRApprovals;
 import org.gaurav.payroll.model.MGSHRAttendanceAccess;
+import org.gaurav.payroll.model.MGSHRAttendanceDayWise;
 import org.gaurav.payroll.model.MGSHRAttendanceDet;
 import org.gaurav.payroll.model.MGSHRAttendanceT;
 import org.gaurav.payroll.model.MGSHRCompCalc;
 import org.gaurav.payroll.model.MGSHRCompensationMaster;
 import org.gaurav.payroll.model.MGSHRDailyAttendanceLog;
+import org.gaurav.payroll.model.MGSHRDeductionOnLate;
 import org.gaurav.payroll.model.MGSHRDocumentBaseType;
 import org.gaurav.payroll.model.MGSHREmpCompensation;
 import org.gaurav.payroll.model.MGSHREmpLeave;
@@ -20,13 +22,19 @@ import org.gaurav.payroll.model.MGSContractCalendar;
 import org.gaurav.payroll.model.MGSContractPeriod;
 import org.gaurav.payroll.model.MGSHREmployee;
 import org.gaurav.payroll.model.MGSHREmployeeAdvance;
+import org.gaurav.payroll.model.MGSHREmployeeMonthlySalary;
+import org.gaurav.payroll.model.MGSHREmployeeSalaryDetails;
 import org.gaurav.payroll.model.MGSHRLeaveApplication;
 import org.gaurav.payroll.model.MGSHRLeaveMaster;
 import org.gaurav.payroll.model.MGSHRLogsImported;
 import org.gaurav.payroll.model.MGSHRMonthlyAttendance;
 import org.gaurav.payroll.model.MGSHRMonthlyLeaves;
+import org.gaurav.payroll.model.MGSHRMonthlySalary;
 import org.gaurav.payroll.model.MGSHRSalaryMonths;
 import org.gaurav.payroll.model.MGSHRTerminalDetails;
+import org.gaurav.payroll.model.MGSHRTimeSlot;
+import org.gaurav.payroll.model.MGSHRTimeSlotGroup;
+import org.gaurav.payroll.model.MGSImportAttendance;
 import org.gaurav.payroll.model.MHRContract;
 import org.gaurav.payroll.model.MHRContractCompensation;
 import org.gaurav.payroll.model.MHRContractLeave;
@@ -115,6 +123,30 @@ public class PayrollModelFactories implements IModelFactory{
 		
 		if(tableName.equalsIgnoreCase(MGSHRLeaveApplication.Table_Name))
 			return MGSHRLeaveApplication.class;
+		
+		if(tableName.equalsIgnoreCase(MGSImportAttendance.Table_Name))
+			return MGSImportAttendance.class;
+		
+		if(tableName.equalsIgnoreCase(MGSHRTimeSlotGroup.Table_Name))
+			return MGSHRTimeSlotGroup.class;
+		
+		if(tableName.equalsIgnoreCase(MGSHRTimeSlot.Table_Name))
+			return MGSHRTimeSlot.class;
+		
+		if(tableName.equalsIgnoreCase(MGSHRAttendanceDayWise.Table_Name))
+			return MGSHRAttendanceDayWise.class;
+		
+		if(tableName.equalsIgnoreCase(MGSHRDeductionOnLate.Table_Name))
+			return MGSHRDeductionOnLate.class;
+		
+		if(tableName.equalsIgnoreCase(MGSHRMonthlySalary.Table_Name))
+			return MGSHRMonthlySalary.class;
+		
+		if(tableName.equalsIgnoreCase(MGSHREmployeeMonthlySalary.Table_Name))
+			return MGSHREmployeeMonthlySalary.class;
+		
+		if(tableName.equalsIgnoreCase(MGSHREmployeeSalaryDetails.Table_Name))
+			return MGSHREmployeeSalaryDetails.class;
 
 		return null;
 	}
@@ -197,6 +229,30 @@ public class PayrollModelFactories implements IModelFactory{
 		if(tableName.equalsIgnoreCase(MGSHRLeaveApplication.Table_Name))
 			return new MGSHRLeaveApplication(Env.getCtx(), Record_ID, trxName);
 		
+		if(tableName.equalsIgnoreCase(MGSImportAttendance.Table_Name))
+			return new MGSImportAttendance(Env.getCtx(), Record_ID, trxName);
+		
+		if(tableName.equalsIgnoreCase(MGSHRTimeSlotGroup.Table_Name))
+			return new MGSHRTimeSlotGroup(Env.getCtx(), Record_ID, trxName);
+		
+		if(tableName.equalsIgnoreCase(MGSHRTimeSlot.Table_Name))
+			return new MGSHRTimeSlot(Env.getCtx(), Record_ID, trxName);
+		
+		if(tableName.equalsIgnoreCase(MGSHRAttendanceDayWise.Table_Name))
+			return new MGSHRAttendanceDayWise(Env.getCtx(), Record_ID, trxName);
+		
+		if(tableName.equalsIgnoreCase(MGSHRDeductionOnLate.Table_Name))
+			return new MGSHRDeductionOnLate(Env.getCtx(), Record_ID, trxName);
+		
+		if(tableName.equalsIgnoreCase(MGSHRMonthlySalary.Table_Name))
+			return new MGSHRMonthlySalary(Env.getCtx(), Record_ID, trxName);
+		
+		if(tableName.equalsIgnoreCase(MGSHREmployeeMonthlySalary.Table_Name))
+			return new MGSHREmployeeMonthlySalary(Env.getCtx(), Record_ID, trxName);
+		
+		if(tableName.equalsIgnoreCase(MGSHREmployeeSalaryDetails.Table_Name))
+			return new MGSHREmployeeSalaryDetails(Env.getCtx(), Record_ID, trxName);
+		
 		return null;
 	}
 
@@ -277,6 +333,30 @@ public class PayrollModelFactories implements IModelFactory{
 		
 		if(tableName.equalsIgnoreCase(MGSHRLeaveApplication.Table_Name))
 			return new MGSHRLeaveApplication(Env.getCtx(), rs, trxName);
+		
+		if(tableName.equalsIgnoreCase(MGSImportAttendance.Table_Name))
+			return new MGSImportAttendance(Env.getCtx(), rs, trxName);
+		
+		if(tableName.equalsIgnoreCase(MGSHRTimeSlotGroup.Table_Name))
+			return new MGSHRTimeSlotGroup(Env.getCtx(), rs, trxName);
+		
+		if(tableName.equalsIgnoreCase(MGSHRTimeSlot.Table_Name))
+			return new MGSHRTimeSlot(Env.getCtx(), rs, trxName);
+		
+		if(tableName.equalsIgnoreCase(MGSHRAttendanceDayWise.Table_Name))
+			return new MGSHRAttendanceDayWise(Env.getCtx(), rs, trxName);
+		
+		if(tableName.equalsIgnoreCase(MGSHRDeductionOnLate.Table_Name))
+			return new MGSHRDeductionOnLate(Env.getCtx(), rs, trxName);
+		
+		if(tableName.equalsIgnoreCase(MGSHRMonthlySalary.Table_Name))
+			return new MGSHRMonthlySalary(Env.getCtx(), rs, trxName);
+		
+		if(tableName.equalsIgnoreCase(MGSHREmployeeMonthlySalary.Table_Name))
+			return new MGSHREmployeeMonthlySalary(Env.getCtx(), rs, trxName);
+		
+		if(tableName.equalsIgnoreCase(MGSHREmployeeSalaryDetails.Table_Name))
+			return new MGSHREmployeeSalaryDetails(Env.getCtx(), rs, trxName);
 		
 		return null;
 	}

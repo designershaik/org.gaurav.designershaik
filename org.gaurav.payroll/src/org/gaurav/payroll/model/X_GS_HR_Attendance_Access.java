@@ -23,14 +23,14 @@ import org.compiere.model.*;
 
 /** Generated Model for GS_HR_Attendance_Access
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_Attendance_Access extends PO implements I_GS_HR_Attendance_Access, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_Attendance_Access (Properties ctx, int GS_HR_Attendance_Access_ID, String trxName)

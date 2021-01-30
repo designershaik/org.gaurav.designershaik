@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for GS_HR_Approvals
  *  @author iDempiere (generated) 
- *  @version Release 5.1
+ *  @version Release 7.1
  */
 @SuppressWarnings("all")
 public interface I_GS_HR_Approvals 
@@ -80,6 +80,15 @@ public interface I_GS_HR_Approvals
 	  */
 	public int getCreatedBy();
 
+    /** Column name DSI_IsApproved */
+    public static final String COLUMNNAME_DSI_IsApproved = "DSI_IsApproved";
+
+	/** Set Approve	  */
+	public void setDSI_IsApproved (boolean DSI_IsApproved);
+
+	/** Get Approve	  */
+	public boolean isDSI_IsApproved();
+
     /** Column name DS_DateApproved */
     public static final String COLUMNNAME_DS_DateApproved = "DS_DateApproved";
 
@@ -93,22 +102,13 @@ public interface I_GS_HR_Approvals
 	  */
 	public Timestamp getDS_DateApproved();
 
-    /** Column name DSI_IsApproved */
-    public static final String COLUMNNAME_DSI_IsApproved = "DSI_IsApproved";
-
-	/** Set Approve	  */
-	public void setDSI_IsApproved (boolean DSI_IsApproved);
-
-	/** Get Approve	  */
-	public boolean isDSI_IsApproved();
-
     /** Column name GS_HR_Approval_ID */
     public static final String COLUMNNAME_GS_HR_Approval_ID = "GS_HR_Approval_ID";
 
-	/** Set Current Approval	  */
+	/** Set Approved By	  */
 	public void setGS_HR_Approval_ID (int GS_HR_Approval_ID);
 
-	/** Get Current Approval	  */
+	/** Get Approved By	  */
 	public int getGS_HR_Approval_ID();
 
 	public org.compiere.model.I_AD_User getGS_HR_Approval() throws RuntimeException;

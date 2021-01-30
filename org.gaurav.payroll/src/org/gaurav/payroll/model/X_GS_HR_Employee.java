@@ -25,14 +25,14 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Model for GS_HR_Employee
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_Employee extends PO implements I_GS_HR_Employee, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_Employee (Properties ctx, int GS_HR_Employee_ID, String trxName)
@@ -218,6 +218,34 @@ public class X_GS_HR_Employee extends PO implements I_GS_HR_Employee, I_Persiste
 		return ii.intValue();
 	}
 
+	/** Overtime Regular 1 = Overtime Regular 1 */
+	public static final String DS_OVERTIMETYPE_OvertimeRegular1 = "Overtime Regular 1";
+	/** Overtime Premium 1 = Overtime Premium 1 */
+	public static final String DS_OVERTIMETYPE_OvertimePremium1 = "Overtime Premium 1";
+	/** Overtime Regular 2 = Overtime Regular 2 */
+	public static final String DS_OVERTIMETYPE_OvertimeRegular2 = "Overtime Regular 2";
+	/** Overtime Regular 3 = Overtime Regular 3 */
+	public static final String DS_OVERTIMETYPE_OvertimeRegular3 = "Overtime Regular 3";
+	/** Overtime Premium 2 = Overtime Premium 2 */
+	public static final String DS_OVERTIMETYPE_OvertimePremium2 = "Overtime Premium 2";
+	/** Set Overtime Type.
+		@param DS_OvertimeType 
+		Overtime Type
+	  */
+	public void setDS_OvertimeType (String DS_OvertimeType)
+	{
+
+		set_Value (COLUMNNAME_DS_OvertimeType, DS_OvertimeType);
+	}
+
+	/** Get Overtime Type.
+		@return Overtime Type
+	  */
+	public String getDS_OvertimeType () 
+	{
+		return (String)get_Value(COLUMNNAME_DS_OvertimeType);
+	}
+
 	/** Set End Date.
 		@param EndDate 
 		Last effective date (inclusive)
@@ -332,6 +360,30 @@ public class X_GS_HR_Employee extends PO implements I_GS_HR_Employee, I_Persiste
 	public String getGS_HR_Employee_UU () 
 	{
 		return (String)get_Value(COLUMNNAME_GS_HR_Employee_UU);
+	}
+
+	/** Set Exempt from Late Deduction.
+		@param GS_HR_ExemptFromLateDeduction 
+		Exempt from Late Deduction
+	  */
+	public void setGS_HR_ExemptFromLateDeduction (boolean GS_HR_ExemptFromLateDeduction)
+	{
+		set_Value (COLUMNNAME_GS_HR_ExemptFromLateDeduction, Boolean.valueOf(GS_HR_ExemptFromLateDeduction));
+	}
+
+	/** Get Exempt from Late Deduction.
+		@return Exempt from Late Deduction
+	  */
+	public boolean isGS_HR_ExemptFromLateDeduction () 
+	{
+		Object oo = get_Value(COLUMNNAME_GS_HR_ExemptFromLateDeduction);
+		if (oo != null) 
+		{
+			 if (oo instanceof Boolean) 
+				 return ((Boolean)oo).booleanValue(); 
+			return "Y".equals(oo);
+		}
+		return false;
 	}
 
 	/** Set Is Terminated.
@@ -449,6 +501,31 @@ public class X_GS_HR_Employee extends PO implements I_GS_HR_Employee, I_Persiste
 	public String getGS_HR_Terminate () 
 	{
 		return (String)get_Value(COLUMNNAME_GS_HR_Terminate);
+	}
+
+	public I_GS_HR_TimeSlot_Group getGS_HR_TimeSlot_Group() throws RuntimeException
+    {
+		return (I_GS_HR_TimeSlot_Group)MTable.get(getCtx(), I_GS_HR_TimeSlot_Group.Table_Name)
+			.getPO(getGS_HR_TimeSlot_Group_ID(), get_TrxName());	}
+
+	/** Set Time Slot.
+		@param GS_HR_TimeSlot_Group_ID Time Slot	  */
+	public void setGS_HR_TimeSlot_Group_ID (int GS_HR_TimeSlot_Group_ID)
+	{
+		if (GS_HR_TimeSlot_Group_ID < 1) 
+			set_Value (COLUMNNAME_GS_HR_TimeSlot_Group_ID, null);
+		else 
+			set_Value (COLUMNNAME_GS_HR_TimeSlot_Group_ID, Integer.valueOf(GS_HR_TimeSlot_Group_ID));
+	}
+
+	/** Get Time Slot.
+		@return Time Slot	  */
+	public int getGS_HR_TimeSlot_Group_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_TimeSlot_Group_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	public I_GS_HR_Warnings getGS_HR_Warnings() throws RuntimeException
@@ -582,6 +659,20 @@ public class X_GS_HR_Employee extends PO implements I_GS_HR_Employee, I_Persiste
 		return (String)get_Value(COLUMNNAME_Name2);
 	}
 
+	/** Set CPR/Social Security Code.
+		@param SSCode CPR/Social Security Code	  */
+	public void setSSCode (String SSCode)
+	{
+		set_Value (COLUMNNAME_SSCode, SSCode);
+	}
+
+	/** Get CPR/Social Security Code.
+		@return CPR/Social Security Code	  */
+	public String getSSCode () 
+	{
+		return (String)get_Value(COLUMNNAME_SSCode);
+	}
+
 	public org.compiere.model.I_S_Resource getS_Resource() throws RuntimeException
     {
 		return (org.compiere.model.I_S_Resource)MTable.get(getCtx(), org.compiere.model.I_S_Resource.Table_Name)
@@ -622,20 +713,6 @@ public class X_GS_HR_Employee extends PO implements I_GS_HR_Employee, I_Persiste
 	public Object getSignature () 
 	{
 				return get_Value(COLUMNNAME_Signature);
-	}
-
-	/** Set CPR/Social Security Code.
-		@param SSCode CPR/Social Security Code	  */
-	public void setSSCode (String SSCode)
-	{
-		set_Value (COLUMNNAME_SSCode, SSCode);
-	}
-
-	/** Get CPR/Social Security Code.
-		@return CPR/Social Security Code	  */
-	public String getSSCode () 
-	{
-		return (String)get_Value(COLUMNNAME_SSCode);
 	}
 
 	/** Set Start Date.

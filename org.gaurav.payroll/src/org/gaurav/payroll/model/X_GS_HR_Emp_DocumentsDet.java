@@ -24,14 +24,14 @@ import org.compiere.model.*;
 
 /** Generated Model for GS_HR_Emp_DocumentsDet
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_Emp_DocumentsDet extends PO implements I_GS_HR_Emp_DocumentsDet, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_Emp_DocumentsDet (Properties ctx, int GS_HR_Emp_DocumentsDet_ID, String trxName)
@@ -40,9 +40,9 @@ public class X_GS_HR_Emp_DocumentsDet extends PO implements I_GS_HR_Emp_Document
       /** if (GS_HR_Emp_DocumentsDet_ID == 0)
         {
 			setGS_HR_Emp_DocumentsDet_ID (0);
+			setHR_DocNumber (null);
 			setHR_Doc_ExpiryDate (new Timestamp( System.currentTimeMillis() ));
 			setHR_Doc_IssueDate (new Timestamp( System.currentTimeMillis() ));
-			setHR_DocNumber (null);
 			setHR_Documents_ID (0);
         } */
     }
@@ -191,6 +191,23 @@ public class X_GS_HR_Emp_DocumentsDet extends PO implements I_GS_HR_Emp_Document
 		return (String)get_Value(COLUMNNAME_GS_HR_IssuedBy);
 	}
 
+	/** Set Document No.
+		@param HR_DocNumber 
+		Identity/Document No
+	  */
+	public void setHR_DocNumber (String HR_DocNumber)
+	{
+		set_Value (COLUMNNAME_HR_DocNumber, HR_DocNumber);
+	}
+
+	/** Get Document No.
+		@return Identity/Document No
+	  */
+	public String getHR_DocNumber () 
+	{
+		return (String)get_Value(COLUMNNAME_HR_DocNumber);
+	}
+
 	/** Set Expiry Date.
 		@param HR_Doc_ExpiryDate 
 		Expiry Date
@@ -223,23 +240,6 @@ public class X_GS_HR_Emp_DocumentsDet extends PO implements I_GS_HR_Emp_Document
 	public Timestamp getHR_Doc_IssueDate () 
 	{
 		return (Timestamp)get_Value(COLUMNNAME_HR_Doc_IssueDate);
-	}
-
-	/** Set Document No.
-		@param HR_DocNumber 
-		Identity/Document No
-	  */
-	public void setHR_DocNumber (String HR_DocNumber)
-	{
-		set_Value (COLUMNNAME_HR_DocNumber, HR_DocNumber);
-	}
-
-	/** Get Document No.
-		@return Identity/Document No
-	  */
-	public String getHR_DocNumber () 
-	{
-		return (String)get_Value(COLUMNNAME_HR_DocNumber);
 	}
 
 	public I_HR_Documents getHR_Documents() throws RuntimeException

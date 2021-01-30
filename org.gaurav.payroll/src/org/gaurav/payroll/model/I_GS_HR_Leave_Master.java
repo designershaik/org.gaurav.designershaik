@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for GS_HR_Leave_Master
  *  @author iDempiere (generated) 
- *  @version Release 5.1
+ *  @version Release 7.1
  */
 @SuppressWarnings("all")
 public interface I_GS_HR_Leave_Master 
@@ -93,6 +93,19 @@ public interface I_GS_HR_Leave_Master
 	  */
 	public String getDescription();
 
+    /** Column name GS_HR_LeaveType */
+    public static final String COLUMNNAME_GS_HR_LeaveType = "GS_HR_LeaveType";
+
+	/** Set Leave Type.
+	  * Leave Type
+	  */
+	public void setGS_HR_LeaveType (String GS_HR_LeaveType);
+
+	/** Get Leave Type.
+	  * Leave Type
+	  */
+	public String getGS_HR_LeaveType();
+
     /** Column name GS_HR_Leave_Master_ID */
     public static final String COLUMNNAME_GS_HR_Leave_Master_ID = "GS_HR_Leave_Master_ID";
 
@@ -123,6 +136,15 @@ public interface I_GS_HR_Leave_Master
 	  * Total number of leaves allowed per employee
 	  */
 	public BigDecimal getGS_HR_LeavesAllowed();
+
+    /** Column name GS_HR_WithPay */
+    public static final String COLUMNNAME_GS_HR_WithPay = "GS_HR_WithPay";
+
+	/** Set With Pay	  */
+	public void setGS_HR_WithPay (boolean GS_HR_WithPay);
+
+	/** Get With Pay	  */
+	public boolean isGS_HR_WithPay();
 
     /** Column name GS_IsResetEveryYear */
     public static final String COLUMNNAME_GS_IsResetEveryYear = "GS_IsResetEveryYear";

@@ -26,14 +26,14 @@ import org.compiere.util.Env;
 
 /** Generated Model for GS_HR_LeaveApplication
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_LeaveApplication extends PO implements I_GS_HR_LeaveApplication, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_LeaveApplication (Properties ctx, int GS_HR_LeaveApplication_ID, String trxName)
@@ -45,8 +45,8 @@ public class X_GS_HR_LeaveApplication extends PO implements I_GS_HR_LeaveApplica
 			setGS_HR_DateApplication (new Timestamp( System.currentTimeMillis() ));
 // @#Date@
 			setGS_HR_Employee_ID (0);
-			setGS_HR_Leave_Master_ID (0);
 			setGS_HR_LeaveApplication_ID (0);
+			setGS_HR_Leave_Master_ID (0);
 			setGS_HR_LeavesAllowed (Env.ZERO);
 // 0
 			setGS_HR_Reason (null);
@@ -122,8 +122,8 @@ public class X_GS_HR_LeaveApplication extends PO implements I_GS_HR_LeaveApplica
 		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_Name)
 			.getPO(getGS_HR_Approval_ID(), get_TrxName());	}
 
-	/** Set Current Approval.
-		@param GS_HR_Approval_ID Current Approval	  */
+	/** Set Approved By.
+		@param GS_HR_Approval_ID Approved By	  */
 	public void setGS_HR_Approval_ID (int GS_HR_Approval_ID)
 	{
 		if (GS_HR_Approval_ID < 1) 
@@ -132,8 +132,8 @@ public class X_GS_HR_LeaveApplication extends PO implements I_GS_HR_LeaveApplica
 			set_Value (COLUMNNAME_GS_HR_Approval_ID, Integer.valueOf(GS_HR_Approval_ID));
 	}
 
-	/** Get Current Approval.
-		@return Current Approval	  */
+	/** Get Approved By.
+		@return Approved By	  */
 	public int getGS_HR_Approval_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_Approval_ID);
@@ -181,31 +181,6 @@ public class X_GS_HR_LeaveApplication extends PO implements I_GS_HR_LeaveApplica
 		return ii.intValue();
 	}
 
-	public I_GS_HR_Leave_Master getGS_HR_Leave_Master() throws RuntimeException
-    {
-		return (I_GS_HR_Leave_Master)MTable.get(getCtx(), I_GS_HR_Leave_Master.Table_Name)
-			.getPO(getGS_HR_Leave_Master_ID(), get_TrxName());	}
-
-	/** Set Leave Type.
-		@param GS_HR_Leave_Master_ID Leave Type	  */
-	public void setGS_HR_Leave_Master_ID (int GS_HR_Leave_Master_ID)
-	{
-		if (GS_HR_Leave_Master_ID < 1) 
-			set_Value (COLUMNNAME_GS_HR_Leave_Master_ID, null);
-		else 
-			set_Value (COLUMNNAME_GS_HR_Leave_Master_ID, Integer.valueOf(GS_HR_Leave_Master_ID));
-	}
-
-	/** Get Leave Type.
-		@return Leave Type	  */
-	public int getGS_HR_Leave_Master_ID () 
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_Leave_Master_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
-	}
-
 	/** Set Leave Application.
 		@param GS_HR_LeaveApplication_ID Leave Application	  */
 	public void setGS_HR_LeaveApplication_ID (int GS_HR_LeaveApplication_ID)
@@ -240,6 +215,31 @@ public class X_GS_HR_LeaveApplication extends PO implements I_GS_HR_LeaveApplica
 		return (String)get_Value(COLUMNNAME_GS_HR_LeaveApplication_UU);
 	}
 
+	public I_GS_HR_Leave_Master getGS_HR_Leave_Master() throws RuntimeException
+    {
+		return (I_GS_HR_Leave_Master)MTable.get(getCtx(), I_GS_HR_Leave_Master.Table_Name)
+			.getPO(getGS_HR_Leave_Master_ID(), get_TrxName());	}
+
+	/** Set Leave Type.
+		@param GS_HR_Leave_Master_ID Leave Type	  */
+	public void setGS_HR_Leave_Master_ID (int GS_HR_Leave_Master_ID)
+	{
+		if (GS_HR_Leave_Master_ID < 1) 
+			set_Value (COLUMNNAME_GS_HR_Leave_Master_ID, null);
+		else 
+			set_Value (COLUMNNAME_GS_HR_Leave_Master_ID, Integer.valueOf(GS_HR_Leave_Master_ID));
+	}
+
+	/** Get Leave Type.
+		@return Leave Type	  */
+	public int getGS_HR_Leave_Master_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_Leave_Master_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
 	/** Set Leaves Allowed.
 		@param GS_HR_LeavesAllowed 
 		Total number of leaves allowed per employee
@@ -255,6 +255,26 @@ public class X_GS_HR_LeaveApplication extends PO implements I_GS_HR_LeaveApplica
 	public BigDecimal getGS_HR_LeavesAllowed () 
 	{
 		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_GS_HR_LeavesAllowed);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set Leaves Approved.
+		@param GS_HR_LeavesApproved 
+		Leaves Approved
+	  */
+	public void setGS_HR_LeavesApproved (BigDecimal GS_HR_LeavesApproved)
+	{
+		set_Value (COLUMNNAME_GS_HR_LeavesApproved, GS_HR_LeavesApproved);
+	}
+
+	/** Get Leaves Approved.
+		@return Leaves Approved
+	  */
+	public BigDecimal getGS_HR_LeavesApproved () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_GS_HR_LeavesApproved);
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;

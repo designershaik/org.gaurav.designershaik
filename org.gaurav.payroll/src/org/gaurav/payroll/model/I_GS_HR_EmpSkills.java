@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for GS_HR_EmpSkills
  *  @author iDempiere (generated) 
- *  @version Release 5.1
+ *  @version Release 7.1
  */
 @SuppressWarnings("all")
 public interface I_GS_HR_EmpSkills 
@@ -80,17 +80,6 @@ public interface I_GS_HR_EmpSkills
 	  */
 	public int getCreatedBy();
 
-    /** Column name GS_HR_Employee_ID */
-    public static final String COLUMNNAME_GS_HR_Employee_ID = "GS_HR_Employee_ID";
-
-	/** Set Employee Details	  */
-	public void setGS_HR_Employee_ID (int GS_HR_Employee_ID);
-
-	/** Get Employee Details	  */
-	public int getGS_HR_Employee_ID();
-
-	public I_GS_HR_Employee getGS_HR_Employee() throws RuntimeException;
-
     /** Column name GS_HR_EmpSkills_ID */
     public static final String COLUMNNAME_GS_HR_EmpSkills_ID = "GS_HR_EmpSkills_ID";
 
@@ -108,6 +97,17 @@ public interface I_GS_HR_EmpSkills
 
 	/** Get GS_HR_EmpSkills_UU	  */
 	public String getGS_HR_EmpSkills_UU();
+
+    /** Column name GS_HR_Employee_ID */
+    public static final String COLUMNNAME_GS_HR_Employee_ID = "GS_HR_Employee_ID";
+
+	/** Set Employee Details	  */
+	public void setGS_HR_Employee_ID (int GS_HR_Employee_ID);
+
+	/** Get Employee Details	  */
+	public int getGS_HR_Employee_ID();
+
+	public I_GS_HR_Employee getGS_HR_Employee() throws RuntimeException;
 
     /** Column name GS_HR_Skills_ID */
     public static final String COLUMNNAME_GS_HR_Skills_ID = "GS_HR_Skills_ID";

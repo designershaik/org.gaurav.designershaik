@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for GS_HR_DailyAttendance_Log
  *  @author iDempiere (generated) 
- *  @version Release 5.1
+ *  @version Release 7.1
  */
 @SuppressWarnings("all")
 public interface I_GS_HR_DailyAttendance_Log 
@@ -93,19 +93,6 @@ public interface I_GS_HR_DailyAttendance_Log
 	  */
 	public int getCreatedBy();
 
-    /** Column name GenerateList */
-    public static final String COLUMNNAME_GenerateList = "GenerateList";
-
-	/** Set Generate List.
-	  * Generate List
-	  */
-	public void setGenerateList (String GenerateList);
-
-	/** Get Generate List.
-	  * Generate List
-	  */
-	public String getGenerateList();
-
     /** Column name GS_AMPM */
     public static final String COLUMNNAME_GS_AMPM = "GS_AMPM";
 
@@ -144,19 +131,6 @@ public interface I_GS_HR_DailyAttendance_Log
 	  * Day of the Week
 	  */
 	public String getGS_DayOfTheWeek();
-
-    /** Column name GS_Hour */
-    public static final String COLUMNNAME_GS_Hour = "GS_Hour";
-
-	/** Set Hour.
-	  * Hour of the Day
-	  */
-	public void setGS_Hour (int GS_Hour);
-
-	/** Get Hour.
-	  * Hour of the Day
-	  */
-	public int getGS_Hour();
 
     /** Column name GS_HR_DailyAttendance_Log_ID */
     public static final String COLUMNNAME_GS_HR_DailyAttendance_Log_ID = "GS_HR_DailyAttendance_Log_ID";
@@ -206,6 +180,19 @@ public interface I_GS_HR_DailyAttendance_Log
 
 	/** Get Terminal SN	  */
 	public String getGS_HR_TerminalSN();
+
+    /** Column name GS_Hour */
+    public static final String COLUMNNAME_GS_Hour = "GS_Hour";
+
+	/** Set Hour.
+	  * Hour of the Day
+	  */
+	public void setGS_Hour (BigDecimal GS_Hour);
+
+	/** Get Hour.
+	  * Hour of the Day
+	  */
+	public BigDecimal getGS_Hour();
 
     /** Column name GS_LogID */
     public static final String COLUMNNAME_GS_LogID = "GS_LogID";
@@ -297,6 +284,19 @@ public interface I_GS_HR_DailyAttendance_Log
 	  * Year
 	  */
 	public int getGS_Year();
+
+    /** Column name GenerateList */
+    public static final String COLUMNNAME_GenerateList = "GenerateList";
+
+	/** Set Generate List.
+	  * Generate List
+	  */
+	public void setGenerateList (String GenerateList);
+
+	/** Get Generate List.
+	  * Generate List
+	  */
+	public String getGenerateList();
 
     /** Column name IsActive */
     public static final String COLUMNNAME_IsActive = "IsActive";

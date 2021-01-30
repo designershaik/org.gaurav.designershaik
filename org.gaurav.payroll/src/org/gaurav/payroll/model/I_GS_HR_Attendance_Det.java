@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for GS_HR_Attendance_Det
  *  @author iDempiere (generated) 
- *  @version Release 5.1
+ *  @version Release 7.1
  */
 @SuppressWarnings("all")
 public interface I_GS_HR_Attendance_Det 
@@ -106,6 +106,19 @@ public interface I_GS_HR_Attendance_Det
 
 	/** Get GS_HR_Attendance_Det_UU	  */
 	public String getGS_HR_Attendance_Det_UU();
+
+    /** Column name GS_HR_ConsolidateWorkingHours */
+    public static final String COLUMNNAME_GS_HR_ConsolidateWorkingHours = "GS_HR_ConsolidateWorkingHours";
+
+	/** Set Consolidated Working Hours.
+	  * Consolidated Working Hours
+	  */
+	public void setGS_HR_ConsolidateWorkingHours (BigDecimal GS_HR_ConsolidateWorkingHours);
+
+	/** Get Consolidated Working Hours.
+	  * Consolidated Working Hours
+	  */
+	public BigDecimal getGS_HR_ConsolidateWorkingHours();
 
     /** Column name GS_HR_Employee_ID */
     public static final String COLUMNNAME_GS_HR_Employee_ID = "GS_HR_Employee_ID";
@@ -202,6 +215,32 @@ public interface I_GS_HR_Attendance_Det
 	public int getGS_HR_SalaryMonths_ID();
 
 	public I_GS_HR_SalaryMonths getGS_HR_SalaryMonths() throws RuntimeException;
+
+    /** Column name GS_HR_TotalWorkingHours */
+    public static final String COLUMNNAME_GS_HR_TotalWorkingHours = "GS_HR_TotalWorkingHours";
+
+	/** Set Total Working Hours For Month.
+	  * Total Working Hours For Month
+	  */
+	public void setGS_HR_TotalWorkingHours (BigDecimal GS_HR_TotalWorkingHours);
+
+	/** Get Total Working Hours For Month.
+	  * Total Working Hours For Month
+	  */
+	public BigDecimal getGS_HR_TotalWorkingHours();
+
+    /** Column name GS_HR_TotalWorkingMinutes */
+    public static final String COLUMNNAME_GS_HR_TotalWorkingMinutes = "GS_HR_TotalWorkingMinutes";
+
+	/** Set Total Working Minutes.
+	  * Total Working Minutes
+	  */
+	public void setGS_HR_TotalWorkingMinutes (BigDecimal GS_HR_TotalWorkingMinutes);
+
+	/** Get Total Working Minutes.
+	  * Total Working Minutes
+	  */
+	public BigDecimal getGS_HR_TotalWorkingMinutes();
 
     /** Column name IsActive */
     public static final String COLUMNNAME_IsActive = "IsActive";

@@ -1,5 +1,6 @@
 package org.gaurav.payroll.process;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -129,7 +130,7 @@ public class AttendanceLogSheet extends SvrProcess
 						attLog.setCode(Integer.parseInt(userID));
 						attLog.setGS_Year(year);
 						attLog.setGS_Month(month);
-						attLog.setGS_Hour(hour);
+						attLog.setGS_Hour(new BigDecimal(hour));
 						attLog.setGS_AMPM(ampm);
 						attLog.setGS_Minutes(minute);
 						attLog.setGS_Seconds(second);

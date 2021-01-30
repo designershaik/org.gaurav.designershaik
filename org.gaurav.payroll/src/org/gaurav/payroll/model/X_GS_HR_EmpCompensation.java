@@ -26,14 +26,14 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Model for GS_HR_EmpCompensation
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_EmpCompensation extends PO implements I_GS_HR_EmpCompensation, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_EmpCompensation (Properties ctx, int GS_HR_EmpCompensation_ID, String trxName)
@@ -93,6 +93,34 @@ public class X_GS_HR_EmpCompensation extends PO implements I_GS_HR_EmpCompensati
 		return bd;
 	}
 
+	public org.compiere.model.I_C_Charge getC_Charge() throws RuntimeException
+    {
+		return (org.compiere.model.I_C_Charge)MTable.get(getCtx(), org.compiere.model.I_C_Charge.Table_Name)
+			.getPO(getC_Charge_ID(), get_TrxName());	}
+
+	/** Set Charge.
+		@param C_Charge_ID 
+		Additional document charges
+	  */
+	public void setC_Charge_ID (int C_Charge_ID)
+	{
+		if (C_Charge_ID < 1) 
+			set_Value (COLUMNNAME_C_Charge_ID, null);
+		else 
+			set_Value (COLUMNNAME_C_Charge_ID, Integer.valueOf(C_Charge_ID));
+	}
+
+	/** Get Charge.
+		@return Additional document charges
+	  */
+	public int getC_Charge_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_C_Charge_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
 	/** Set Description.
 		@param Description 
 		Optional short description of the record
@@ -110,23 +138,41 @@ public class X_GS_HR_EmpCompensation extends PO implements I_GS_HR_EmpCompensati
 		return (String)get_Value(COLUMNNAME_Description);
 	}
 
+	/** Set Compensation Dependent On.
+		@param GS_HR_CompDependantOn 
+		Compensation Dependent On
+	  */
+	public void setGS_HR_CompDependantOn (String GS_HR_CompDependantOn)
+	{
+
+		set_Value (COLUMNNAME_GS_HR_CompDependantOn, GS_HR_CompDependantOn);
+	}
+
+	/** Get Compensation Dependent On.
+		@return Compensation Dependent On
+	  */
+	public String getGS_HR_CompDependantOn () 
+	{
+		return (String)get_Value(COLUMNNAME_GS_HR_CompDependantOn);
+	}
+
 	public I_GS_HR_Compensation_Master getGS_HR_Compensation_Master() throws RuntimeException
     {
 		return (I_GS_HR_Compensation_Master)MTable.get(getCtx(), I_GS_HR_Compensation_Master.Table_Name)
 			.getPO(getGS_HR_Compensation_Master_ID(), get_TrxName());	}
 
-	/** Set Compensation Type.
-		@param GS_HR_Compensation_Master_ID Compensation Type	  */
+	/** Set Compensation.
+		@param GS_HR_Compensation_Master_ID Compensation	  */
 	public void setGS_HR_Compensation_Master_ID (int GS_HR_Compensation_Master_ID)
 	{
 		if (GS_HR_Compensation_Master_ID < 1) 
-			set_ValueNoCheck (COLUMNNAME_GS_HR_Compensation_Master_ID, null);
+			set_Value (COLUMNNAME_GS_HR_Compensation_Master_ID, null);
 		else 
-			set_ValueNoCheck (COLUMNNAME_GS_HR_Compensation_Master_ID, Integer.valueOf(GS_HR_Compensation_Master_ID));
+			set_Value (COLUMNNAME_GS_HR_Compensation_Master_ID, Integer.valueOf(GS_HR_Compensation_Master_ID));
 	}
 
-	/** Get Compensation Type.
-		@return Compensation Type	  */
+	/** Get Compensation.
+		@return Compensation	  */
 	public int getGS_HR_Compensation_Master_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_Compensation_Master_ID);
@@ -268,5 +314,25 @@ public class X_GS_HR_EmpCompensation extends PO implements I_GS_HR_EmpCompensati
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
+	}
+
+	/** Set Sequence.
+		@param SeqNo 
+		Method of ordering records; lowest number comes first
+	  */
+	public void setSeqNo (int SeqNo)
+	{
+		set_Value (COLUMNNAME_SeqNo, Integer.valueOf(SeqNo));
+	}
+
+	/** Get Sequence.
+		@return Method of ordering records; lowest number comes first
+	  */
+	public int getSeqNo () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_SeqNo);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 }

@@ -17,6 +17,7 @@ import org.compiere.model.MMovementLine;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MUser;
+import org.dsi.crm.callouts.CallOutBPartnerLocationSetBillLocation;
 import org.dsi.crm.callouts.CallOutCopyContactMasterToUser;
 import org.dsi.crm.callouts.CallOutCopyServiceRequestDetails;
 import org.dsi.crm.callouts.CallOutLeadCopyNameToValue;
@@ -158,6 +159,12 @@ public class DSICRMCallOutFactories implements IColumnCalloutFactory{
 		if(tableName.equalsIgnoreCase(MDSPOSHeader.Table_Name) 
 				&& columnName.equalsIgnoreCase(MDSPOSHeader.COLUMNNAME_DS_POSHeader_ID))
 			list.add(new CallOutSetOrderSourceOnPOS());
+		
+		if(tableName.equalsIgnoreCase(MOrder.Table_Name) 
+				&& columnName.equalsIgnoreCase(MOrder.COLUMNNAME_C_BPartner_Location_ID))
+			list.add(new CallOutBPartnerLocationSetBillLocation());
+		
+		
 		
 		return list!=null ? list.toArray(new IColumnCallout[0]): new IColumnCallout[0];
 	}

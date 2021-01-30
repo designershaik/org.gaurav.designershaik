@@ -24,14 +24,14 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Model for GS_HR_MonthlyAttendance
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_MonthlyAttendance extends PO implements I_GS_HR_MonthlyAttendance, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_MonthlyAttendance (Properties ctx, int GS_HR_MonthlyAttendance_ID, String trxName)
@@ -70,6 +70,51 @@ public class X_GS_HR_MonthlyAttendance extends PO implements I_GS_HR_MonthlyAtte
         .append(get_ID()).append("]");
       return sb.toString();
     }
+
+	public org.compiere.model.I_C_Year getC_Year() throws RuntimeException
+    {
+		return (org.compiere.model.I_C_Year)MTable.get(getCtx(), org.compiere.model.I_C_Year.Table_Name)
+			.getPO(getC_Year_ID(), get_TrxName());	}
+
+	/** Set Year.
+		@param C_Year_ID 
+		Calendar Year
+	  */
+	public void setC_Year_ID (int C_Year_ID)
+	{
+		if (C_Year_ID < 1) 
+			set_Value (COLUMNNAME_C_Year_ID, null);
+		else 
+			set_Value (COLUMNNAME_C_Year_ID, Integer.valueOf(C_Year_ID));
+	}
+
+	/** Get Year.
+		@return Calendar Year
+	  */
+	public int getC_Year_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_C_Year_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set Document No.
+		@param DocumentNo 
+		Document sequence number of the document
+	  */
+	public void setDocumentNo (String DocumentNo)
+	{
+		set_ValueNoCheck (COLUMNNAME_DocumentNo, DocumentNo);
+	}
+
+	/** Get Document No.
+		@return Document sequence number of the document
+	  */
+	public String getDocumentNo () 
+	{
+		return (String)get_Value(COLUMNNAME_DocumentNo);
+	}
 
 	/** Set Monthly Attendance.
 		@param GS_HR_MonthlyAttendance_ID Monthly Attendance	  */

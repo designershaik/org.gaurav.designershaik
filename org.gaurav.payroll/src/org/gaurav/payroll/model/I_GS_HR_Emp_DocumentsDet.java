@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for GS_HR_Emp_DocumentsDet
  *  @author iDempiere (generated) 
- *  @version Release 5.1
+ *  @version Release 7.1
  */
 @SuppressWarnings("all")
 public interface I_GS_HR_Emp_DocumentsDet 
@@ -148,6 +148,19 @@ public interface I_GS_HR_Emp_DocumentsDet
 	  */
 	public String getGS_HR_IssuedBy();
 
+    /** Column name HR_DocNumber */
+    public static final String COLUMNNAME_HR_DocNumber = "HR_DocNumber";
+
+	/** Set Document No.
+	  * Identity/Document No
+	  */
+	public void setHR_DocNumber (String HR_DocNumber);
+
+	/** Get Document No.
+	  * Identity/Document No
+	  */
+	public String getHR_DocNumber();
+
     /** Column name HR_Doc_ExpiryDate */
     public static final String COLUMNNAME_HR_Doc_ExpiryDate = "HR_Doc_ExpiryDate";
 
@@ -173,19 +186,6 @@ public interface I_GS_HR_Emp_DocumentsDet
 	  * Issue Date
 	  */
 	public Timestamp getHR_Doc_IssueDate();
-
-    /** Column name HR_DocNumber */
-    public static final String COLUMNNAME_HR_DocNumber = "HR_DocNumber";
-
-	/** Set Document No.
-	  * Identity/Document No
-	  */
-	public void setHR_DocNumber (String HR_DocNumber);
-
-	/** Get Document No.
-	  * Identity/Document No
-	  */
-	public String getHR_DocNumber();
 
     /** Column name HR_Documents_ID */
     public static final String COLUMNNAME_HR_Documents_ID = "HR_Documents_ID";

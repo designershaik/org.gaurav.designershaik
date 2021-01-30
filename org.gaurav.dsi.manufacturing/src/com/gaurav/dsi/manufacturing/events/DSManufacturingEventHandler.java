@@ -206,8 +206,8 @@ public class DSManufacturingEventHandler extends AbstractEventHandler {
 					MAttributeSetInstance msi = new MAttributeSetInstance(ctx, M_AttributeSetInstance_ID, trxName);
 					if(msi.getGuaranteeDate()!=null)
 					{
-						Timestamp today = new Timestamp(TimeUtil.getToday().getTimeInMillis());
-						if(msi.getGuaranteeDate().before(today))
+						Timestamp dateOrdered = bomLine.getPP_Order().getDateOrdered();
+						if(msi.getGuaranteeDate().before(dateOrdered))
 							throw new AdempiereException("Expired batch");
 					}
 				}

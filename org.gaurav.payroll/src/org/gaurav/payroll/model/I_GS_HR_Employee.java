@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for GS_HR_Employee
  *  @author iDempiere (generated) 
- *  @version Release 5.1
+ *  @version Release 7.1
  */
 @SuppressWarnings("all")
 public interface I_GS_HR_Employee 
@@ -164,6 +164,19 @@ public interface I_GS_HR_Employee
 	  */
 	public int getCreatedBy();
 
+    /** Column name DS_OvertimeType */
+    public static final String COLUMNNAME_DS_OvertimeType = "DS_OvertimeType";
+
+	/** Set Overtime Type.
+	  * Overtime Type
+	  */
+	public void setDS_OvertimeType (String DS_OvertimeType);
+
+	/** Get Overtime Type.
+	  * Overtime Type
+	  */
+	public String getDS_OvertimeType();
+
     /** Column name EndDate */
     public static final String COLUMNNAME_EndDate = "EndDate";
 
@@ -230,6 +243,19 @@ public interface I_GS_HR_Employee
 	/** Get GS_HR_Employee_UU	  */
 	public String getGS_HR_Employee_UU();
 
+    /** Column name GS_HR_ExemptFromLateDeduction */
+    public static final String COLUMNNAME_GS_HR_ExemptFromLateDeduction = "GS_HR_ExemptFromLateDeduction";
+
+	/** Set Exempt from Late Deduction.
+	  * Exempt from Late Deduction
+	  */
+	public void setGS_HR_ExemptFromLateDeduction (boolean GS_HR_ExemptFromLateDeduction);
+
+	/** Get Exempt from Late Deduction.
+	  * Exempt from Late Deduction
+	  */
+	public boolean isGS_HR_ExemptFromLateDeduction();
+
     /** Column name GS_HR_IsTerminate */
     public static final String COLUMNNAME_GS_HR_IsTerminate = "GS_HR_IsTerminate";
 
@@ -293,6 +319,17 @@ public interface I_GS_HR_Employee
 
 	/** Get Terminate Employee	  */
 	public String getGS_HR_Terminate();
+
+    /** Column name GS_HR_TimeSlot_Group_ID */
+    public static final String COLUMNNAME_GS_HR_TimeSlot_Group_ID = "GS_HR_TimeSlot_Group_ID";
+
+	/** Set Time Slot	  */
+	public void setGS_HR_TimeSlot_Group_ID (int GS_HR_TimeSlot_Group_ID);
+
+	/** Get Time Slot	  */
+	public int getGS_HR_TimeSlot_Group_ID();
+
+	public I_GS_HR_TimeSlot_Group getGS_HR_TimeSlot_Group() throws RuntimeException;
 
     /** Column name GS_HR_Warnings_ID */
     public static final String COLUMNNAME_GS_HR_Warnings_ID = "GS_HR_Warnings_ID";
@@ -375,6 +412,15 @@ public interface I_GS_HR_Employee
 	  */
 	public String getName2();
 
+    /** Column name SSCode */
+    public static final String COLUMNNAME_SSCode = "SSCode";
+
+	/** Set CPR/Social Security Code	  */
+	public void setSSCode (String SSCode);
+
+	/** Get CPR/Social Security Code	  */
+	public String getSSCode();
+
     /** Column name S_Resource_ID */
     public static final String COLUMNNAME_S_Resource_ID = "S_Resource_ID";
 
@@ -398,15 +444,6 @@ public interface I_GS_HR_Employee
 
 	/** Get Signature	  */
 	public Object getSignature();
-
-    /** Column name SSCode */
-    public static final String COLUMNNAME_SSCode = "SSCode";
-
-	/** Set CPR/Social Security Code	  */
-	public void setSSCode (String SSCode);
-
-	/** Get CPR/Social Security Code	  */
-	public String getSSCode();
 
     /** Column name StartDate */
     public static final String COLUMNNAME_StartDate = "StartDate";

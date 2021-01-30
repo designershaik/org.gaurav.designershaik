@@ -23,17 +23,18 @@ import java.sql.Timestamp;
 import java.util.Properties;
 import org.compiere.model.*;
 import org.compiere.util.Env;
+import org.compiere.util.KeyNamePair;
 
 /** Generated Model for GS_HR_EmployeeAdvance
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_EmployeeAdvance extends PO implements I_GS_HR_EmployeeAdvance, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_EmployeeAdvance (Properties ctx, int GS_HR_EmployeeAdvance_ID, String trxName)
@@ -46,8 +47,8 @@ public class X_GS_HR_EmployeeAdvance extends PO implements I_GS_HR_EmployeeAdvan
 // @SQL=SELECT GS_HR_Compensation_Master_ID FROM GS_HR_Compensation_Master WHERE GS_HR_Advance='Y'
 			setGS_HR_DateApplication (new Timestamp( System.currentTimeMillis() ));
 // @#Date@
-			setGS_HR_Employee_ID (0);
 			setGS_HR_EmployeeAdvance_ID (0);
+			setGS_HR_Employee_ID (0);
 			setGS_HR_Installments (Env.ZERO);
 			setGS_HR_LoanAmt (Env.ZERO);
 			setGS_HR_Reason (null);
@@ -203,23 +204,6 @@ public class X_GS_HR_EmployeeAdvance extends PO implements I_GS_HR_EmployeeAdvan
 		return (String)get_Value(COLUMNNAME_CreatePayment);
 	}
 
-	/** Set Document No.
-		@param DocumentNo 
-		Document sequence number of the document
-	  */
-	public void setDocumentNo (String DocumentNo)
-	{
-		set_Value (COLUMNNAME_DocumentNo, DocumentNo);
-	}
-
-	/** Get Document No.
-		@return Document sequence number of the document
-	  */
-	public String getDocumentNo () 
-	{
-		return (String)get_Value(COLUMNNAME_DocumentNo);
-	}
-
 	/** Set Approved Amount.
 		@param DS_HR_ApprovedAmt Approved Amount	  */
 	public void setDS_HR_ApprovedAmt (BigDecimal DS_HR_ApprovedAmt)
@@ -252,6 +236,23 @@ public class X_GS_HR_EmployeeAdvance extends PO implements I_GS_HR_EmployeeAdvan
 	public String getDS_RejectionResult () 
 	{
 		return (String)get_Value(COLUMNNAME_DS_RejectionResult);
+	}
+
+	/** Set Document No.
+		@param DocumentNo 
+		Document sequence number of the document
+	  */
+	public void setDocumentNo (String DocumentNo)
+	{
+		set_Value (COLUMNNAME_DocumentNo, DocumentNo);
+	}
+
+	/** Get Document No.
+		@return Document sequence number of the document
+	  */
+	public String getDocumentNo () 
+	{
+		return (String)get_Value(COLUMNNAME_DocumentNo);
 	}
 
 	/** Set Expected Close Date.
@@ -296,8 +297,8 @@ public class X_GS_HR_EmployeeAdvance extends PO implements I_GS_HR_EmployeeAdvan
 		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_Name)
 			.getPO(getGS_HR_Approval_ID(), get_TrxName());	}
 
-	/** Set Current Approval.
-		@param GS_HR_Approval_ID Current Approval	  */
+	/** Set Approved By.
+		@param GS_HR_Approval_ID Approved By	  */
 	public void setGS_HR_Approval_ID (int GS_HR_Approval_ID)
 	{
 		if (GS_HR_Approval_ID < 1) 
@@ -306,8 +307,8 @@ public class X_GS_HR_EmployeeAdvance extends PO implements I_GS_HR_EmployeeAdvan
 			set_Value (COLUMNNAME_GS_HR_Approval_ID, Integer.valueOf(GS_HR_Approval_ID));
 	}
 
-	/** Get Current Approval.
-		@return Current Approval	  */
+	/** Get Approved By.
+		@return Approved By	  */
 	public int getGS_HR_Approval_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_Approval_ID);
@@ -316,8 +317,8 @@ public class X_GS_HR_EmployeeAdvance extends PO implements I_GS_HR_EmployeeAdvan
 		return ii.intValue();
 	}
 
-	/** Set Compensation Type.
-		@param GS_HR_Compensation_Master_ID Compensation Type	  */
+	/** Set Compensation.
+		@param GS_HR_Compensation_Master_ID Compensation	  */
 	public void setGS_HR_Compensation_Master_ID (int GS_HR_Compensation_Master_ID)
 	{
 		if (GS_HR_Compensation_Master_ID < 1) 
@@ -326,8 +327,8 @@ public class X_GS_HR_EmployeeAdvance extends PO implements I_GS_HR_EmployeeAdvan
 			set_Value (COLUMNNAME_GS_HR_Compensation_Master_ID, Integer.valueOf(GS_HR_Compensation_Master_ID));
 	}
 
-	/** Get Compensation Type.
-		@return Compensation Type	  */
+	/** Get Compensation.
+		@return Compensation	  */
 	public int getGS_HR_Compensation_Master_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_Compensation_Master_ID);
@@ -348,31 +349,6 @@ public class X_GS_HR_EmployeeAdvance extends PO implements I_GS_HR_EmployeeAdvan
 	public Timestamp getGS_HR_DateApplication () 
 	{
 		return (Timestamp)get_Value(COLUMNNAME_GS_HR_DateApplication);
-	}
-
-	public I_GS_HR_Employee getGS_HR_Employee() throws RuntimeException
-    {
-		return (I_GS_HR_Employee)MTable.get(getCtx(), I_GS_HR_Employee.Table_Name)
-			.getPO(getGS_HR_Employee_ID(), get_TrxName());	}
-
-	/** Set Employee Details.
-		@param GS_HR_Employee_ID Employee Details	  */
-	public void setGS_HR_Employee_ID (int GS_HR_Employee_ID)
-	{
-		if (GS_HR_Employee_ID < 1) 
-			set_Value (COLUMNNAME_GS_HR_Employee_ID, null);
-		else 
-			set_Value (COLUMNNAME_GS_HR_Employee_ID, Integer.valueOf(GS_HR_Employee_ID));
-	}
-
-	/** Get Employee Details.
-		@return Employee Details	  */
-	public int getGS_HR_Employee_ID () 
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_Employee_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
 	}
 
 	/** Set Employee Advance.
@@ -408,6 +384,39 @@ public class X_GS_HR_EmployeeAdvance extends PO implements I_GS_HR_EmployeeAdvan
 	{
 		return (String)get_Value(COLUMNNAME_GS_HR_EmployeeAdvance_UU);
 	}
+
+	public I_GS_HR_Employee getGS_HR_Employee() throws RuntimeException
+    {
+		return (I_GS_HR_Employee)MTable.get(getCtx(), I_GS_HR_Employee.Table_Name)
+			.getPO(getGS_HR_Employee_ID(), get_TrxName());	}
+
+	/** Set Employee Details.
+		@param GS_HR_Employee_ID Employee Details	  */
+	public void setGS_HR_Employee_ID (int GS_HR_Employee_ID)
+	{
+		if (GS_HR_Employee_ID < 1) 
+			set_Value (COLUMNNAME_GS_HR_Employee_ID, null);
+		else 
+			set_Value (COLUMNNAME_GS_HR_Employee_ID, Integer.valueOf(GS_HR_Employee_ID));
+	}
+
+	/** Get Employee Details.
+		@return Employee Details	  */
+	public int getGS_HR_Employee_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_Employee_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+    /** Get Record ID/ColumnName
+        @return ID/ColumnName pair
+      */
+    public KeyNamePair getKeyNamePair() 
+    {
+        return new KeyNamePair(get_ID(), String.valueOf(getGS_HR_Employee_ID()));
+    }
 
 	/** Set Total Installments.
 		@param GS_HR_Installments 

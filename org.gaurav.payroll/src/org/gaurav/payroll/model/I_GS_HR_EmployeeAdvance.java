@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for GS_HR_EmployeeAdvance
  *  @author iDempiere (generated) 
- *  @version Release 5.1
+ *  @version Release 7.1
  */
 @SuppressWarnings("all")
 public interface I_GS_HR_EmployeeAdvance 
@@ -118,6 +118,15 @@ public interface I_GS_HR_EmployeeAdvance
 
 	public org.compiere.model.I_C_Payment getC_Payment() throws RuntimeException;
 
+    /** Column name CreatePayment */
+    public static final String COLUMNNAME_CreatePayment = "CreatePayment";
+
+	/** Set Create Payment	  */
+	public void setCreatePayment (String CreatePayment);
+
+	/** Get Create Payment	  */
+	public String getCreatePayment();
+
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
 
@@ -133,28 +142,6 @@ public interface I_GS_HR_EmployeeAdvance
 	  * User who created this records
 	  */
 	public int getCreatedBy();
-
-    /** Column name CreatePayment */
-    public static final String COLUMNNAME_CreatePayment = "CreatePayment";
-
-	/** Set Create Payment	  */
-	public void setCreatePayment (String CreatePayment);
-
-	/** Get Create Payment	  */
-	public String getCreatePayment();
-
-    /** Column name DocumentNo */
-    public static final String COLUMNNAME_DocumentNo = "DocumentNo";
-
-	/** Set Document No.
-	  * Document sequence number of the document
-	  */
-	public void setDocumentNo (String DocumentNo);
-
-	/** Get Document No.
-	  * Document sequence number of the document
-	  */
-	public String getDocumentNo();
 
     /** Column name DS_HR_ApprovedAmt */
     public static final String COLUMNNAME_DS_HR_ApprovedAmt = "DS_HR_ApprovedAmt";
@@ -177,6 +164,19 @@ public interface I_GS_HR_EmployeeAdvance
 	  * Rejection Result
 	  */
 	public String getDS_RejectionResult();
+
+    /** Column name DocumentNo */
+    public static final String COLUMNNAME_DocumentNo = "DocumentNo";
+
+	/** Set Document No.
+	  * Document sequence number of the document
+	  */
+	public void setDocumentNo (String DocumentNo);
+
+	/** Get Document No.
+	  * Document sequence number of the document
+	  */
+	public String getDocumentNo();
 
     /** Column name ExpectedCloseDate */
     public static final String COLUMNNAME_ExpectedCloseDate = "ExpectedCloseDate";
@@ -207,10 +207,10 @@ public interface I_GS_HR_EmployeeAdvance
     /** Column name GS_HR_Approval_ID */
     public static final String COLUMNNAME_GS_HR_Approval_ID = "GS_HR_Approval_ID";
 
-	/** Set Current Approval	  */
+	/** Set Approved By	  */
 	public void setGS_HR_Approval_ID (int GS_HR_Approval_ID);
 
-	/** Get Current Approval	  */
+	/** Get Approved By	  */
 	public int getGS_HR_Approval_ID();
 
 	public org.compiere.model.I_AD_User getGS_HR_Approval() throws RuntimeException;
@@ -218,10 +218,10 @@ public interface I_GS_HR_EmployeeAdvance
     /** Column name GS_HR_Compensation_Master_ID */
     public static final String COLUMNNAME_GS_HR_Compensation_Master_ID = "GS_HR_Compensation_Master_ID";
 
-	/** Set Compensation Type	  */
+	/** Set Compensation	  */
 	public void setGS_HR_Compensation_Master_ID (int GS_HR_Compensation_Master_ID);
 
-	/** Get Compensation Type	  */
+	/** Get Compensation	  */
 	public int getGS_HR_Compensation_Master_ID();
 
     /** Column name GS_HR_DateApplication */
@@ -232,17 +232,6 @@ public interface I_GS_HR_EmployeeAdvance
 
 	/** Get Application Date	  */
 	public Timestamp getGS_HR_DateApplication();
-
-    /** Column name GS_HR_Employee_ID */
-    public static final String COLUMNNAME_GS_HR_Employee_ID = "GS_HR_Employee_ID";
-
-	/** Set Employee Details	  */
-	public void setGS_HR_Employee_ID (int GS_HR_Employee_ID);
-
-	/** Get Employee Details	  */
-	public int getGS_HR_Employee_ID();
-
-	public I_GS_HR_Employee getGS_HR_Employee() throws RuntimeException;
 
     /** Column name GS_HR_EmployeeAdvance_ID */
     public static final String COLUMNNAME_GS_HR_EmployeeAdvance_ID = "GS_HR_EmployeeAdvance_ID";
@@ -261,6 +250,17 @@ public interface I_GS_HR_EmployeeAdvance
 
 	/** Get GS_HR_EmployeeAdvance_UU	  */
 	public String getGS_HR_EmployeeAdvance_UU();
+
+    /** Column name GS_HR_Employee_ID */
+    public static final String COLUMNNAME_GS_HR_Employee_ID = "GS_HR_Employee_ID";
+
+	/** Set Employee Details	  */
+	public void setGS_HR_Employee_ID (int GS_HR_Employee_ID);
+
+	/** Get Employee Details	  */
+	public int getGS_HR_Employee_ID();
+
+	public I_GS_HR_Employee getGS_HR_Employee() throws RuntimeException;
 
     /** Column name GS_HR_Installments */
     public static final String COLUMNNAME_GS_HR_Installments = "GS_HR_Installments";

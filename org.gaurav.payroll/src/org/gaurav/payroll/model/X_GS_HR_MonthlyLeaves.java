@@ -22,18 +22,17 @@ import java.sql.ResultSet;
 import java.util.Properties;
 import org.compiere.model.*;
 import org.compiere.util.Env;
-import org.compiere.util.KeyNamePair;
 
 /** Generated Model for GS_HR_MonthlyLeaves
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_MonthlyLeaves extends PO implements I_GS_HR_MonthlyLeaves, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_MonthlyLeaves (Properties ctx, int GS_HR_MonthlyLeaves_ID, String trxName)
@@ -72,6 +71,31 @@ public class X_GS_HR_MonthlyLeaves extends PO implements I_GS_HR_MonthlyLeaves, 
         .append(get_ID()).append("]");
       return sb.toString();
     }
+
+	public I_GS_HR_Attendance_Det getGS_HR_Attendance_Det() throws RuntimeException
+    {
+		return (I_GS_HR_Attendance_Det)MTable.get(getCtx(), I_GS_HR_Attendance_Det.Table_Name)
+			.getPO(getGS_HR_Attendance_Det_ID(), get_TrxName());	}
+
+	/** Set Attendance Details.
+		@param GS_HR_Attendance_Det_ID Attendance Details	  */
+	public void setGS_HR_Attendance_Det_ID (int GS_HR_Attendance_Det_ID)
+	{
+		if (GS_HR_Attendance_Det_ID < 1) 
+			set_Value (COLUMNNAME_GS_HR_Attendance_Det_ID, null);
+		else 
+			set_Value (COLUMNNAME_GS_HR_Attendance_Det_ID, Integer.valueOf(GS_HR_Attendance_Det_ID));
+	}
+
+	/** Get Attendance Details.
+		@return Attendance Details	  */
+	public int getGS_HR_Attendance_Det_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_Attendance_Det_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
 
 	public I_GS_HR_Leave_Master getGS_HR_Leave_Master() throws RuntimeException
     {
@@ -176,39 +200,6 @@ public class X_GS_HR_MonthlyLeaves extends PO implements I_GS_HR_MonthlyLeaves, 
 	{
 		return (String)get_Value(COLUMNNAME_GS_HR_MonthlyLeaves_UU);
 	}
-
-	public I_GS_HR_SalaryMonths getGS_HR_SalaryMonths() throws RuntimeException
-    {
-		return (I_GS_HR_SalaryMonths)MTable.get(getCtx(), I_GS_HR_SalaryMonths.Table_Name)
-			.getPO(getGS_HR_SalaryMonths_ID(), get_TrxName());	}
-
-	/** Set Salary Months.
-		@param GS_HR_SalaryMonths_ID Salary Months	  */
-	public void setGS_HR_SalaryMonths_ID (int GS_HR_SalaryMonths_ID)
-	{
-		if (GS_HR_SalaryMonths_ID < 1) 
-			set_Value (COLUMNNAME_GS_HR_SalaryMonths_ID, null);
-		else 
-			set_Value (COLUMNNAME_GS_HR_SalaryMonths_ID, Integer.valueOf(GS_HR_SalaryMonths_ID));
-	}
-
-	/** Get Salary Months.
-		@return Salary Months	  */
-	public int getGS_HR_SalaryMonths_ID () 
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_SalaryMonths_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
-	}
-
-    /** Get Record ID/ColumnName
-        @return ID/ColumnName pair
-      */
-    public KeyNamePair getKeyNamePair() 
-    {
-        return new KeyNamePair(get_ID(), String.valueOf(getGS_HR_SalaryMonths_ID()));
-    }
 
 	/** Set Year.
 		@param Year Year	  */

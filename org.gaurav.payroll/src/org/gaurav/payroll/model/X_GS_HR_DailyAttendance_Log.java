@@ -17,21 +17,23 @@
 /** Generated Model - DO NOT CHANGE */
 package org.gaurav.payroll.model;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Properties;
 import org.compiere.model.*;
+import org.compiere.util.Env;
 
 /** Generated Model for GS_HR_DailyAttendance_Log
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_DailyAttendance_Log extends PO implements I_GS_HR_DailyAttendance_Log, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_DailyAttendance_Log (Properties ctx, int GS_HR_DailyAttendance_Log_ID, String trxName)
@@ -91,23 +93,6 @@ public class X_GS_HR_DailyAttendance_Log extends PO implements I_GS_HR_DailyAtte
 		return ii.intValue();
 	}
 
-	/** Set Generate List.
-		@param GenerateList 
-		Generate List
-	  */
-	public void setGenerateList (String GenerateList)
-	{
-		set_Value (COLUMNNAME_GenerateList, GenerateList);
-	}
-
-	/** Get Generate List.
-		@return Generate List
-	  */
-	public String getGenerateList () 
-	{
-		return (String)get_Value(COLUMNNAME_GenerateList);
-	}
-
 	/** Set AM/PM.
 		@param GS_AMPM 
 		AM/PM
@@ -148,12 +133,27 @@ public class X_GS_HR_DailyAttendance_Log extends PO implements I_GS_HR_DailyAtte
 		return ii.intValue();
 	}
 
+	/** Sunday = Sunday */
+	public static final String GS_DAYOFTHEWEEK_Sunday = "Sunday";
+	/** Monday = Monday */
+	public static final String GS_DAYOFTHEWEEK_Monday = "Monday";
+	/** Tuesday = Tuesday */
+	public static final String GS_DAYOFTHEWEEK_Tuesday = "Tuesday";
+	/** Wednesday = Wednesday */
+	public static final String GS_DAYOFTHEWEEK_Wednesday = "Wednesday";
+	/** Thursday = Thursday */
+	public static final String GS_DAYOFTHEWEEK_Thursday = "Thursday";
+	/** Friday = Friday */
+	public static final String GS_DAYOFTHEWEEK_Friday = "Friday";
+	/** Saturday = Saturday */
+	public static final String GS_DAYOFTHEWEEK_Saturday = "Saturday";
 	/** Set Day of the Week.
 		@param GS_DayOfTheWeek 
 		Day of the Week
 	  */
 	public void setGS_DayOfTheWeek (String GS_DayOfTheWeek)
 	{
+
 		set_Value (COLUMNNAME_GS_DayOfTheWeek, GS_DayOfTheWeek);
 	}
 
@@ -163,26 +163,6 @@ public class X_GS_HR_DailyAttendance_Log extends PO implements I_GS_HR_DailyAtte
 	public String getGS_DayOfTheWeek () 
 	{
 		return (String)get_Value(COLUMNNAME_GS_DayOfTheWeek);
-	}
-
-	/** Set Hour.
-		@param GS_Hour 
-		Hour of the Day
-	  */
-	public void setGS_Hour (int GS_Hour)
-	{
-		set_Value (COLUMNNAME_GS_Hour, Integer.valueOf(GS_Hour));
-	}
-
-	/** Get Hour.
-		@return Hour of the Day
-	  */
-	public int getGS_Hour () 
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_GS_Hour);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
 	}
 
 	/** Set Daily Attendance Log.
@@ -281,6 +261,26 @@ public class X_GS_HR_DailyAttendance_Log extends PO implements I_GS_HR_DailyAtte
 	public String getGS_HR_TerminalSN () 
 	{
 		return (String)get_Value(COLUMNNAME_GS_HR_TerminalSN);
+	}
+
+	/** Set Hour.
+		@param GS_Hour 
+		Hour of the Day
+	  */
+	public void setGS_Hour (BigDecimal GS_Hour)
+	{
+		set_Value (COLUMNNAME_GS_Hour, GS_Hour);
+	}
+
+	/** Get Hour.
+		@return Hour of the Day
+	  */
+	public BigDecimal getGS_Hour () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_GS_Hour);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	/** Set Log ID.
@@ -415,6 +415,23 @@ public class X_GS_HR_DailyAttendance_Log extends PO implements I_GS_HR_DailyAtte
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Generate List.
+		@param GenerateList 
+		Generate List
+	  */
+	public void setGenerateList (String GenerateList)
+	{
+		set_Value (COLUMNNAME_GenerateList, GenerateList);
+	}
+
+	/** Get Generate List.
+		@return Generate List
+	  */
+	public String getGenerateList () 
+	{
+		return (String)get_Value(COLUMNNAME_GenerateList);
 	}
 
 	/** Set Processed.

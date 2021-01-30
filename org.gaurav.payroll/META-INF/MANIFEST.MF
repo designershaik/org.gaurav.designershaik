@@ -14,7 +14,7 @@ Require-Bundle: org.adempiere.base;bundle-version="5.1.0",
  zul;bundle-version="8.0.2",
  org.adempiere.ui;bundle-version="5.1.0",
  org.apache.commons.logging;bundle-version="1.2.0",
- jakarta.xml.soap-api;bundle-version="1.4.1"
+ javax.wsdl;bundle-version="1.6.2"
 Service-Component: OSGI-INF/PayrollProcessFactory.xml,OSGI-INF/PayrollModelFactory.xml,OSGI-INF/PayrollCallOutFactory.xml,OSGI-INF/PayrollEventHandlerFactory.xml,
  OSGI-INF/PayrollCreateFromFactory.xml
 Bundle-ClassPath: .,
@@ -22,3 +22,4 @@ Bundle-ClassPath: .,
  lib/commons-discovery-0.5.jar,
  lib/jaxrpc-api.jar
 Export-Package: org.gaurav.payroll.model
+Import-Package: javax.xml.soap;version="1.4.1"

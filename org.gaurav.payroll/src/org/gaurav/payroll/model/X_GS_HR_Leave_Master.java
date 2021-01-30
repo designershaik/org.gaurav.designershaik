@@ -26,14 +26,14 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Model for GS_HR_Leave_Master
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_Leave_Master extends PO implements I_GS_HR_Leave_Master, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_Leave_Master (Properties ctx, int GS_HR_Leave_Master_ID, String trxName)
@@ -93,6 +93,36 @@ public class X_GS_HR_Leave_Master extends PO implements I_GS_HR_Leave_Master, I_
 		return (String)get_Value(COLUMNNAME_Description);
 	}
 
+	/** Sick Leave = SL */
+	public static final String GS_HR_LEAVETYPE_SickLeave = "SL";
+	/** AVL = AL */
+	public static final String GS_HR_LEAVETYPE_AVL = "AL";
+	/** Bereavement Leave = BL */
+	public static final String GS_HR_LEAVETYPE_BereavementLeave = "BL";
+	/** Haj Leave = HL */
+	public static final String GS_HR_LEAVETYPE_HajLeave = "HL";
+	/** Marriage Leave = ML */
+	public static final String GS_HR_LEAVETYPE_MarriageLeave = "ML";
+	/** Paternity/Maternity Leave = PM */
+	public static final String GS_HR_LEAVETYPE_PaternityMaternityLeave = "PM";
+	/** Set Leave Type.
+		@param GS_HR_LeaveType 
+		Leave Type
+	  */
+	public void setGS_HR_LeaveType (String GS_HR_LeaveType)
+	{
+
+		set_Value (COLUMNNAME_GS_HR_LeaveType, GS_HR_LeaveType);
+	}
+
+	/** Get Leave Type.
+		@return Leave Type
+	  */
+	public String getGS_HR_LeaveType () 
+	{
+		return (String)get_Value(COLUMNNAME_GS_HR_LeaveType);
+	}
+
 	/** Set Leave Type.
 		@param GS_HR_Leave_Master_ID Leave Type	  */
 	public void setGS_HR_Leave_Master_ID (int GS_HR_Leave_Master_ID)
@@ -145,6 +175,27 @@ public class X_GS_HR_Leave_Master extends PO implements I_GS_HR_Leave_Master, I_
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
+	}
+
+	/** Set With Pay.
+		@param GS_HR_WithPay With Pay	  */
+	public void setGS_HR_WithPay (boolean GS_HR_WithPay)
+	{
+		set_Value (COLUMNNAME_GS_HR_WithPay, Boolean.valueOf(GS_HR_WithPay));
+	}
+
+	/** Get With Pay.
+		@return With Pay	  */
+	public boolean isGS_HR_WithPay () 
+	{
+		Object oo = get_Value(COLUMNNAME_GS_HR_WithPay);
+		if (oo != null) 
+		{
+			 if (oo instanceof Boolean) 
+				 return ((Boolean)oo).booleanValue(); 
+			return "Y".equals(oo);
+		}
+		return false;
 	}
 
 	/** Set Reset Every Year.

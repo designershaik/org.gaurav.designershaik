@@ -2,32 +2,27 @@ package org.gaurav.payroll.event;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
 import org.adempiere.base.event.AbstractEventHandler;
 import org.adempiere.base.event.IEventTopics;
-import org.adempiere.util.IProcessUI;
-import org.compiere.model.MClient;
+import org.compiere.model.MInvoice;
+import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MJournal;
 import org.compiere.model.MJournalLine;
-import org.compiere.model.MPeriod;
 import org.compiere.model.PO;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
-import org.compiere.util.Language;
 import org.compiere.util.TimeUtil;
 import org.gaurav.payroll.model.MGSContractCalendar;
 import org.gaurav.payroll.model.MGSHREmployee;
 import org.gaurav.payroll.model.MGSHREmployeeAdvance;
+import org.gaurav.payroll.model.MGSHREmployeeSalaryDetails;
 import org.gaurav.payroll.model.MGSHRInstallments;
 import org.gaurav.payroll.model.MHRContract;
-import org.joda.time.DateTime;
+import org.gaurav.payroll.process.CreateLoanPayment;
 import org.osgi.service.event.Event;
 
 public class PayrollEventHandler extends AbstractEventHandler
@@ -111,6 +106,44 @@ public class PayrollEventHandler extends AbstractEventHandler
 				cal.saveEx();
 				createStdPeriods(null, validFrom, "mm/YYYY");
 			}
+		}
+		if(po instanceof MInvoice)
+		{
+			MInvoice invoice = (MInvoice)po;
+			int GS_HR_Compensation_Master_ID = DB.getSQLValue(trxName, 
+					"select GS_HR_Compensation_Master_ID from GS_HR_Compensation_Master "
+					+ "where gs_hr_compensationtype ='ADV' and AD_Client_ID = ? ",invoice.getAD_Client_ID());
+			MInvoiceLine[] lines = invoice.getLines();
+			for(MInvoiceLine line : lines)
+			{
+				int GS_HR_Employee_ID = line.get_ValueAsInt("GS_HR_Employee_ID");
+				if(GS_HR_Employee_ID>0)
+				{
+					MGSHREmployeeAdvance advance = new MGSHREmployeeAdvance(ctx, 0, trxName);
+					advance.setGS_HR_Approval_ID(invoice.getUpdatedBy());
+					advance.setGS_HR_Compensation_Master_ID(GS_HR_Compensation_Master_ID);
+					advance.setGS_HR_DateApplication(invoice.getDateAcct());
+					advance.setGS_HR_Employee_ID(GS_HR_Employee_ID);
+					advance.setGS_HR_Installments(Env.ONE);
+					advance.setGS_HR_LoanAmt(line.getLineTotalAmt());
+					advance.setGS_HR_Reason(line.getDescription());
+					advance.setGS_HR_RemainingInstallments(Env.ONE);
+					advance.setGS_HR_RepaidAmt(Env.ZERO);
+					advance.setStartDate(invoice.getDateAcct());
+					advance.setDS_HR_ApprovedAmt(line.getLineTotalAmt());
+					advance.setPayDate(invoice.getDateAcct());
+					advance.setProcessed(true);
+					advance.setExpectedCloseDate(invoice.getDateAcct());
+					if(advance.save())
+					{
+						CreateLoanPayment payment = new CreateLoanPayment();
+						payment.createInstallments(advance.getGS_HR_EmployeeAdvance_ID(),trxName);
+					}
+					line.set_ValueNoCheck("GS_HR_EmployeeAdvance_ID", advance.getGS_HR_EmployeeAdvance_ID());
+					line.saveEx();
+				}
+			}
+			
 		}
 	}
 
@@ -236,5 +269,10 @@ public class PayrollEventHandler extends AbstractEventHandler
 		
 		registerTableEvent(IEventTopics.PO_BEFORE_NEW, MHRContract.Table_Name);
 		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, MHRContract.Table_Name);
+		
+		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, MGSHREmployeeSalaryDetails.Table_Name);
+		registerTableEvent(IEventTopics.PO_AFTER_NEW, MGSHREmployeeSalaryDetails.Table_Name);
+		
+		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, MInvoice.Table_Name);
 	}
 }

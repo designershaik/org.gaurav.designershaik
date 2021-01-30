@@ -3,6 +3,8 @@ package org.gaurav.payroll.factories;
 import org.adempiere.base.IProcessFactory;
 import org.compiere.process.ProcessCall;
 import org.gaurav.payroll.process.AttendanceLogSheet;
+import org.gaurav.payroll.process.CalculateSalary;
+import org.gaurav.payroll.process.ConsolidateAttendance;
 import org.gaurav.payroll.process.CreateLoanPayment;
 import org.gaurav.payroll.process.GenerateAttendance;
 import org.gaurav.payroll.process.GenerateInstallments;
@@ -31,6 +33,13 @@ public class PayrollProcessFactory implements IProcessFactory{
 		
 		if(className.equals(YearCreateSalaryPeriods.class.getName()))
 			return new YearCreateSalaryPeriods();
+		
+		if(className.equals(ConsolidateAttendance.class.getName()))
+			return new ConsolidateAttendance();
+		
+		if(className.equals(CalculateSalary.class.getName()))
+			return new CalculateSalary();
+		
 		
 		return null;
 	}

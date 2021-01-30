@@ -23,14 +23,14 @@ import org.compiere.model.*;
 
 /** Generated Model for GS_HR_Compensation_Acct
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 7.1 - $Id$ */
 public class X_GS_HR_Compensation_Acct extends PO implements I_GS_HR_Compensation_Acct, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190724L;
+	private static final long serialVersionUID = 20210123L;
 
     /** Standard Constructor */
     public X_GS_HR_Compensation_Acct (Properties ctx, int GS_HR_Compensation_Acct_ID, String trxName)
@@ -138,8 +138,8 @@ public class X_GS_HR_Compensation_Acct extends PO implements I_GS_HR_Compensatio
 		return (String)get_Value(COLUMNNAME_GS_HR_Compensation_Acct_UU);
 	}
 
-	/** Set Compensation Type.
-		@param GS_HR_Compensation_Master_ID Compensation Type	  */
+	/** Set Compensation.
+		@param GS_HR_Compensation_Master_ID Compensation	  */
 	public void setGS_HR_Compensation_Master_ID (int GS_HR_Compensation_Master_ID)
 	{
 		if (GS_HR_Compensation_Master_ID < 1) 
@@ -148,8 +148,8 @@ public class X_GS_HR_Compensation_Acct extends PO implements I_GS_HR_Compensatio
 			set_Value (COLUMNNAME_GS_HR_Compensation_Master_ID, Integer.valueOf(GS_HR_Compensation_Master_ID));
 	}
 
-	/** Get Compensation Type.
-		@return Compensation Type	  */
+	/** Get Compensation.
+		@return Compensation	  */
 	public int getGS_HR_Compensation_Master_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_Compensation_Master_ID);

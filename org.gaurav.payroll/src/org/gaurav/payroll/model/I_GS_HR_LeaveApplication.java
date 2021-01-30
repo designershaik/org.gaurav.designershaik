@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for GS_HR_LeaveApplication
  *  @author iDempiere (generated) 
- *  @version Release 5.1
+ *  @version Release 7.1
  */
 @SuppressWarnings("all")
 public interface I_GS_HR_LeaveApplication 
@@ -109,10 +109,10 @@ public interface I_GS_HR_LeaveApplication
     /** Column name GS_HR_Approval_ID */
     public static final String COLUMNNAME_GS_HR_Approval_ID = "GS_HR_Approval_ID";
 
-	/** Set Current Approval	  */
+	/** Set Approved By	  */
 	public void setGS_HR_Approval_ID (int GS_HR_Approval_ID);
 
-	/** Get Current Approval	  */
+	/** Get Approved By	  */
 	public int getGS_HR_Approval_ID();
 
 	public org.compiere.model.I_AD_User getGS_HR_Approval() throws RuntimeException;
@@ -137,17 +137,6 @@ public interface I_GS_HR_LeaveApplication
 
 	public I_GS_HR_Employee getGS_HR_Employee() throws RuntimeException;
 
-    /** Column name GS_HR_Leave_Master_ID */
-    public static final String COLUMNNAME_GS_HR_Leave_Master_ID = "GS_HR_Leave_Master_ID";
-
-	/** Set Leave Type	  */
-	public void setGS_HR_Leave_Master_ID (int GS_HR_Leave_Master_ID);
-
-	/** Get Leave Type	  */
-	public int getGS_HR_Leave_Master_ID();
-
-	public I_GS_HR_Leave_Master getGS_HR_Leave_Master() throws RuntimeException;
-
     /** Column name GS_HR_LeaveApplication_ID */
     public static final String COLUMNNAME_GS_HR_LeaveApplication_ID = "GS_HR_LeaveApplication_ID";
 
@@ -166,6 +155,17 @@ public interface I_GS_HR_LeaveApplication
 	/** Get GS_HR_LeaveApplication_UU	  */
 	public String getGS_HR_LeaveApplication_UU();
 
+    /** Column name GS_HR_Leave_Master_ID */
+    public static final String COLUMNNAME_GS_HR_Leave_Master_ID = "GS_HR_Leave_Master_ID";
+
+	/** Set Leave Type	  */
+	public void setGS_HR_Leave_Master_ID (int GS_HR_Leave_Master_ID);
+
+	/** Get Leave Type	  */
+	public int getGS_HR_Leave_Master_ID();
+
+	public I_GS_HR_Leave_Master getGS_HR_Leave_Master() throws RuntimeException;
+
     /** Column name GS_HR_LeavesAllowed */
     public static final String COLUMNNAME_GS_HR_LeavesAllowed = "GS_HR_LeavesAllowed";
 
@@ -178,6 +178,19 @@ public interface I_GS_HR_LeaveApplication
 	  * Total number of leaves allowed per employee
 	  */
 	public BigDecimal getGS_HR_LeavesAllowed();
+
+    /** Column name GS_HR_LeavesApproved */
+    public static final String COLUMNNAME_GS_HR_LeavesApproved = "GS_HR_LeavesApproved";
+
+	/** Set Leaves Approved.
+	  * Leaves Approved
+	  */
+	public void setGS_HR_LeavesApproved (BigDecimal GS_HR_LeavesApproved);
+
+	/** Get Leaves Approved.
+	  * Leaves Approved
+	  */
+	public BigDecimal getGS_HR_LeavesApproved();
 
     /** Column name GS_HR_Reason */
     public static final String COLUMNNAME_GS_HR_Reason = "GS_HR_Reason";
