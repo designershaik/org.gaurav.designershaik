@@ -48,6 +48,7 @@ import org.compiere.model.MPeriod;
 import org.compiere.model.MPrivateAccess;
 import org.compiere.model.MProduct;
 import org.compiere.model.MProductCategory;
+import org.compiere.model.MTax;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
 import org.compiere.util.DB;
@@ -142,6 +143,13 @@ public class FinanceEventHandler extends AbstractEventHandler
 			{
 				BigDecimal lineTotalAmt = DB.getSQLValueBD(trxName, "Select sum(LineTotalAmt) From C_InvoiceLine Where C_Invoice_ID = ? ", line.getC_Invoice_ID());
 				DB.executeUpdateEx("Update C_Invoice Set GrandTotal = ? Where C_Invoice_ID = ? ", new Object[] {lineTotalAmt,invoice.getC_Invoice_ID()},trxName);
+			}
+			if((event.getTopic().equalsIgnoreCase(IEventTopics.PO_BEFORE_NEW) || event.getTopic().equalsIgnoreCase(IEventTopics.PO_BEFORE_CHANGE))  && !invoice.isSOTrx())
+			{
+				Integer C_Tax_ID = line.getC_Tax_ID();
+				MTax tax = new MTax(ctx,C_Tax_ID,null);
+				if(tax.getRate().compareTo(Env.ZERO)>0 && (invoice.getC_BPartner().getTaxID()==null || invoice.getC_BPartner().getTaxID().isBlank()))
+					throw new AdempiereException("Business partner is not tax registered");
 			}
 		}
 		if(po instanceof MOrderLine)

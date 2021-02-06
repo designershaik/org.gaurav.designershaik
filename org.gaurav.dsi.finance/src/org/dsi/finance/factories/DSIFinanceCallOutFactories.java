@@ -33,6 +33,7 @@ import org.dsi.finance.callouts.CallOutSetIsPOPMandatory;
 import org.dsi.finance.callouts.CallOutSetTaxRateBasedOnBPGroup;
 import org.dsi.finance.callouts.CallOutSetTotalCashAmt;
 import org.dsi.finance.callouts.CallOutSetTransactionDateBasedOnAccntDatePayment;
+import org.dsi.finance.callouts.CallOutVerifyIfBPartnerIsTaxable;
 import org.dsi.finance.callouts.CopyInvoiceDescription;
 import org.gaurav.dsi.model.I_DS_FixedDeposit;
 import org.gaurav.dsi.model.I_DS_Product_Request;
@@ -189,6 +190,10 @@ public class DSIFinanceCallOutFactories implements IColumnCalloutFactory{
 				&& columnName.equalsIgnoreCase(MInvoiceLine.COLUMNNAME_PriceList))
 			list.add(new CalculateAmmortizationAmt());
 				
+		if(tableName.equalsIgnoreCase(MInvoiceLine.Table_Name) 
+				&& columnName.equalsIgnoreCase(MInvoiceLine.COLUMNNAME_C_Tax_ID))
+			list.add(new CallOutVerifyIfBPartnerIsTaxable());
+		
 		return list!=null ? list.toArray(new IColumnCallout[0]): new IColumnCallout[0];
 	}
 

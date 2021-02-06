@@ -77,7 +77,7 @@ public class CreateLoanPayment extends SvrProcess{
 		if(M_PriceList_ID<=0)
 			M_PriceList_ID = DB.getSQLValue(get_TrxName(), "Select M_PriceList_ID from M_PriceList "
 					+ "Where C_Currency_ID = ? and IsSoPriceList='N' "
-					+ "and AD_Client_ID=? Order By I	sDefault desc ",advance.getC_BankAccount().getC_Currency_ID(),getAD_Client_ID());
+					+ "and AD_Client_ID=? Order By IsDefault desc ",advance.getC_BankAccount().getC_Currency_ID(),getAD_Client_ID());
 	
 		MInvoice invoice = new MInvoice(getCtx(), 0, get_TrxName());
 		invoice.setIsSOTrx(false);
