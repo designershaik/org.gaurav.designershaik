@@ -117,7 +117,7 @@ public class PayrollEventHandler extends AbstractEventHandler
 			for(MInvoiceLine line : lines)
 			{
 				int GS_HR_Employee_ID = line.get_ValueAsInt("GS_HR_Employee_ID");
-				if(GS_HR_Employee_ID>0)
+				if(GS_HR_Employee_ID>0 && line.getLineTotalAmt().compareTo(Env.ZERO)>0)
 				{
 					MGSHREmployeeAdvance advance = new MGSHREmployeeAdvance(ctx, 0, trxName);
 					advance.setGS_HR_Approval_ID(invoice.getUpdatedBy());
