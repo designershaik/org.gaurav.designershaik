@@ -87,37 +87,40 @@ public class ConsolidateAttendance extends SvrProcess
 				MGSHREmployee emp = new MGSHREmployee(getCtx(), employee_ID, get_TrxName());
 				int Day = rs.getInt("GS_Day");
 				String daysOfTheWeek = rs.getString("GS_DayOfTheWeek").trim();
-				if(outTime==null && inTime!=null)
-					outTime = inTime;
-				if(inTime==null && outTime!=null)
-					inTime = outTime;
-				
-				long diff = outTime.getTime() - inTime.getTime();
-		        long diffSeconds = diff / 1000 % 60;
-		        long diffMinutes = diff / (60 * 1000) % 60;
-		        long diffHours = diff / (60 * 60 * 1000) % 24;
-		        if(existingEmployee_ID==0 || existingEmployee_ID!=employee_ID)
-		        {
-		        	existingEmployee_ID = employee_ID;
-		        	det = new MGSHRAttendanceDet(getCtx(), 0, get_TrxName());
-		        	det.setGS_HR_Employee_ID(existingEmployee_ID);
-		        	det.setGS_HR_SalaryMonths_ID(mAtt.getGS_HR_SalaryMonths_ID());
-		        	det.setGS_HR_MonthlyAttendance_ID(getRecord_ID());
-		        	det.setYear(mAtt.getYear());
-		        	det.saveEx();
-		        }
-		       	MGSHRAttendanceDayWise daywise = new MGSHRAttendanceDayWise(getCtx(), 0, get_TrxName());
-				daywise.setDS_In(inTime);
-				daywise.setDS_Out(outTime);
-				daywise.setGS_Day(Day);
-				daywise.setGS_DayOfTheWeek(daysOfTheWeek);
-				daywise.setGS_HR_Employee_ID(employee_ID);
-				daywise.setGS_HR_MonthlyAttendance_ID(monthlyAttendance_ID);
-				daywise.setGS_Hour(diffHours+":"+diffMinutes+":"+diffSeconds);
-				daywise.setGS_HR_Attendance_Det_ID(det.getGS_HR_Attendance_Det_ID());
-				if(!emp.isGS_HR_ExemptFromLateDeduction())
-					setLateOrEarlyOutDeductions(daywise,employee_ID,inTime,daysOfTheWeek);
-				daywise.saveEx();
+				if(!punchedOnHoliday( daysOfTheWeek,employee_ID))
+				{
+					if(outTime==null && inTime!=null)
+						outTime = inTime;
+					if(inTime==null && outTime!=null)
+						inTime = outTime;
+					
+					long diff = outTime.getTime() - inTime.getTime();
+			        long diffSeconds = diff / 1000 % 60;
+			        long diffMinutes = diff / (60 * 1000) % 60;
+			        long diffHours = diff / (60 * 60 * 1000) % 24;
+			        if(existingEmployee_ID==0 || existingEmployee_ID!=employee_ID)
+			        {
+			        	existingEmployee_ID = employee_ID;
+			        	det = new MGSHRAttendanceDet(getCtx(), 0, get_TrxName());
+			        	det.setGS_HR_Employee_ID(existingEmployee_ID);
+			        	det.setGS_HR_SalaryMonths_ID(mAtt.getGS_HR_SalaryMonths_ID());
+			        	det.setGS_HR_MonthlyAttendance_ID(getRecord_ID());
+			        	det.setYear(mAtt.getYear());
+			        	det.saveEx();
+			        }
+			       	MGSHRAttendanceDayWise daywise = new MGSHRAttendanceDayWise(getCtx(), 0, get_TrxName());
+					daywise.setDS_In(inTime);
+					daywise.setDS_Out(outTime);
+					daywise.setGS_Day(Day);
+					daywise.setGS_DayOfTheWeek(daysOfTheWeek);
+					daywise.setGS_HR_Employee_ID(employee_ID);
+					daywise.setGS_HR_MonthlyAttendance_ID(monthlyAttendance_ID);
+					daywise.setGS_Hour(diffHours+":"+diffMinutes+":"+diffSeconds);
+					daywise.setGS_HR_Attendance_Det_ID(det.getGS_HR_Attendance_Det_ID());
+					if(!emp.isGS_HR_ExemptFromLateDeduction())
+						setLateOrEarlyOutDeductions(daywise,employee_ID,inTime,daysOfTheWeek);
+					daywise.saveEx();
+				}
 			}
 		}
 		catch(Exception e)
@@ -130,6 +133,19 @@ public class ConsolidateAttendance extends SvrProcess
 		}
 		updateHolidays();
 		return "@OK@";
+	}
+
+	private boolean punchedOnHoliday(String daysOfTheWeek,int employee_ID) 
+	{
+		boolean isNonHoliday = false;
+		int[] weekdendSlot_ID = DB.getIDsEx(get_TrxName(), "select slt.gs_hr_timeslot_id from gs_hr_employee emp,GS_HR_TimeSlot slt "
+				+ "where emp.gs_hr_employee_id = ? and emp.gs_hr_timeslot_group_id = slt.gs_hr_timeslot_group_id  "
+				+ "and slt.gs_hr_weeklyoff ='Y'"
+				+ "and slt.GS_DayOfTheWeek like ? ",employee_ID,daysOfTheWeek);
+		if(weekdendSlot_ID.length>0)
+			isNonHoliday = true;
+		
+		return isNonHoliday;
 	}
 
 	private void updateHolidays() 
