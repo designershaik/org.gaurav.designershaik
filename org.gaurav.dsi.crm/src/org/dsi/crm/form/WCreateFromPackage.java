@@ -41,12 +41,12 @@ public class WCreateFromPackage extends CreateFrom
 		StringBuilder sqlWhere = new StringBuilder("");
 		for(String s:shipments)
 		{
-			if(sqlWhere.toString().isBlank())
+			if(sqlWhere.toString().isEmpty())
 				sqlWhere.append("in (").append(s);
 			else
 				sqlWhere.append(",").append(s);
 		}
-		if(!sqlWhere.toString().isBlank())
+		if(!sqlWhere.toString().isEmpty())
 			sqlWhere.append(")");
 		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
 		String sql = "select l.M_InOutLine_ID,l.Line||'-'||m.DocumentNo as LineDescription,l.movementqty,l.M_Product_ID ,coalesce(mp.UnitsPerPack,0)UnitsPerPack ,mp.value ||'-'||mp.name as Description ,mp.m_product_category_id  " + 

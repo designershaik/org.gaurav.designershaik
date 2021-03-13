@@ -27,6 +27,7 @@ public class ConsolidateAttendance extends SvrProcess
 	int p_Employee_ID = 0 ;
 	Timestamp monthStartDate = null;
 	Timestamp monthEndDate = null;
+	BigDecimal TotalMonthDays = Env.ZERO ;
 	@Override
 	protected void prepare() 
 	{
@@ -46,6 +47,7 @@ public class ConsolidateAttendance extends SvrProcess
 		
 		monthStartDate = mAtt.getGS_HR_SalaryMonths().getStartDate();
 		monthEndDate = mAtt.getGS_HR_SalaryMonths().getEndDate();
+		TotalMonthDays = new BigDecimal(TimeUtil.getDaysBetween(monthStartDate, monthEndDate));
 	}
 
 	@Override
@@ -165,8 +167,12 @@ public class ConsolidateAttendance extends SvrProcess
 				MGSHRTimeSlot slot = new MGSHRTimeSlot(getCtx(), slot_ID, get_TrxName());
 				weekDays = getWorkingDaysBetweenTwoDates(slot.getWeekDay(), weekDays);
 			}
-			det.setGS_HR_PresentDays(det.getGS_HR_PresentDays().add(new BigDecimal((weekDays))));
-			det.setGS_HR_Holidays(new BigDecimal(totalHolidays));
+			BigDecimal totalPresentDays = det.getGS_HR_PresentDays().add(new BigDecimal((weekDays)));
+			BigDecimal holidays = new BigDecimal(totalHolidays);
+			BigDecimal remainingDaysWhichAreConsideredAsAbsent =TotalMonthDays.subtract(totalPresentDays).subtract(new BigDecimal(totalHolidays));
+			det.setGS_HR_PresentDays(totalPresentDays);
+			det.setGS_HR_Holidays(holidays);
+			det.setGS_HR_AbsentDays(remainingDaysWhichAreConsideredAsAbsent.compareTo(Env.ZERO)<=0?Env.ZERO:remainingDaysWhichAreConsideredAsAbsent);
 			det.saveEx();
 		}
 	}

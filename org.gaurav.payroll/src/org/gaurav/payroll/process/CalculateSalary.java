@@ -53,7 +53,9 @@ public class CalculateSalary extends SvrProcess
 			boolean calculated = det.calculate(MonthlySalary_ID);
 			log.info("Is Salary Calculated: "+calculated);
 		}
+		sal.setProcessed(true);
+		sal.saveEx();
 		
-		return null;
+		return "@SalaryCalculated@";
 	}
 }

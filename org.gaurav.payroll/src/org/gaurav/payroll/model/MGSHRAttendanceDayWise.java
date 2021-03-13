@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.util.Properties;
 
 import org.adempiere.exceptions.AdempiereException;
-import org.compiere.util.DB;
 import org.compiere.util.Env;
 
 public class MGSHRAttendanceDayWise extends X_GS_HR_AttendanceDayWise {
@@ -28,7 +27,6 @@ public class MGSHRAttendanceDayWise extends X_GS_HR_AttendanceDayWise {
 	{
 		if (!success)
 			return success;
-		System.out.println(getGS_HR_SalaryPaidOn());
 		if(getGS_HR_SalaryPaidOn().compareTo(Env.ONE)>0)
 			throw new AdempiereException("Salary Paid On Can't be more than one.");
 		
@@ -51,11 +49,15 @@ public class MGSHRAttendanceDayWise extends X_GS_HR_AttendanceDayWise {
 		}
 		else
 		{
-			BigDecimal totalPresentDays = DB.getSQLValueBD(get_TrxName(), "Select coalesce(sum(GS_HR_SalaryPaidOn),0) from GS_HR_AttendanceDayWise Where GS_HR_Attendance_Det_ID = ? ", getGS_HR_Attendance_Det_ID());
-			BigDecimal totalAbsentDays = DB.getSQLValueBD(get_TrxName(), "Select coalesce(sum(GS_HR_TotalDeduction),0) from GS_HR_AttendanceDayWise Where GS_HR_Attendance_Det_ID = ? ", getGS_HR_Attendance_Det_ID());
-			det.setGS_HR_PresentDays(totalPresentDays);
-			det.setGS_HR_AbsentDays(totalAbsentDays);
-			det.saveEx();
+			if(is_ValueChanged(COLUMNNAME_GS_HR_SalaryPaidOn))
+			{
+				BigDecimal oldValue = (BigDecimal) get_ValueOld("GS_HR_SalaryPaidOn");
+				BigDecimal salariesPaidOn = getGS_HR_SalaryPaidOn();
+				BigDecimal difference = oldValue.subtract(salariesPaidOn);
+				det.setGS_HR_PresentDays(det.getGS_HR_PresentDays().subtract(difference));
+				det.setGS_HR_AbsentDays(det.getGS_HR_AbsentDays().add(difference));
+				det.saveEx();
+			}
 		}
 		det.saveEx();
 		return true;

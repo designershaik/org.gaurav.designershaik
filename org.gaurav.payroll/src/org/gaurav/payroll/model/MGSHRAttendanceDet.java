@@ -3,10 +3,12 @@ package org.gaurav.payroll.model;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MClient;
 import org.compiere.model.MCurrency;
 import org.compiere.model.Query;
@@ -68,7 +70,7 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 		monthSal.saveEx();
 		
 		
-		BigDecimal totalPaidLeaves = DB.getSQLValueBD(get_TrxName(), "Select sum(GS_HR_LeavesConsumed) "
+		BigDecimal totalPaidLeaves = DB.getSQLValueBD(get_TrxName(), "Select coalesce(sum(GS_HR_LeavesConsumed),0) "
 				+ "from GS_HR_MonthlyLeaves lv,GS_HR_Leave_Master mst "
 				+ "where lv.gs_hr_leave_master_id = mst.gs_hr_leave_master_id "
 				+ "and lv.GS_HR_Attendance_Det_ID= ? "
@@ -76,7 +78,7 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 				+ "and mst.isactive ='Y' "
 				+ "and mst.gs_hr_withpay ='Y' ", getGS_HR_Attendance_Det_ID());
 		
-		BigDecimal avlDays = DB.getSQLValueBD(get_TrxName(), "Select sum(GS_HR_LeavesConsumed) "
+		BigDecimal avlDays = DB.getSQLValueBD(get_TrxName(), "Select coalesce(sum(GS_HR_LeavesConsumed),0) "
 				+ "from GS_HR_MonthlyLeaves lv,GS_HR_Leave_Master mst "
 				+ "where lv.gs_hr_leave_master_id = mst.gs_hr_leave_master_id "
 				+ "and lv.GS_HR_Attendance_Det_ID= ? "
@@ -117,7 +119,6 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 					if(comp.getGS_HR_CompensationType().equalsIgnoreCase("OTI"))
 					{
 						BigDecimal perHour = alreadyCalculatedSalary.divide(new BigDecimal(totalDaysInMonth), 10, RoundingMode.CEILING).divide(averageWorkingHour, 10, RoundingMode.CEILING);
-						System.out.println("Per hour: "+perHour);
 						if(comp.getDS_OvertimeType().equalsIgnoreCase(MGSHRCompensationMaster.DS_OVERTIMETYPE_OvertimeRegular1) && OT1.compareTo(Env.ZERO)>0)
 							calculatedAmt = perHour.multiply(OT1).multiply(empComp.getPercent()).divide(Env.ONEHUNDRED,  10, RoundingMode.CEILING);
 						if(comp.getDS_OvertimeType().equalsIgnoreCase(MGSHRCompensationMaster.DS_OVERTIMETYPE_OvertimePremium1) && OT2.compareTo(Env.ZERO)>0)
@@ -143,6 +144,7 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 		}
 		monthSal.setGS_HR_GrossAmt(grossSalary);
 		monthSal.setGS_HR_NetAmt(grossSalary.subtract(totalDeduction));
+		monthSal.setProcessed(true);
 		monthSal.saveEx();
 		
 		return false;
@@ -187,6 +189,27 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 			totalDeduction = totalDeduction.add(calculatedAmt);
 		}
 		det.saveEx();
+	}
+	
+	protected boolean afterSave (boolean newRecord, boolean success)
+	{
+		if (!success)
+			return success;
+		
+		MGSHRMonthlyAttendance att = new MGSHRMonthlyAttendance(getCtx(), getGS_HR_MonthlyAttendance_ID(), get_TrxName());
+		
+		Timestamp monthStartDate = att.getGS_HR_SalaryMonths().getStartDate();
+		Timestamp monthEndDate = att.getGS_HR_SalaryMonths().getEndDate();
+		BigDecimal TotalMonthDays = new BigDecimal(TimeUtil.getDaysBetween(monthStartDate, monthEndDate));
+		BigDecimal totalLeaves = DB.getSQLValueBD(get_TrxName(), 
+				"Select coalesce(sum(GS_HR_LeavesConsumed),0) From GS_HR_MonthlyLeaves Where GS_HR_Attendance_Det_ID = ? ", getGS_HR_Attendance_Det_ID());
+		
+		BigDecimal totalDays =  getGS_HR_AbsentDays().add(getGS_HR_PresentDays()).add(getGS_HR_Holidays()).add(totalLeaves);
+		
+		if(totalDays.compareTo(TotalMonthDays)>0)
+			throw new AdempiereException("Total Days In The Month "+TotalMonthDays+" < "+totalDays);
+		
+		return true;
 	}
 
 }
