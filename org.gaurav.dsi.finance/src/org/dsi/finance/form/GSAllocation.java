@@ -89,7 +89,7 @@ public class GSAllocation
 			return;
 
 		//	Async BPartner Test
-		Integer key = new Integer(m_C_BPartner_ID);
+		Integer key =m_C_BPartner_ID;
 		if (!m_bpartnerCheck.contains(key))
 		{
 			new Thread()
@@ -116,7 +116,7 @@ public class GSAllocation
 			+ "c.ISO_Code,p.PayAmt,"                            //  4..5
 			+ "currencyConvert(p.PayAmt,p.C_Currency_ID,?,?,p.C_ConversionType_ID,p.AD_Client_ID,p.AD_Org_ID),"//  6   #1, #2
 			+ "currencyConvert(paymentAvailable(p.C_Payment_ID),p.C_Currency_ID,?,?,p.C_ConversionType_ID,p.AD_Client_ID,p.AD_Org_ID),"  //  7   #3, #4
-			+ "p.MultiplierAP,p.checkno,co.DocumentNo "
+			+ "p.MultiplierAP,p.checkno,co.DocumentNo,currencyrate(p.C_Currency_ID, ?, ?, p.C_ConversionType_ID, p.AD_Client_ID,p.AD_Org_ID) as CurrencyRate "
 			+ "FROM C_Payment_v p"		//	Corrected for AP/AR
 			+ " INNER JOIN C_Currency c ON (p.C_Currency_ID=c.C_Currency_ID)"
 			+ " LEFT OUTER JOIN C_ORDER CO on p.c_order_id = co.c_order_id "
@@ -142,14 +142,16 @@ public class GSAllocation
 			pstmt.setTimestamp(2, (Timestamp)date);
 			pstmt.setInt(3, m_C_Currency_ID);
 			pstmt.setTimestamp(4, (Timestamp)date);
-			pstmt.setInt(5, m_C_BPartner_ID);
+			pstmt.setInt(5, m_C_Currency_ID);
+			pstmt.setTimestamp(6, (Timestamp)date);
+			pstmt.setInt(7, m_C_BPartner_ID);
 			if (!isMultiCurrency)
-				pstmt.setInt(6, m_C_Currency_ID);
+				pstmt.setInt(8, m_C_Currency_ID);
 			rs = pstmt.executeQuery();
 			while (rs.next())
 			{
 				Vector<Object> line = new Vector<Object>();
-				line.add(new Boolean(false));       //  0-Selection
+				line.add(false);       //  0-Selection
 				line.add(rs.getTimestamp(1));       //  1-TrxDate
 				KeyNamePair pp = new KeyNamePair(rs.getInt(3), rs.getString(2));
 				line.add(pp);                       //  2-DocumentNo
@@ -166,7 +168,7 @@ public class GSAllocation
 				line.add(Env.ZERO);					//  5/7-Payment
 				line.add(rs.getString(9)); // ChechNo
 				line.add(rs.getString(10));//PO Number
-//				line.add(rs.getBigDecimal(8));		//  6/8-Multiplier
+				line.add(rs.getBigDecimal("CurrencyRate"));		//  6/8-Multiplier
 				//
 				data.add(line);
 			}
@@ -200,6 +202,7 @@ public class GSAllocation
 		columnNames.add(Msg.getMsg(Env.getCtx(), "AppliedAmt"));
 		columnNames.add(Msg.getMsg(Env.getCtx(), "CheckNo"));
 		columnNames.add(Msg.getMsg(Env.getCtx(), "Order No."));
+		columnNames.add(Msg.getMsg(Env.getCtx(), "Rate"));
 //		columnNames.add(" ");	//	Multiplier
 		
 		return columnNames;
@@ -220,8 +223,8 @@ public class GSAllocation
 		paymentTable.setColumnClass(i++, BigDecimal.class, true);       //  6-ConvOpen
 		paymentTable.setColumnClass(i++, BigDecimal.class, false);      //  7-Allocated
 		paymentTable.setColumnClass(i++, String.class, true);      //  8- CheckNo
-		paymentTable.setColumnClass(i++, String.class, true);      //  8- Order No
-//		paymentTable.setColumnClass(i++, BigDecimal.class, true);      	//  9-Multiplier
+		paymentTable.setColumnClass(i++, String.class, true);      //  9- Order No
+		paymentTable.setColumnClass(i++, BigDecimal.class, true);      	//  10-Multiplier/Rate
 
 		//
 		i_payment = isMultiCurrency ? 7 : 5;
@@ -256,7 +259,7 @@ public class GSAllocation
 			+ "currencyConvert(invoiceOpen(C_Invoice_ID,C_InvoicePaySchedule_ID),i.C_Currency_ID,?,?,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID)*i.MultiplierAP, "  //  7   #3, #4  Converted Open
 			+ "currencyConvert(invoiceDiscount"                               //  8       AllowedDiscount
 			+ "(i.C_Invoice_ID,?,C_InvoicePaySchedule_ID),i.C_Currency_ID,?,i.DateInvoiced,i.C_ConversionType_ID,i.AD_Client_ID,i.AD_Org_ID)*i.Multiplier*i.MultiplierAP,"               //  #5, #6
-			+ "i.MultiplierAP,i.poreference,co.documentNo "
+			+ "i.MultiplierAP,i.poreference,co.documentNo,currencyrate(i.C_Currency_ID, ?, ?, i.C_ConversionType_ID, i.AD_Client_ID,i.AD_Org_ID) as CurrencyRate "
 			+ "FROM C_Invoice_v i"		//  corrected for CM/Split
 			+ " INNER JOIN C_Currency c ON (i.C_Currency_ID=c.C_Currency_ID)"
 			+ " LEFT OUTER JOIN C_ORDER co ON (i.C_Order_ID = co.C_Order_ID ) "
@@ -283,14 +286,17 @@ public class GSAllocation
 			pstmt.setTimestamp(4, (Timestamp)date);
 			pstmt.setTimestamp(5, (Timestamp)date);
 			pstmt.setInt(6, m_C_Currency_ID);
-			pstmt.setInt(7, m_C_BPartner_ID);
+			pstmt.setInt(7, m_C_Currency_ID);
+			pstmt.setTimestamp(8, (Timestamp)date);
+			pstmt.setInt(9, m_C_BPartner_ID);
 			if (!isMultiCurrency)
-				pstmt.setInt(8, m_C_Currency_ID);
+				pstmt.setInt(10, m_C_Currency_ID);
+			
 			rs = pstmt.executeQuery();
 			while (rs.next())
 			{
 				Vector<Object> line = new Vector<Object>();
-				line.add(new Boolean(false));       //  0-Selection
+				line.add(false);       //  0-Selection
 				line.add(rs.getTimestamp(1));       //  1-TrxDate
 				KeyNamePair pp = new KeyNamePair(rs.getInt(3), rs.getString(2));
 				line.add(pp);                       //  2-Value
@@ -313,7 +319,7 @@ public class GSAllocation
 				line.add(open);				    //  8/10-OverUnder
 				line.add(rs.getString(10)); // POReference
 				line.add(rs.getString(11));// Order No
-//				line.add(rs.getBigDecimal(9));		//	8/10-Multiplier
+				line.add(rs.getBigDecimal("CurrencyRate"));		//	8/10-Multiplier
 				//	Add when open <> 0 (i.e. not if no conversion rate)
 				if (Env.ZERO.compareTo(open) != 0)
 					data.add(line);
@@ -351,6 +357,7 @@ public class GSAllocation
 		columnNames.add(Msg.getMsg(Env.getCtx(), "OverUnderAmt"));
 		columnNames.add(Msg.getMsg(Env.getCtx(), "POReference"));
 		columnNames.add(Msg.getMsg(Env.getCtx(), "Order No"));
+		columnNames.add(Msg.getMsg(Env.getCtx(), "Rate"));
 //		columnNames.add(" ");	//	Multiplier
 		
 		return columnNames;
@@ -375,7 +382,7 @@ public class GSAllocation
 		invoiceTable.setColumnClass(i++, BigDecimal.class, true);		//	10-Conv Applied
 		invoiceTable.setColumnClass(i++, String.class, true);		//	11-POReference
 		invoiceTable.setColumnClass(i++, String.class, true);		//	12-SO/PO Number
-//		invoiceTable.setColumnClass(i++, BigDecimal.class, true);      	//  10-Multiplier
+		invoiceTable.setColumnClass(i++, BigDecimal.class, true);      	//  13-Multiplier/Rate
 		//  Table UI
 		invoiceTable.autoSize();
 	}
@@ -640,7 +647,7 @@ public class GSAllocation
 				KeyNamePair pp = (KeyNamePair)payment.getValueAt(i, 2);   //  Value
 				//  Payment variables
 				int C_Payment_ID = pp.getKey();
-				paymentList.add(new Integer(C_Payment_ID));
+				paymentList.add(C_Payment_ID);
 				//
 				BigDecimal PaymentAmt = (BigDecimal)payment.getValueAt(i, i_payment);  //  Applied Payment
 				amountList.add(PaymentAmt);

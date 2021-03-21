@@ -30,7 +30,7 @@ public class CalculateSalary extends SvrProcess
 				log.log(Level.SEVERE,"prepare - Unknown Parameter: " + name);
 		}
 		MonthlySalary_ID = getRecord_ID();
-		MGSHRMonthlySalary sal = new MGSHRMonthlySalary(getCtx(), getRecord_ID(), get_TrxName());
+		sal = new MGSHRMonthlySalary(getCtx(), getRecord_ID(), get_TrxName());
 		salaryMonth_ID = sal.getGS_HR_SalaryMonths_ID();
 		year_ID = sal.getC_Year_ID();
 	}
