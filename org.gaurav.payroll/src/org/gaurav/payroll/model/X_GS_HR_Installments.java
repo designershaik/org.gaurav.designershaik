@@ -33,7 +33,7 @@ public class X_GS_HR_Installments extends PO implements I_GS_HR_Installments, I_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20210123L;
+	private static final long serialVersionUID = 20210321L;
 
     /** Standard Constructor */
     public X_GS_HR_Installments (Properties ctx, int GS_HR_Installments_ID, String trxName)
@@ -127,6 +127,31 @@ public class X_GS_HR_Installments extends PO implements I_GS_HR_Installments, I_
 	public int getGS_HR_EmployeeAdvance_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_EmployeeAdvance_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public I_GS_HR_EmployeeSalaryDetails getGS_HR_EmployeeSalaryDetails() throws RuntimeException
+    {
+		return (I_GS_HR_EmployeeSalaryDetails)MTable.get(getCtx(), I_GS_HR_EmployeeSalaryDetails.Table_Name)
+			.getPO(getGS_HR_EmployeeSalaryDetails_ID(), get_TrxName());	}
+
+	/** Set Employee Salary Details.
+		@param GS_HR_EmployeeSalaryDetails_ID Employee Salary Details	  */
+	public void setGS_HR_EmployeeSalaryDetails_ID (int GS_HR_EmployeeSalaryDetails_ID)
+	{
+		if (GS_HR_EmployeeSalaryDetails_ID < 1) 
+			set_Value (COLUMNNAME_GS_HR_EmployeeSalaryDetails_ID, null);
+		else 
+			set_Value (COLUMNNAME_GS_HR_EmployeeSalaryDetails_ID, Integer.valueOf(GS_HR_EmployeeSalaryDetails_ID));
+	}
+
+	/** Get Employee Salary Details.
+		@return Employee Salary Details	  */
+	public int getGS_HR_EmployeeSalaryDetails_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_GS_HR_EmployeeSalaryDetails_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();

@@ -41,28 +41,21 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 	BigDecimal grossSalary = Env.ZERO;
 	BigDecimal netSalary = Env.ZERO;
 	BigDecimal totalDeduction = Env.ZERO;
-	
+	Timestamp startDate = null;
+	Timestamp endDate = null;
 	public boolean calculate(int monthlySalary_Trans_ID) 
 	{
+		setVariables();
 		employee_ID = getGS_HR_Employee_ID();
-		totalDaysInMonth = TimeUtil.getDaysBetween(getGS_HR_MonthlyAttendance().getGS_HR_SalaryMonths().getStartDate(),
-				getGS_HR_MonthlyAttendance().getGS_HR_SalaryMonths().getEndDate())+1;
+		totalDaysInMonth = TimeUtil.getDaysBetween(startDate,endDate)+1;
+		
 		MGSHREmployee employee = new MGSHREmployee(getCtx(), employee_ID, get_TrxName());
 		BigDecimal averageWorkingHour = employee.getAverageWorkingHour();
 		MClient client = MClient.get(getCtx());
 		MCurrency baseCur = new MCurrency(getCtx(), client.getC_Currency_ID(), get_TrxName()); 
 		precision = baseCur.getStdPrecision();
 		
-		int existing_empMonthlySalary_ID = DB.getSQLValue(get_TrxName(), "Select GS_HR_EmployeeMonthlySalary_ID "
-				+ "From GS_HR_EmployeeMonthlySalary where GS_HR_Employee_ID = ? and  GS_HR_MonthlySalary_ID = ? ",employee_ID,monthlySalary_Trans_ID);
-		if(existing_empMonthlySalary_ID<=0)
-			existing_empMonthlySalary_ID = 0 ;
-		else
-		{
-			int i = DB.executeUpdate("Delete from GS_HR_EmployeeSalaryDetails where GS_HR_EmployeeMonthlySalary_ID = "+existing_empMonthlySalary_ID, get_TrxName());
-			log.info("total deleted existing compensations: "+i);
-		}
-		MGSHREmployeeMonthlySalary monthSal = new MGSHREmployeeMonthlySalary(getCtx(), existing_empMonthlySalary_ID, get_TrxName());
+		MGSHREmployeeMonthlySalary monthSal = new MGSHREmployeeMonthlySalary(getCtx(), 0, get_TrxName());
 		monthSal.setGS_HR_Employee_ID(getGS_HR_Employee_ID());
 		monthSal.setGS_HR_MonthlySalary_ID(monthlySalary_Trans_ID);
 		monthSal.setGS_HR_GrossAmt(grossSalary);
@@ -141,6 +134,7 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 				if(calculatedAmt.compareTo(Env.ZERO)!=0)
 					setSalaryDetails(monthSal,calculatedAmt.setScale(precision, RoundingMode.CEILING),compensation_id,comp.isGS_HR_IsEarning());
 			}
+			calculateGeneralCalculations(monthSal);
 		}
 		monthSal.setGS_HR_GrossAmt(grossSalary);
 		monthSal.setGS_HR_NetAmt(grossSalary.subtract(totalDeduction));
@@ -148,6 +142,41 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 		monthSal.saveEx();
 		
 		return false;
+	}
+
+	private void setVariables() 
+	{
+		precision = 3;
+		presentDays = Env.ZERO;
+		totalDaysInMonth = 0 ; 
+		employee_ID = 0 ;
+		grossSalary = Env.ZERO;
+		netSalary = Env.ZERO;
+		totalDeduction = Env.ZERO;
+		startDate = getGS_HR_MonthlyAttendance().getGS_HR_SalaryMonths().getStartDate();
+		endDate = getGS_HR_MonthlyAttendance().getGS_HR_SalaryMonths().getEndDate();
+		
+	}
+
+	private void calculateGeneralCalculations(MGSHREmployeeMonthlySalary monthSal) 
+	{
+		int[] installments_id = DB.getIDsEx(get_TrxName(), "select ins.gs_hr_installments_id from gs_hr_employeeadvance adv,gs_hr_installments ins "
+				+ "where adv.gs_hr_employeeadvance_id = ins.gs_hr_employeeadvance_id  "
+				+ "and ins.PayDate between ? and ?  "
+				+ "and adv.gs_hr_employee_id  = ? "
+				+ "and (ins.hr_break='N' or ins.IsActive='N') ",startDate,endDate,getGS_HR_Employee_ID());
+		for(int inst_id : installments_id)
+		{
+			MGSHRInstallments inst = new MGSHRInstallments(getCtx(), inst_id, get_TrxName());
+			BigDecimal amt = inst.getGS_InstallmentAmt();
+			
+			MGSHREmployeeAdvance advance = new MGSHREmployeeAdvance(getCtx(), inst.getGS_HR_EmployeeAdvance_ID(), get_TrxName());
+			MGSHREmployeeSalaryDetails det = setSalaryDetails(monthSal, amt, advance.getGS_HR_Compensation_Master_ID(), false);
+			
+			inst.setGS_HR_EmployeeSalaryDetails_ID(det.getGS_HR_EmployeeSalaryDetails_ID());
+			inst.setDate1(monthSal.getGS_HR_MonthlySalary().getGS_HR_SalaryDate());
+			inst.saveEx();
+		}
 	}
 
 	private BigDecimal getCalculatedSalary(String dependantOn, int monthlySalary_ID, boolean calculatedOnActuals,int employee_ID) 
@@ -174,7 +203,7 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 		return totalSalary;
 	}
 
-	private void setSalaryDetails(MGSHREmployeeMonthlySalary monthSal, BigDecimal calculatedAmt, int compensation_id,boolean isEarning) 
+	private MGSHREmployeeSalaryDetails setSalaryDetails(MGSHREmployeeMonthlySalary monthSal, BigDecimal calculatedAmt, int compensation_id,boolean isEarning) 
 	{
 		MGSHREmployeeSalaryDetails det = new MGSHREmployeeSalaryDetails(monthSal);
 		det.setGS_HR_Compensation_Master_ID(compensation_id);
@@ -189,6 +218,8 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 			totalDeduction = totalDeduction.add(calculatedAmt);
 		}
 		det.saveEx();
+		
+		return det;
 	}
 	
 	protected boolean afterSave (boolean newRecord, boolean success)
@@ -198,9 +229,7 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 		
 		MGSHRMonthlyAttendance att = new MGSHRMonthlyAttendance(getCtx(), getGS_HR_MonthlyAttendance_ID(), get_TrxName());
 		
-		Timestamp monthStartDate = att.getGS_HR_SalaryMonths().getStartDate();
-		Timestamp monthEndDate = att.getGS_HR_SalaryMonths().getEndDate();
-		BigDecimal TotalMonthDays = new BigDecimal(TimeUtil.getDaysBetween(monthStartDate, monthEndDate));
+		BigDecimal TotalMonthDays = att.getDaysBetween();
 		BigDecimal totalLeaves = DB.getSQLValueBD(get_TrxName(), 
 				"Select coalesce(sum(GS_HR_LeavesConsumed),0) From GS_HR_MonthlyLeaves Where GS_HR_Attendance_Det_ID = ? ", getGS_HR_Attendance_Det_ID());
 		

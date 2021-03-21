@@ -108,6 +108,19 @@ public interface I_GS_HR_MonthlySalary
 	  */
 	public String getDocumentNo();
 
+    /** Column name GS_HR_DeleteSalaries */
+    public static final String COLUMNNAME_GS_HR_DeleteSalaries = "GS_HR_DeleteSalaries";
+
+	/** Set Delete Calculated Salaries.
+	  * Delete Calculated Salaries
+	  */
+	public void setGS_HR_DeleteSalaries (String GS_HR_DeleteSalaries);
+
+	/** Get Delete Calculated Salaries.
+	  * Delete Calculated Salaries
+	  */
+	public String getGS_HR_DeleteSalaries();
+
     /** Column name GS_HR_MonthlySalary_ID */
     public static final String COLUMNNAME_GS_HR_MonthlySalary_ID = "GS_HR_MonthlySalary_ID";
 
@@ -125,6 +138,19 @@ public interface I_GS_HR_MonthlySalary
 
 	/** Get GS_HR_MonthlySalary_UU	  */
 	public String getGS_HR_MonthlySalary_UU();
+
+    /** Column name GS_HR_SalaryDate */
+    public static final String COLUMNNAME_GS_HR_SalaryDate = "GS_HR_SalaryDate";
+
+	/** Set Salary Date.
+	  * Salary Calculation Date
+	  */
+	public void setGS_HR_SalaryDate (Timestamp GS_HR_SalaryDate);
+
+	/** Get Salary Date.
+	  * Salary Calculation Date
+	  */
+	public Timestamp getGS_HR_SalaryDate();
 
     /** Column name GS_HR_SalaryMonths_ID */
     public static final String COLUMNNAME_GS_HR_SalaryMonths_ID = "GS_HR_SalaryMonths_ID";

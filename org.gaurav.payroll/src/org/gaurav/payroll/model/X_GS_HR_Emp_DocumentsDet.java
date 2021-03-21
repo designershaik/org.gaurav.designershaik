@@ -31,7 +31,7 @@ public class X_GS_HR_Emp_DocumentsDet extends PO implements I_GS_HR_Emp_Document
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20210123L;
+	private static final long serialVersionUID = 20210321L;
 
     /** Standard Constructor */
     public X_GS_HR_Emp_DocumentsDet (Properties ctx, int GS_HR_Emp_DocumentsDet_ID, String trxName)

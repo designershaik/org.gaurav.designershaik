@@ -3,6 +3,7 @@ package org.gaurav.payroll.process;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.logging.Level;
@@ -17,6 +18,7 @@ import org.gaurav.payroll.model.MGSHRAttendanceDayWise;
 import org.gaurav.payroll.model.MGSHRAttendanceDet;
 import org.gaurav.payroll.model.MGSHREmployee;
 import org.gaurav.payroll.model.MGSHRMonthlyAttendance;
+import org.gaurav.payroll.model.MGSHRMonthlyLeaves;
 import org.gaurav.payroll.model.MGSHRSalaryMonths;
 import org.gaurav.payroll.model.MGSHRTimeSlot;
 
@@ -47,7 +49,7 @@ public class ConsolidateAttendance extends SvrProcess
 		
 		monthStartDate = mAtt.getGS_HR_SalaryMonths().getStartDate();
 		monthEndDate = mAtt.getGS_HR_SalaryMonths().getEndDate();
-		TotalMonthDays = new BigDecimal(TimeUtil.getDaysBetween(monthStartDate, monthEndDate));
+		TotalMonthDays = mAtt.getDaysBetween();
 	}
 
 	@Override
@@ -137,6 +139,46 @@ public class ConsolidateAttendance extends SvrProcess
 		return "@OK@";
 	}
 
+	private BigDecimal updateLeaves(MGSHRAttendanceDet det) 
+	{
+		BigDecimal totalLeaves = Env.ZERO;
+		String sql = "select DATE_PART('day', AGE((case when ? < enddate then ? else enddate end),startdate)) AS days,gs_hr_leave_master_id  "
+				+ "from GS_HR_LeaveApplication "
+				+ "where startdate between ? and ? "
+				+ "and GS_HR_Employee_ID = ? ";
+		PreparedStatement pstmt = DB.prepareStatement(sql, get_TrxName());
+		ResultSet rs = null;
+		try 
+		{
+			pstmt.setTimestamp(1, monthEndDate);
+			pstmt.setTimestamp(2,monthEndDate);
+			pstmt.setTimestamp(3,monthStartDate);
+			pstmt.setTimestamp(4,monthEndDate);
+			pstmt.setInt(5, det.getGS_HR_Employee_ID());
+			rs = pstmt.executeQuery();
+			while(rs.next())
+			{
+				int leave_Master_ID = rs.getInt("gs_hr_leave_master_id");
+				BigDecimal days = rs.getBigDecimal("days");
+				MGSHRMonthlyLeaves leaves = new MGSHRMonthlyLeaves(getCtx(), 0, get_TrxName());
+				leaves.setGS_HR_Leave_Master_ID(leave_Master_ID);
+				leaves.setGS_HR_LeavesConsumed(days);
+				leaves.setGS_HR_Attendance_Det_ID(det.getGS_HR_Attendance_Det_ID());
+				leaves.saveEx();
+				totalLeaves = totalLeaves.add(days);
+			}
+		} 
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			DB.close(rs, pstmt);
+		}
+		return totalLeaves;
+	}
+
 	private boolean punchedOnHoliday(String daysOfTheWeek,int employee_ID) 
 	{
 		boolean isNonHoliday = false;
@@ -157,6 +199,7 @@ public class ConsolidateAttendance extends SvrProcess
 											.list();
 		for(MGSHRAttendanceDet det:details)
 		{
+			BigDecimal totalLeaves = updateLeaves(det);
 			int totalHolidays = DB.getSQLValue(get_TrxName(), "select count(*) from C_NonBusinessDay nb where nb.date1 between ? and ? ",monthStartDate,monthEndDate);
 			int weekDays = 0 ;
 			int[] weekdendSlot_ID = DB.getIDsEx(get_TrxName(), "select slt.gs_hr_timeslot_id from gs_hr_employee emp,GS_HR_TimeSlot slt "
@@ -169,7 +212,7 @@ public class ConsolidateAttendance extends SvrProcess
 			}
 			BigDecimal totalPresentDays = det.getGS_HR_PresentDays().add(new BigDecimal((weekDays)));
 			BigDecimal holidays = new BigDecimal(totalHolidays);
-			BigDecimal remainingDaysWhichAreConsideredAsAbsent =TotalMonthDays.subtract(totalPresentDays).subtract(new BigDecimal(totalHolidays));
+			BigDecimal remainingDaysWhichAreConsideredAsAbsent =TotalMonthDays.subtract(totalPresentDays).subtract(new BigDecimal(totalHolidays)).subtract(totalLeaves);
 			det.setGS_HR_PresentDays(totalPresentDays);
 			det.setGS_HR_Holidays(holidays);
 			det.setGS_HR_AbsentDays(remainingDaysWhichAreConsideredAsAbsent.compareTo(Env.ZERO)<=0?Env.ZERO:remainingDaysWhichAreConsideredAsAbsent);

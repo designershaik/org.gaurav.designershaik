@@ -33,7 +33,7 @@ public class X_GS_HR_EmpCompensation extends PO implements I_GS_HR_EmpCompensati
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20210123L;
+	private static final long serialVersionUID = 20210321L;
 
     /** Standard Constructor */
     public X_GS_HR_EmpCompensation (Properties ctx, int GS_HR_EmpCompensation_ID, String trxName)

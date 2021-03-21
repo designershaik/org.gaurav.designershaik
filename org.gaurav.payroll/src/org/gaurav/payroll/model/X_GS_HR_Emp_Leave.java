@@ -32,7 +32,7 @@ public class X_GS_HR_Emp_Leave extends PO implements I_GS_HR_Emp_Leave, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20210123L;
+	private static final long serialVersionUID = 20210321L;
 
     /** Standard Constructor */
     public X_GS_HR_Emp_Leave (Properties ctx, int GS_HR_Emp_Leave_ID, String trxName)

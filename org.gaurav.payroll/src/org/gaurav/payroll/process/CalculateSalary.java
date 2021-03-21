@@ -15,6 +15,7 @@ public class CalculateSalary extends SvrProcess
 	int salaryMonth_ID = 0 ;
 	int year_ID = 0 ; 
 	MGSHRMonthlySalary sal = null ; 
+	boolean recalculate = false;
 	@Override
 	protected void prepare() 
 	{
@@ -26,6 +27,8 @@ public class CalculateSalary extends SvrProcess
 				;
 			else if (name.equals("GS_HR_Employee_ID"))
 				p_GS_HR_Employee_ID = para[i].getParameterAsInt();
+			else if (name.equals("GS_HR_Recalculate"))
+				recalculate = "Y".equals(para[i].getParameter());
 			else
 				log.log(Level.SEVERE,"prepare - Unknown Parameter: " + name);
 		}
@@ -46,12 +49,22 @@ public class CalculateSalary extends SvrProcess
 				"from GS_HR_MonthlyAttendance mnth,GS_HR_Attendance_Det det " + 
 				"where mnth.gs_hr_monthlyattendance_id = det.gs_hr_monthlyattendance_id "+
 				"and mnth.C_Year_ID = ? " +
-				"and mnth.GS_HR_SalaryMonths_ID = ? "+whereClause , year_ID,salaryMonth_ID);
+				"and NOT EXISTS (select sal.* from GS_HR_EmployeeMonthlySalary sal "
+				+ "where sal.GS_HR_Employee_ID=det.GS_HR_Employee_ID and sal.GS_HR_MonthlySalary_ID!= ? ) "+
+				"and mnth.GS_HR_SalaryMonths_ID = ? "+whereClause , year_ID,MonthlySalary_ID,salaryMonth_ID);
 		for(int det_id : monthlyAttendanceDetails_ID)
 		{
 			MGSHRAttendanceDet det = new MGSHRAttendanceDet(getCtx(), det_id, get_TrxName());
-			boolean calculated = det.calculate(MonthlySalary_ID);
-			log.info("Is Salary Calculated: "+calculated);
+			int GS_HR_EmployeeMonthlySalary_ID = DB.getSQLValue(get_TrxName(), 
+					"Select GS_HR_EmployeeMonthlySalary_ID "
+					+ "From GS_HR_EmployeeMonthlySalary "
+					+ "Where GS_HR_MonthlySalary_ID = ? and GS_HR_Employee_ID = ? ",MonthlySalary_ID,det.getGS_HR_Employee_ID());
+			
+			if((GS_HR_EmployeeMonthlySalary_ID>0 && recalculate) || GS_HR_EmployeeMonthlySalary_ID<=0)
+			{
+				boolean calculated = det.calculate(MonthlySalary_ID);
+				log.info("Is Salary Calculated: "+calculated);
+			}
 		}
 		sal.setProcessed(true);
 		sal.saveEx();

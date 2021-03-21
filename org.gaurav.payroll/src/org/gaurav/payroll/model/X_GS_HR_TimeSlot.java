@@ -33,7 +33,7 @@ public class X_GS_HR_TimeSlot extends PO implements I_GS_HR_TimeSlot, I_Persiste
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20210123L;
+	private static final long serialVersionUID = 20210321L;
 
     /** Standard Constructor */
     public X_GS_HR_TimeSlot (Properties ctx, int GS_HR_TimeSlot_ID, String trxName)

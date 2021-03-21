@@ -31,7 +31,7 @@ public class X_GS_HR_FamilyRelation extends PO implements I_GS_HR_FamilyRelation
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20210123L;
+	private static final long serialVersionUID = 20210321L;
 
     /** Standard Constructor */
     public X_GS_HR_FamilyRelation (Properties ctx, int GS_HR_FamilyRelation_ID, String trxName)

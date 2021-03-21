@@ -12,12 +12,12 @@ public class MGSHREmployeeSalaryDetails extends X_GS_HR_EmployeeSalaryDetails {
 
 	public MGSHREmployeeSalaryDetails(Properties ctx, int GS_HR_EmployeeSalaryDetails_ID, String trxName) {
 		super(ctx, GS_HR_EmployeeSalaryDetails_ID, trxName);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	public MGSHREmployeeSalaryDetails(Properties ctx, ResultSet rs, String trxName) {
 		super(ctx, rs, trxName);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	public MGSHREmployeeSalaryDetails(MGSHREmployeeMonthlySalary monthSal) 
@@ -28,5 +28,4 @@ public class MGSHREmployeeSalaryDetails extends X_GS_HR_EmployeeSalaryDetails {
 		setGS_HR_EmployeeMonthlySalary_ID(monthSal.getGS_HR_EmployeeMonthlySalary_ID());	//	parent
 		setClientOrg(monthSal);
 	}
-
 }

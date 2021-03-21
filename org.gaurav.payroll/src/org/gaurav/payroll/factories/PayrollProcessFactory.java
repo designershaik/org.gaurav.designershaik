@@ -6,6 +6,7 @@ import org.gaurav.payroll.process.AttendanceLogSheet;
 import org.gaurav.payroll.process.CalculateSalary;
 import org.gaurav.payroll.process.ConsolidateAttendance;
 import org.gaurav.payroll.process.CreateLoanPayment;
+import org.gaurav.payroll.process.FinalizeAttendance;
 import org.gaurav.payroll.process.GenerateAttendance;
 import org.gaurav.payroll.process.GenerateInstallments;
 import org.gaurav.payroll.process.SubmitForApproval;
@@ -39,6 +40,9 @@ public class PayrollProcessFactory implements IProcessFactory{
 		
 		if(className.equals(CalculateSalary.class.getName()))
 			return new CalculateSalary();
+		
+		if(className.equals(FinalizeAttendance.class.getName()))
+			return new FinalizeAttendance();
 		
 		
 		return null;

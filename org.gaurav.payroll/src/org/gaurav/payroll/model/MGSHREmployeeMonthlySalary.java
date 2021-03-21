@@ -12,12 +12,11 @@ public class MGSHREmployeeMonthlySalary extends X_GS_HR_EmployeeMonthlySalary {
 
 	public MGSHREmployeeMonthlySalary(Properties ctx, int GS_HR_EmployeeMonthlySalary_ID, String trxName) {
 		super(ctx, GS_HR_EmployeeMonthlySalary_ID, trxName);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	public MGSHREmployeeMonthlySalary(Properties ctx, ResultSet rs, String trxName) {
 		super(ctx, rs, trxName);
-		// TODO Auto-generated constructor stub
+		
 	}
-
 }

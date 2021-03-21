@@ -32,7 +32,7 @@ public class X_GS_HR_EmpSkills extends PO implements I_GS_HR_EmpSkills, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20210123L;
+	private static final long serialVersionUID = 20210321L;
 
     /** Standard Constructor */
     public X_GS_HR_EmpSkills (Properties ctx, int GS_HR_EmpSkills_ID, String trxName)

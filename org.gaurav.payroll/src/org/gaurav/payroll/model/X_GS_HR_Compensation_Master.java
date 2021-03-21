@@ -33,7 +33,7 @@ public class X_GS_HR_Compensation_Master extends PO implements I_GS_HR_Compensat
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20210123L;
+	private static final long serialVersionUID = 20210321L;
 
     /** Standard Constructor */
     public X_GS_HR_Compensation_Master (Properties ctx, int GS_HR_Compensation_Master_ID, String trxName)

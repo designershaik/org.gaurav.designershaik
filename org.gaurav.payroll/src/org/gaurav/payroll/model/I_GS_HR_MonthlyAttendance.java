@@ -95,6 +95,19 @@ public interface I_GS_HR_MonthlyAttendance
 	  */
 	public int getCreatedBy();
 
+    /** Column name Date1 */
+    public static final String COLUMNNAME_Date1 = "Date1";
+
+	/** Set Date.
+	  * Date when business is not conducted
+	  */
+	public void setDate1 (Timestamp Date1);
+
+	/** Get Date.
+	  * Date when business is not conducted
+	  */
+	public Timestamp getDate1();
+
     /** Column name DocumentNo */
     public static final String COLUMNNAME_DocumentNo = "DocumentNo";
 
@@ -149,6 +162,28 @@ public interface I_GS_HR_MonthlyAttendance
 	  * The record is active in the system
 	  */
 	public boolean isActive();
+
+    /** Column name Processed */
+    public static final String COLUMNNAME_Processed = "Processed";
+
+	/** Set Processed.
+	  * The document has been processed
+	  */
+	public void setProcessed (boolean Processed);
+
+	/** Get Processed.
+	  * The document has been processed
+	  */
+	public boolean isProcessed();
+
+    /** Column name Processing */
+    public static final String COLUMNNAME_Processing = "Processing";
+
+	/** Set Process Now	  */
+	public void setProcessing (boolean Processing);
+
+	/** Get Process Now	  */
+	public boolean isProcessing();
 
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";

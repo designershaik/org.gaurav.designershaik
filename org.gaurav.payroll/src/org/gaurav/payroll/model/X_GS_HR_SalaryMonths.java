@@ -32,7 +32,7 @@ public class X_GS_HR_SalaryMonths extends PO implements I_GS_HR_SalaryMonths, I_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20210123L;
+	private static final long serialVersionUID = 20210321L;
 
     /** Standard Constructor */
     public X_GS_HR_SalaryMonths (Properties ctx, int GS_HR_SalaryMonths_ID, String trxName)
@@ -199,6 +199,14 @@ public class X_GS_HR_SalaryMonths extends PO implements I_GS_HR_SalaryMonths, I_
 		return (String)get_Value(COLUMNNAME_Name);
 	}
 
+    /** Get Record ID/ColumnName
+        @return ID/ColumnName pair
+      */
+    public KeyNamePair getKeyNamePair() 
+    {
+        return new KeyNamePair(get_ID(), getName());
+    }
+
 	/** Set Period No.
 		@param PeriodNo 
 		Unique Period Number
@@ -235,12 +243,4 @@ public class X_GS_HR_SalaryMonths extends PO implements I_GS_HR_SalaryMonths, I_
 	{
 		return (Timestamp)get_Value(COLUMNNAME_StartDate);
 	}
-
-    /** Get Record ID/ColumnName
-        @return ID/ColumnName pair
-      */
-    public KeyNamePair getKeyNamePair() 
-    {
-        return new KeyNamePair(get_ID(), String.valueOf(getStartDate()));
-    }
 }

@@ -31,7 +31,7 @@ public class X_GS_HR_DocumentBaseType extends PO implements I_GS_HR_DocumentBase
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20210123L;
+	private static final long serialVersionUID = 20210321L;
 
     /** Standard Constructor */
     public X_GS_HR_DocumentBaseType (Properties ctx, int GS_HR_DocumentBaseType_ID, String trxName)

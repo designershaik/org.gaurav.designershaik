@@ -18,6 +18,7 @@
 package org.gaurav.payroll.model;
 
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Properties;
 import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
@@ -31,7 +32,7 @@ public class X_GS_HR_MonthlyAttendance extends PO implements I_GS_HR_MonthlyAtte
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20210123L;
+	private static final long serialVersionUID = 20210321L;
 
     /** Standard Constructor */
     public X_GS_HR_MonthlyAttendance (Properties ctx, int GS_HR_MonthlyAttendance_ID, String trxName)
@@ -97,6 +98,23 @@ public class X_GS_HR_MonthlyAttendance extends PO implements I_GS_HR_MonthlyAtte
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Date.
+		@param Date1 
+		Date when business is not conducted
+	  */
+	public void setDate1 (Timestamp Date1)
+	{
+		set_Value (COLUMNNAME_Date1, Date1);
+	}
+
+	/** Get Date.
+		@return Date when business is not conducted
+	  */
+	public Timestamp getDate1 () 
+	{
+		return (Timestamp)get_Value(COLUMNNAME_Date1);
 	}
 
 	/** Set Document No.
@@ -182,6 +200,51 @@ public class X_GS_HR_MonthlyAttendance extends PO implements I_GS_HR_MonthlyAtte
     {
         return new KeyNamePair(get_ID(), String.valueOf(getGS_HR_SalaryMonths_ID()));
     }
+
+	/** Set Processed.
+		@param Processed 
+		The document has been processed
+	  */
+	public void setProcessed (boolean Processed)
+	{
+		set_Value (COLUMNNAME_Processed, Boolean.valueOf(Processed));
+	}
+
+	/** Get Processed.
+		@return The document has been processed
+	  */
+	public boolean isProcessed () 
+	{
+		Object oo = get_Value(COLUMNNAME_Processed);
+		if (oo != null) 
+		{
+			 if (oo instanceof Boolean) 
+				 return ((Boolean)oo).booleanValue(); 
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set Process Now.
+		@param Processing Process Now	  */
+	public void setProcessing (boolean Processing)
+	{
+		set_Value (COLUMNNAME_Processing, Boolean.valueOf(Processing));
+	}
+
+	/** Get Process Now.
+		@return Process Now	  */
+	public boolean isProcessing () 
+	{
+		Object oo = get_Value(COLUMNNAME_Processing);
+		if (oo != null) 
+		{
+			 if (oo instanceof Boolean) 
+				 return ((Boolean)oo).booleanValue(); 
+			return "Y".equals(oo);
+		}
+		return false;
+	}
 
 	/** Set Year.
 		@param Year Year	  */

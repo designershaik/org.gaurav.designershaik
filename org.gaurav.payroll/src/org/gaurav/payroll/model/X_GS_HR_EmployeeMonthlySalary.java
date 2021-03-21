@@ -32,7 +32,7 @@ public class X_GS_HR_EmployeeMonthlySalary extends PO implements I_GS_HR_Employe
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20210123L;
+	private static final long serialVersionUID = 20210321L;
 
     /** Standard Constructor */
     public X_GS_HR_EmployeeMonthlySalary (Properties ctx, int GS_HR_EmployeeMonthlySalary_ID, String trxName)

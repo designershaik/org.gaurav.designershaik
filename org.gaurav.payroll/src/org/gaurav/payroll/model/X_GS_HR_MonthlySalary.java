@@ -18,6 +18,7 @@
 package org.gaurav.payroll.model;
 
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Properties;
 import org.compiere.model.*;
 import org.compiere.util.KeyNamePair;
@@ -31,7 +32,7 @@ public class X_GS_HR_MonthlySalary extends PO implements I_GS_HR_MonthlySalary, 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20210123L;
+	private static final long serialVersionUID = 20210321L;
 
     /** Standard Constructor */
     public X_GS_HR_MonthlySalary (Properties ctx, int GS_HR_MonthlySalary_ID, String trxName)
@@ -117,6 +118,23 @@ public class X_GS_HR_MonthlySalary extends PO implements I_GS_HR_MonthlySalary, 
 		return (String)get_Value(COLUMNNAME_DocumentNo);
 	}
 
+	/** Set Delete Calculated Salaries.
+		@param GS_HR_DeleteSalaries 
+		Delete Calculated Salaries
+	  */
+	public void setGS_HR_DeleteSalaries (String GS_HR_DeleteSalaries)
+	{
+		set_Value (COLUMNNAME_GS_HR_DeleteSalaries, GS_HR_DeleteSalaries);
+	}
+
+	/** Get Delete Calculated Salaries.
+		@return Delete Calculated Salaries
+	  */
+	public String getGS_HR_DeleteSalaries () 
+	{
+		return (String)get_Value(COLUMNNAME_GS_HR_DeleteSalaries);
+	}
+
 	/** Set Monthly Salary.
 		@param GS_HR_MonthlySalary_ID Monthly Salary	  */
 	public void setGS_HR_MonthlySalary_ID (int GS_HR_MonthlySalary_ID)
@@ -149,6 +167,23 @@ public class X_GS_HR_MonthlySalary extends PO implements I_GS_HR_MonthlySalary, 
 	public String getGS_HR_MonthlySalary_UU () 
 	{
 		return (String)get_Value(COLUMNNAME_GS_HR_MonthlySalary_UU);
+	}
+
+	/** Set Salary Date.
+		@param GS_HR_SalaryDate 
+		Salary Calculation Date
+	  */
+	public void setGS_HR_SalaryDate (Timestamp GS_HR_SalaryDate)
+	{
+		set_Value (COLUMNNAME_GS_HR_SalaryDate, GS_HR_SalaryDate);
+	}
+
+	/** Get Salary Date.
+		@return Salary Calculation Date
+	  */
+	public Timestamp getGS_HR_SalaryDate () 
+	{
+		return (Timestamp)get_Value(COLUMNNAME_GS_HR_SalaryDate);
 	}
 
 	public I_GS_HR_SalaryMonths getGS_HR_SalaryMonths() throws RuntimeException

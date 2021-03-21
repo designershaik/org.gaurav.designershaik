@@ -30,7 +30,7 @@ public class X_GS_HR_Comp_Calc extends PO implements I_GS_HR_Comp_Calc, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20210123L;
+	private static final long serialVersionUID = 20210321L;
 
     /** Standard Constructor */
     public X_GS_HR_Comp_Calc (Properties ctx, int GS_HR_Comp_Calc_ID, String trxName)

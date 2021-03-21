@@ -117,6 +117,17 @@ public interface I_GS_HR_Installments
 
 	public I_GS_HR_EmployeeAdvance getGS_HR_EmployeeAdvance() throws RuntimeException;
 
+    /** Column name GS_HR_EmployeeSalaryDetails_ID */
+    public static final String COLUMNNAME_GS_HR_EmployeeSalaryDetails_ID = "GS_HR_EmployeeSalaryDetails_ID";
+
+	/** Set Employee Salary Details	  */
+	public void setGS_HR_EmployeeSalaryDetails_ID (int GS_HR_EmployeeSalaryDetails_ID);
+
+	/** Get Employee Salary Details	  */
+	public int getGS_HR_EmployeeSalaryDetails_ID();
+
+	public I_GS_HR_EmployeeSalaryDetails getGS_HR_EmployeeSalaryDetails() throws RuntimeException;
+
     /** Column name GS_HR_Installments_ID */
     public static final String COLUMNNAME_GS_HR_Installments_ID = "GS_HR_Installments_ID";
 

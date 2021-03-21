@@ -31,7 +31,7 @@ public class X_GS_HR_Attendance_T extends PO implements I_GS_HR_Attendance_T, I_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20210123L;
+	private static final long serialVersionUID = 20210321L;
 
     /** Standard Constructor */
     public X_GS_HR_Attendance_T (Properties ctx, int GS_HR_Attendance_T_ID, String trxName)

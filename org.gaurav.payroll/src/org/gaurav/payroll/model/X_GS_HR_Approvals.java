@@ -31,7 +31,7 @@ public class X_GS_HR_Approvals extends PO implements I_GS_HR_Approvals, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20210123L;
+	private static final long serialVersionUID = 20210321L;
 
     /** Standard Constructor */
     public X_GS_HR_Approvals (Properties ctx, int GS_HR_Approvals_ID, String trxName)
