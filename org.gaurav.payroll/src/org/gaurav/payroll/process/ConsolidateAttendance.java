@@ -30,6 +30,8 @@ public class ConsolidateAttendance extends SvrProcess
 	Timestamp monthStartDate = null;
 	Timestamp monthEndDate = null;
 	BigDecimal TotalMonthDays = Env.ZERO ;
+	Timestamp onRecordMonthEndDate = null;
+	
 	@Override
 	protected void prepare() 
 	{
@@ -48,7 +50,8 @@ public class ConsolidateAttendance extends SvrProcess
 		mAtt = new MGSHRMonthlyAttendance(getCtx(), monthlyAttendance_ID, get_TrxName());
 		
 		monthStartDate = mAtt.getGS_HR_SalaryMonths().getStartDate();
-		monthEndDate = mAtt.getGS_HR_SalaryMonths().getEndDate();
+		monthEndDate = TimeUtil.addDays(mAtt.getGS_HR_SalaryMonths().getEndDate(),1);
+		onRecordMonthEndDate = mAtt.getGS_HR_SalaryMonths().getEndDate();
 		TotalMonthDays = mAtt.getDaysBetween();
 	}
 
@@ -59,9 +62,6 @@ public class ConsolidateAttendance extends SvrProcess
 		int existingEmployee_ID = 0 ;
 		PreparedStatement pstmt = null; 
 		ResultSet rs = null;
-		MGSHRSalaryMonths salMonths = new MGSHRSalaryMonths(getCtx(),mAtt.getGS_HR_SalaryMonths_ID(),get_TrxName());
-		Timestamp startDate = salMonths.getStartDate();
-		Timestamp endDate = salMonths.getEndDate();
 		StringBuilder sqlWhere = new StringBuilder(" and lg.AD_Client_ID = "+getAD_Client_ID());
 		if(p_Employee_ID>0)
 			sqlWhere = sqlWhere.append(" and lg.GS_HR_Employee_ID = ?  ");
@@ -78,8 +78,8 @@ public class ConsolidateAttendance extends SvrProcess
 		try
 		{
 			pstmt = DB.prepareStatement(sql, get_TrxName());
-			pstmt.setTimestamp(1, startDate);
-			pstmt.setTimestamp(2, endDate);
+			pstmt.setTimestamp(1, monthStartDate);
+			pstmt.setTimestamp(2, monthEndDate);
 			if(p_Employee_ID>0)
 				pstmt.setInt(3, p_Employee_ID);
 			rs = pstmt.executeQuery();
@@ -150,10 +150,10 @@ public class ConsolidateAttendance extends SvrProcess
 		ResultSet rs = null;
 		try 
 		{
-			pstmt.setTimestamp(1, monthEndDate);
-			pstmt.setTimestamp(2,monthEndDate);
+			pstmt.setTimestamp(1, onRecordMonthEndDate);
+			pstmt.setTimestamp(2,onRecordMonthEndDate);
 			pstmt.setTimestamp(3,monthStartDate);
-			pstmt.setTimestamp(4,monthEndDate);
+			pstmt.setTimestamp(4,onRecordMonthEndDate);
 			pstmt.setInt(5, det.getGS_HR_Employee_ID());
 			rs = pstmt.executeQuery();
 			while(rs.next())
@@ -200,7 +200,7 @@ public class ConsolidateAttendance extends SvrProcess
 		for(MGSHRAttendanceDet det:details)
 		{
 			BigDecimal totalLeaves = updateLeaves(det);
-			int totalHolidays = DB.getSQLValue(get_TrxName(), "select count(*) from C_NonBusinessDay nb where nb.date1 between ? and ? ",monthStartDate,monthEndDate);
+			int totalHolidays = DB.getSQLValue(get_TrxName(), "select count(*) from C_NonBusinessDay nb where nb.date1 between ? and ? ",monthStartDate,onRecordMonthEndDate);
 			int weekDays = 0 ;
 			int[] weekdendSlot_ID = DB.getIDsEx(get_TrxName(), "select slt.gs_hr_timeslot_id from gs_hr_employee emp,GS_HR_TimeSlot slt "
 															+ "where emp.gs_hr_employee_id = ? and emp.gs_hr_timeslot_group_id = slt.gs_hr_timeslot_group_id  "
@@ -222,10 +222,10 @@ public class ConsolidateAttendance extends SvrProcess
 	
 	public int getWorkingDaysBetweenTwoDates(int weekDay,int weekendDays) 
 	{
-		int DaysBetween = TimeUtil.getDaysBetween(monthStartDate, monthEndDate);
+		
 		int totalDays = DB.getSQLValue(get_TrxName(),"select coalesce(count(1),0) "
 				+ "from (select ?::date + s*'1day'::interval as datum "
-				+ "from generate_series(0,?) s)foo where extract(dow from datum)=? ",monthStartDate,DaysBetween,weekDay-1);
+				+ "from generate_series(0,?) s)foo where extract(dow from datum)=? ",monthStartDate,TotalMonthDays,weekDay-1);
 
 	    return weekendDays+totalDays;
 	}
