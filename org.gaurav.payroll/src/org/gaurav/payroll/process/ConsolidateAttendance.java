@@ -198,8 +198,9 @@ public class ConsolidateAttendance extends SvrProcess
 											.list();
 		for(MGSHRAttendanceDet det:details)
 		{
+			Timestamp employeeEndDate = DB.getSQLValueTS(get_TrxName(), "Selct max(DS_In) From GS_HR_AttendanceDayWise Where GS_HR_Employee_ID = ? ", det.getGS_HR_Employee_ID());
 			BigDecimal totalLeaves = updateLeaves(det);
-			int totalHolidays = DB.getSQLValue(get_TrxName(), "select count(*) from C_NonBusinessDay nb where nb.date1 between ? and ? ",monthStartDate,onRecordMonthEndDate);
+			int totalHolidays = DB.getSQLValue(get_TrxName(), "select count(*) from C_NonBusinessDay nb where nb.date1 between ? and ? ",monthStartDate,employeeEndDate);
 			int weekDays = 0 ;
 			int[] weekdendSlot_ID = DB.getIDsEx(get_TrxName(), "select slt.gs_hr_timeslot_id "
 															+ "from gs_hr_employee emp,GS_HR_TimeSlot slt "
@@ -208,7 +209,7 @@ public class ConsolidateAttendance extends SvrProcess
 			for(int slot_ID: weekdendSlot_ID)
 			{
 				MGSHRTimeSlot slot = new MGSHRTimeSlot(getCtx(), slot_ID, get_TrxName());
-				weekDays = getWorkingDaysBetweenTwoDates(slot.getWeekDay(), weekDays);
+				weekDays = getWorkingDaysBetweenTwoDates(slot.getWeekDay(), weekDays,employeeEndDate);
 			}
 			BigDecimal totalPresentDays = det.getGS_HR_PresentDays().add(new BigDecimal((weekDays)));
 			BigDecimal holidays = new BigDecimal(totalHolidays);
@@ -220,12 +221,12 @@ public class ConsolidateAttendance extends SvrProcess
 		}
 	}
 	
-	public int getWorkingDaysBetweenTwoDates(int weekDay,int weekendDays) 
+	public int getWorkingDaysBetweenTwoDates(int weekDay,int weekendDays,Timestamp employeeMonthEndDate) 
 	{
 		int totalDays = DB.getSQLValue(get_TrxName(),"select coalesce(count(1),0) "
 				+ "from (select ?::date + s*'1day'::interval as datum "
-				+ "from generate_series(0,?) s where s!=0 )foo "
-				+ "where extract(dow from datum)=? ",monthStartDate,TotalMonthDays,weekDay-1);
+				+ "from generate_series(0,?) s where ?::date + s*'1day'::interval< ? )foo "
+				+ "where extract(dow from datum)=? ",monthStartDate,TotalMonthDays,weekDay-1,monthStartDate,employeeMonthEndDate);
 	    return weekendDays+totalDays;
 	}
 
