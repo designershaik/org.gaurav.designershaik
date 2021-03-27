@@ -236,7 +236,7 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 		BigDecimal totalDays =  getGS_HR_AbsentDays().add(getGS_HR_PresentDays()).add(getGS_HR_Holidays()).add(totalLeaves);
 		
 		if(totalDays.compareTo(TotalMonthDays)>0)
-			throw new AdempiereException("Total Days In The Month "+TotalMonthDays+" < "+totalDays);
+			throw new AdempiereException("Total Days In The Month "+TotalMonthDays+" < "+totalDays+" Employee: "+getGS_HR_Employee().getName());
 		
 		return true;
 	}
