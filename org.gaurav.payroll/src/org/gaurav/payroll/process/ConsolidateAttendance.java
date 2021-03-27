@@ -19,7 +19,6 @@ import org.gaurav.payroll.model.MGSHRAttendanceDet;
 import org.gaurav.payroll.model.MGSHREmployee;
 import org.gaurav.payroll.model.MGSHRMonthlyAttendance;
 import org.gaurav.payroll.model.MGSHRMonthlyLeaves;
-import org.gaurav.payroll.model.MGSHRSalaryMonths;
 import org.gaurav.payroll.model.MGSHRTimeSlot;
 
 public class ConsolidateAttendance extends SvrProcess 
@@ -79,7 +78,7 @@ public class ConsolidateAttendance extends SvrProcess
 		{
 			pstmt = DB.prepareStatement(sql, get_TrxName());
 			pstmt.setTimestamp(1, monthStartDate);
-			pstmt.setTimestamp(2, monthEndDate);
+			pstmt.setTimestamp(2, onRecordMonthEndDate);
 			if(p_Employee_ID>0)
 				pstmt.setInt(3, p_Employee_ID);
 			rs = pstmt.executeQuery();
@@ -202,7 +201,8 @@ public class ConsolidateAttendance extends SvrProcess
 			BigDecimal totalLeaves = updateLeaves(det);
 			int totalHolidays = DB.getSQLValue(get_TrxName(), "select count(*) from C_NonBusinessDay nb where nb.date1 between ? and ? ",monthStartDate,onRecordMonthEndDate);
 			int weekDays = 0 ;
-			int[] weekdendSlot_ID = DB.getIDsEx(get_TrxName(), "select slt.gs_hr_timeslot_id from gs_hr_employee emp,GS_HR_TimeSlot slt "
+			int[] weekdendSlot_ID = DB.getIDsEx(get_TrxName(), "select slt.gs_hr_timeslot_id "
+															+ "from gs_hr_employee emp,GS_HR_TimeSlot slt "
 															+ "where emp.gs_hr_employee_id = ? and emp.gs_hr_timeslot_group_id = slt.gs_hr_timeslot_group_id  "
 															+ "and slt.gs_hr_weeklyoff ='Y'",det.getGS_HR_Employee_ID());
 			for(int slot_ID: weekdendSlot_ID)
@@ -222,11 +222,10 @@ public class ConsolidateAttendance extends SvrProcess
 	
 	public int getWorkingDaysBetweenTwoDates(int weekDay,int weekendDays) 
 	{
-		
 		int totalDays = DB.getSQLValue(get_TrxName(),"select coalesce(count(1),0) "
 				+ "from (select ?::date + s*'1day'::interval as datum "
-				+ "from generate_series(0,?) s)foo where extract(dow from datum)=? ",monthStartDate,TotalMonthDays,weekDay-1);
-
+				+ "from generate_series(0,?) s where s!=0 )foo "
+				+ "where extract(dow from datum)=? ",monthStartDate,TotalMonthDays,weekDay-1);
 	    return weekendDays+totalDays;
 	}
 
