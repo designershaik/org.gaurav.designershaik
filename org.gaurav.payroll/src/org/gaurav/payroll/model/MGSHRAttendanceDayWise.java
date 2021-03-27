@@ -54,6 +54,8 @@ public class MGSHRAttendanceDayWise extends X_GS_HR_AttendanceDayWise {
 				BigDecimal oldValue = (BigDecimal) get_ValueOld("GS_HR_SalaryPaidOn");
 				BigDecimal salariesPaidOn = getGS_HR_SalaryPaidOn();
 				BigDecimal difference = oldValue.subtract(salariesPaidOn);
+				System.out.println(difference);
+				System.out.println(det.getGS_HR_PresentDays().subtract(difference));
 				det.setGS_HR_PresentDays(det.getGS_HR_PresentDays().subtract(difference));
 				det.setGS_HR_AbsentDays(det.getGS_HR_AbsentDays().add(difference));
 				det.saveEx();
