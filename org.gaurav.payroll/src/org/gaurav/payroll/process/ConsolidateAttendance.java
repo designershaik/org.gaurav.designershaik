@@ -226,7 +226,7 @@ public class ConsolidateAttendance extends SvrProcess
 		int totalDays = DB.getSQLValue(get_TrxName(),"select coalesce(count(1),0) "
 				+ "from (select ?::date + s*'1day'::interval as datum "
 				+ "from generate_series(0,?) s where ?::date + s*'1day'::interval< ? )foo "
-				+ "where extract(dow from datum)=? ",monthStartDate,TotalMonthDays,weekDay-1,monthStartDate,employeeMonthEndDate);
+				+ "where extract(dow from datum)=? ",monthStartDate,TotalMonthDays,monthStartDate,employeeMonthEndDate,weekDay-1);
 	    return weekendDays+totalDays;
 	}
 
