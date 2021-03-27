@@ -198,7 +198,7 @@ public class ConsolidateAttendance extends SvrProcess
 											.list();
 		for(MGSHRAttendanceDet det:details)
 		{
-			Timestamp employeeEndDate = DB.getSQLValueTS(get_TrxName(), "Selct max(DS_In) From GS_HR_AttendanceDayWise Where GS_HR_Employee_ID = ? ", det.getGS_HR_Employee_ID());
+			Timestamp employeeEndDate = DB.getSQLValueTS(get_TrxName(), "Select max(DS_In) From GS_HR_AttendanceDayWise Where GS_HR_Employee_ID = ? ", det.getGS_HR_Employee_ID());
 			BigDecimal totalLeaves = updateLeaves(det);
 			int totalHolidays = DB.getSQLValue(get_TrxName(), "select count(*) from C_NonBusinessDay nb where nb.date1 between ? and ? ",monthStartDate,employeeEndDate);
 			int weekDays = 0 ;
@@ -225,7 +225,7 @@ public class ConsolidateAttendance extends SvrProcess
 	{
 		int totalDays = DB.getSQLValue(get_TrxName(),"select coalesce(count(1),0) "
 				+ "from (select ?::date + s*'1day'::interval as datum "
-				+ "from generate_series(0,?) s where ?::date + s*'1day'::interval< ? )foo "
+				+ "from generate_series(0,?) s where (?::date + s*'1day')::interval< ? )foo "
 				+ "where extract(dow from datum)=? ",monthStartDate,TotalMonthDays,monthStartDate,employeeMonthEndDate,weekDay-1);
 	    return weekendDays+totalDays;
 	}
