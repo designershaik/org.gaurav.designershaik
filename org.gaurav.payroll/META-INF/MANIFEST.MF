@@ -20,6 +20,7 @@ Service-Component: OSGI-INF/PayrollProcessFactory.xml,OSGI-INF/PayrollModelFacto
 Bundle-ClassPath: .,
  lib/axis.jar,
  lib/commons-discovery-0.5.jar,
- lib/jaxrpc-api.jar
+ lib/jaxrpc-api.jar,
+ lib/jsch-0.1.54.jar
 Export-Package: org.gaurav.payroll.model
 Import-Package: javax.xml.soap;version="1.4.1"

@@ -5,6 +5,7 @@ import org.compiere.process.ProcessCall;
 import org.gaurav.payroll.process.AttendanceLogSheet;
 import org.gaurav.payroll.process.CalculateSalary;
 import org.gaurav.payroll.process.ConsolidateAttendance;
+import org.gaurav.payroll.process.CreateAUBSalaryFile;
 import org.gaurav.payroll.process.CreateLoanPayment;
 import org.gaurav.payroll.process.FinalizeAttendance;
 import org.gaurav.payroll.process.GenerateAttendance;
@@ -43,6 +44,9 @@ public class PayrollProcessFactory implements IProcessFactory{
 		
 		if(className.equals(FinalizeAttendance.class.getName()))
 			return new FinalizeAttendance();
+		
+		if(className.equals(CreateAUBSalaryFile.class.getName()))
+			return new CreateAUBSalaryFile();
 		
 		
 		return null;
