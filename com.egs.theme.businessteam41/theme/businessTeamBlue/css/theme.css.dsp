@@ -8,7 +8,7 @@ html,body {
 	height: 100%;
 	width: 100%;
 	background-color: #D4E3F4;
-	color: #333;
+	color: #555;
 	font-family: Helvetica,Arial,sans-serif;
 	overflow: hidden;
 }

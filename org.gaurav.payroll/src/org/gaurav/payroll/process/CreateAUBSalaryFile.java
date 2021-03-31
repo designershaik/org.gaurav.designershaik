@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,8 +15,7 @@ import java.util.logging.Level;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MAttachment;
-import org.compiere.model.MOrg;
-import org.compiere.model.MOrgInfo;
+import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -35,17 +35,31 @@ public class CreateAUBSalaryFile extends SvrProcess
 	int C_BankAccount_ID = 0 ; 
 	String fileName = "";
 	String FileName;
-	File directory;
 	String orgName = "";
 	File TextFile;
 	PrintWriter pw;
 	String S1 = "";
 	String S2 = "";
 	StringBuilder S3 = new StringBuilder("");
-	
+	static String LINE_Seperator = "\r\n";
+	int p_GS_HR_Employee_ID = 0 ; 
+	int p_C_BP_BankAccount_ID = 0 ;
 	@Override
 	protected void prepare() 
 	{
+		ProcessInfoParameter[] para = getParameter();
+		for (int i = 0; i < para.length; i++)
+		{
+			String name = para[i].getParameterName();
+			if (para[i].getParameter() == null)
+				;
+			else if (name.equals("GS_HR_Employee_ID"))
+				p_GS_HR_Employee_ID = para[i].getParameterAsInt();	
+			else if (name.equals("C_BP_BankAccount_ID"))
+				p_C_BP_BankAccount_ID = para[i].getParameterAsInt();	
+			else
+				log.log(Level.SEVERE,"prepare - Unknown Parameter: " + name);
+		}
 		MonthlySalary_ID = getRecord_ID();
 		sal = new MGSHRMonthlySalary(getCtx(), MonthlySalary_ID, get_TrxName());	
 	}
@@ -55,35 +69,31 @@ public class CreateAUBSalaryFile extends SvrProcess
 	{
 		int AD_Org_ID = sal.getAD_Org_ID();
 		C_BankAccount_ID = DB.getSQLValue(get_TrxName(), "Select C_BankAccount_ID From C_BankAccount Where DS_IsSalaryBankAccount='Y' and AD_Org_ID = ? ",AD_Org_ID);
-		MOrg org = new MOrg(getCtx(), AD_Org_ID, get_TrxName());
-		MOrgInfo info = new MOrgInfo(org);
-		orgName = info.get_ValueAsString("OrgName");
+		orgName = DB.getSQLValueString(get_TrxName(), "Select OrgName From AD_OrgInfo Where AD_Org_ID = ? ", AD_Org_ID);
 		fileName = createSalaryTransfer();
 		return "@Generated@";
 	}
 
 	private String createSalaryTransfer() throws IOException, SQLException 
 	{
-		createFiles(true);
+		createFiles();
 		prepareSalaryDetails();
-		return postProcessFiles(true);
+		return postProcessFiles();
 	}
 	
-	private void createFiles(boolean isSalary) throws IOException 
+	private void createFiles() throws IOException 
 	{
 		String FilePath=System.getProperty("java.io.tmpdir");
-		directory = new File(FilePath);
-		if(isSalary)
-			FilePath = FilePath+orgName+"_SAL";
-		else
-			FilePath = FilePath + File.separator +"DS_PAY";
-		directory.mkdirs();
-		sal = new MGSHRMonthlySalary(getCtx(), MonthlySalary_ID, get_TrxName());
+		File directory = new File(FilePath);
+		
+		FilePath = directory+File.separator+orgName+"_SAL";
 		
 		String dateTime = DB.getSQLValueString(get_TrxName(), "select TO_CHAR(now(), 'DDMMYYYYHH24MISS') ");
 		TextFile = new File(FilePath+"_"+dateTime+".txt");
+		
 		FileName=FilePath+"_"+dateTime+".txt";
 		
+		addLog("File Name: "+FileName);
 		// (works for both Windows and Linux)
 		TextFile.createNewFile();
 	
@@ -94,12 +104,13 @@ public class CreateAUBSalaryFile extends SvrProcess
 	{
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		String sql = "select distinct 'S1,',Substr(info.DUNS,1,7)||',',bank.ACCOUNTNO||',','MXD'||',','1,',',',TO_CHAR(now(),'DD-Mon-YY')||',' ,TO_CHAR(now(), 'DDMMYYYYHH24MISS') "
+		StringBuilder sql = new StringBuilder("select distinct 'S1,',Substr(info.DUNS,1,7)||',',bank.ACCOUNTNO||',','MXD'||',','1,',',',TO_CHAR(now(),'DD-Mon-YY')||',' ,TO_CHAR(now(), 'DDMMYYYYHH24MISS') "
 				+ "from AD_ORG org,AD_OrgInfo info,C_BankAccount bank "
-				+ "where bank.AD_ORG_ID=org.AD_ORG_ID and org.AD_ORG_ID=info.AD_ORG_ID and bank.c_bankaccount_id="
-				+ C_BankAccount_ID;
-		pstmt = DB.prepareStatement(sql,get_TrxName());
+				+ "where bank.AD_ORG_ID=org.AD_ORG_ID and org.AD_ORG_ID=info.AD_ORG_ID and bank.c_bankaccount_id=? ");
+
+		pstmt = DB.prepareStatement(sql.toString(),get_TrxName());
 		try {
+			pstmt.setInt(1, C_BankAccount_ID);
 			rs = pstmt.executeQuery();
 			while (rs.next()) 
 			{
@@ -112,49 +123,72 @@ public class CreateAUBSalaryFile extends SvrProcess
 				S1 = S1.concat(rs.getString(7)); // Request Date
 				S1 = S1.concat(rs.getString(8)); // Company's Batch Reference
 				pw.write(S1);
-				pw.println();
+				pw.append(LINE_Seperator);
 			}
 		} catch (Exception e) {
-			log.log(Level.SEVERE, sql, e);
+			log.log(Level.SEVERE, sql.toString(), e);
 		} finally {
 			rs = null;
 		}
 		int totalCount = 0 ;
 		BigDecimal totalSalaryPaid = Env.ZERO;
-		sql = "select 'S2,',bpacc.dsi_transfermethod ||',' as TransferMethod,empmnth.gs_hr_netamt as net_amount ,','||cc.iso_code||',' as Currency ,',' as ExchangeRate,',' as DealRefNo,',' as PrefDate,',' as DebitAccount,"
-				+ "bpacc.AccountNo||',' as EmpAccountNo,mnth.documentno||empmnth.gs_hr_employeemonthlysalary_id||',' as UniqueTransRef,"
-				+ "trim(nvl(SUBSTR(mnth.Description,1,35),''))||',' DBNar1, ',' DBNar2,"
-				+ "	trim(nvl(SUBSTR(mnth.Description,1,35),''))||',' CRNar,trim(nvl(SUBSTR(mnth.Description,1,35),''))||',' as PaymentDetail1,','PaymentDetail12,','PaymentDetail3,','PaymentDetail4,"
-				+ "	SUBSTR(bp.name,1,35)||',' as BusinessPartner,nvl(SUBSTR(bpacc.A_Street,1,35),'')||',' as Adress1,trim(nvl(SUBSTR(bpacc.A_City,1,35),''))||',' as Adress2,bank.name||',' as BankName,nvl(loc.ADDRESS1,'')||',',"
-				+ "	nvl(loc.ADDRESS2,'')||',',nvl(loc.ADDRESS3,'')||',',bank.SwiftCode ||',' as SwiftCode ,',' IntermediateAccount,',' IntermediatSwift,','IntermediateName,',' IntermediateAd1,',' IntermediateAd2,',' IntermediateAd3,'A,' ChargeType,',' SortCode,',' BIC "
+		sql = new StringBuilder("select 'S2,',bpacc.dsi_transfermethod ||',' as TransferMethod,empmnth.gs_hr_netamt as net_amount ,','||cc.iso_code||',' as Currency ,',' as ExchangeRate,',' as DealRefNo,',' as PrefDate,',' as DebitAccount,"
+				+ "coalesce(bpacc.AccountNo,bpacc.iban)||',' as EmpAccountNo,mnth.documentno||empmnth.gs_hr_employeemonthlysalary_id as UniqueTransRef,"
+				+ "trim(coalesce(SUBSTR(mnth.Description,1,35),''))||',' DBNar1, ',' DBNar2,"
+				+ "	trim(coalesce(SUBSTR(mnth.Description,1,35),''))||',' CRNar,trim(coalesce(SUBSTR(mnth.Description,1,35),''))||',' as PaymentDetail1,','PaymentDetail12,','PaymentDetail3,','PaymentDetail4,"
+				+ "	SUBSTR(bpacc.A_Name,1,35)||',' as BusinessPartner,coalesce(SUBSTR(bpacc.A_Street,1,35),'')||',' as Adress1,trim(coalesce(SUBSTR(bpacc.A_City,1,35),''))||',' as Adress2,bank.name||',' as BankName,',',"
+				+ "	',',',',coalesce(bank.SwiftCode,bpacc.swiftcode) ||',' as SwiftCode ,',' IntermediateAccount,',' IntermediatSwift,','IntermediateName,',' IntermediateAd1,"
+				+ "',' IntermediateAd2,',' IntermediateAd3,'A,' ChargeType,',' SortCode,',' BIC,bp.C_BPartner_ID "
 				+ "	from GS_HR_MonthlySalary mnth , GS_HR_EmployeeMonthlySalary empmnth, GS_HR_Employee emp, C_BPartner bp,C_BP_BankAccount bpacc,c_bank bank,"
-				+ "	c_location loc,C_Currency cc "
+				+ "	C_Currency cc "
 				+ "	where mnth.GS_HR_MonthlySalary_ID=empmnth.GS_HR_MonthlySalary_ID "
 				+ "	and empmnth.gs_hr_employee_id =emp.gs_hr_employee_id"
 				+ "	and bp.c_Bpartner_id = emp.c_Bpartner_id	"
 				+ " and bp.c_bpartner_id=bpacc.c_bpartner_id"
 				+ "	and bpacc.c_bank_id=bank.c_bank_id "
-				+ " and bank.c_location_id=loc.c_location_id"
 				+ " and bpacc.C_Currency_ID=cc.C_Currency_ID"
 				+ "	and empmnth.IsActive='Y' "
 				+ " and mnth.GS_HR_MonthlySalary_ID = ? "
 				+ " and bpacc.gs_hr_salaryaccount ='Y' "
-				+ " and empmnth.gs_hr_netamt>0 "
-				+ "	order by BankName,BusinessPartner";
+				+ " and empmnth.gs_hr_netamt>0 ");
+		if(p_GS_HR_Employee_ID>0)
+				sql.append(" and empmnth.GS_HR_Employee_ID = ? ");
+		
+		if(p_C_BP_BankAccount_ID>0)
+			sql.append(" and bpacc.C_BP_BankAccount_ID = ? ");
+		
+		sql.append(" order by BankName,BusinessPartner");
 		PreparedStatement dPstmt = null;
 		ResultSet dRs = null;
-		dPstmt = DB.prepareStatement(sql, get_TrxName());
+		dPstmt = DB.prepareStatement(sql.toString(), get_TrxName());
 		try 
 		{
 			dPstmt.setInt(1,MonthlySalary_ID);
+			if(p_GS_HR_Employee_ID>0)
+				dPstmt.setInt(2,p_GS_HR_Employee_ID);
+			if(p_C_BP_BankAccount_ID>0)
+				dPstmt.setInt(3,p_C_BP_BankAccount_ID);
 			dRs = dPstmt.executeQuery();
 			while (dRs.next()) 
 			{
+				int C_BPartner_ID = dRs.getInt("C_BPartner_ID");
+				StringBuilder countOfBusinessPartnerAccounts = new StringBuilder("select count(bpacc.*),bp.c_bpartner_id " + 
+						"from GS_HR_MonthlySalary mnth,GS_HR_EmployeeMonthlySalary empmnth, GS_HR_Employee emp, C_BPartner bp,C_BP_BankAccount bpacc " + 
+						"where mnth.gs_hr_monthlysalary_id = empmnth.gs_hr_monthlysalary_id " + 
+						"and empmnth.gs_hr_employee_id = emp.gs_hr_employee_id " + 
+						"and emp.c_bpartner_id = bp.c_bpartner_id " + 
+						"and bp.c_bpartner_id = bpacc.c_bpartner_id " + 
+						"and bpacc.gs_hr_salaryaccount ='Y' " + 
+						"and bpacc.IsActive ='Y' " + 
+						"and bpacc.C_BPartner_ID =? ");
+				countOfBusinessPartnerAccounts.append(" group by bp.c_bpartner_id ");
+				int totalBankAccountNo = DB.getSQLValue(get_TrxName(), countOfBusinessPartnerAccounts.toString(),C_BPartner_ID);
 				S2 = dRs.getString(1); // Section Index
 				S2 = S2.concat(dRs.getString(2)); // Transfer Method
 				DecimalFormat df = new DecimalFormat("#.000");
-				Double Amount=dRs.getDouble(3);
-				String roundedAmt=df.format(Amount);
+				BigDecimal Amount=dRs.getBigDecimal(3);
+				BigDecimal dividedAmt = Amount.divide(new BigDecimal(totalBankAccountNo), 3, RoundingMode.HALF_UP);
+				String roundedAmt=df.format(dividedAmt);
 //				System.out.println(roundedAmt);
 				S2 = S2.concat(roundedAmt); // Credit Amount
 				S2 = S2.concat(dRs.getString(4)); // Credit Currency
@@ -163,7 +197,7 @@ public class CreateAUBSalaryFile extends SvrProcess
 				S2 = S2.concat(dRs.getString(7)); // Preferred Value Date
 				S2 = S2.concat(dRs.getString(8)); // Debit Account Number
 				S2 = S2.concat(dRs.getString(9)); // Beneficiary Account Number
-				S2 = S2.concat(dRs.getString(10)); // Unique Transaction Ref No
+				S2 = S2.concat(dRs.getString(10)+totalCount+","); // Unique Transaction Ref No
 				S2 = S2.concat(dRs.getString(11)); // Debit Narrative 1
 				S2 = S2.concat(dRs.getString(12)); // Debit Narrative 2
 				S2 = S2.concat(dRs.getString(13)); // Credit Narrative
@@ -190,12 +224,12 @@ public class CreateAUBSalaryFile extends SvrProcess
 				S2 = S2.concat(dRs.getString(34)); // BIC
 //				S2 = S2.concat(ors.getString(35)); // ABA Routing Number
 				pw.write(S2);
-				pw.println();
+				pw.append(LINE_Seperator);
 				totalCount++;
-				totalSalaryPaid = totalSalaryPaid.add(new BigDecimal(Amount));
+				totalSalaryPaid = totalSalaryPaid.add(dividedAmt);
 			}
 		} catch (Exception e) {
-			log.log(Level.SEVERE, sql, e);
+			log.log(Level.SEVERE, sql.toString(), e);
 		} finally {
 			dRs = null;
 		}
@@ -204,12 +238,12 @@ public class CreateAUBSalaryFile extends SvrProcess
 		String roundedAmt=df.format(totalSalaryPaid);
 		S3.append("S3,").append(totalCount).append(",").append(roundedAmt);
 		pw.write(S3.toString());
-		pw.println();
+		pw.append(LINE_Seperator);
 		
 		pw.close();
 	}
 
-	private String postProcessFiles(boolean isSalary) throws IOException 
+	private String postProcessFiles() throws IOException 
 	{
 		MAttachment maa = new MAttachment(getCtx(), getTable_ID(),getRecord_ID(), get_TrxName());
 		if (maa.get_ID()<=0) {
@@ -226,11 +260,11 @@ public class CreateAUBSalaryFile extends SvrProcess
 			maa.addTextMsg("Added new Text File" + FileName);
 			maa.saveEx();
 		}
-		boolean uploadedSuccessfully = UploadToSFTP(TextFile,isSalary);
+		boolean uploadedSuccessfully = UploadToSFTP(TextFile);
 		return "File Created : -" + FileName + " E Advice created : -"+ " File uploaded "+ uploadedSuccessfully;
 	}
 	
-	private boolean UploadToSFTP(File MainFile, boolean isSalary) throws IOException 
+	private boolean UploadToSFTP(File MainFile) throws IOException 
 	{
 		int B2BConfigurationID = DB.getSQLValue(get_TrxName(), "select DS_B2B_Configuration_ID from DS_B2B_Configuration Where ad_org_id = ? ", Env.getAD_Org_ID(getCtx()));
 		MDSB2BConfiguration conf = new MDSB2BConfiguration(getCtx(), B2BConfigurationID, get_TrxName());

@@ -71,7 +71,7 @@ public class ConsolidateAttendance extends SvrProcess
 				"where gs_day =lg.gs_day and gs_month =lg.gs_month and gs_year=lg.gs_year and gs_hr_employee_id =lg.gs_hr_employee_id " + 
 				"and gs_triggertype ='IN' group by gs_day ,gs_hr_employee_id) as InTime,GS_Day ,GS_HR_Employee_ID ,lg.GS_DayOfTheWeek " + 
 				"from GS_HR_DailyAttendance_Log lg " + 
-				"where lg.gs_punchtime::TIMESTAMP::timestamp between ? and ? "+sqlWhere.toString()+ 
+				"where to_char(lg.gs_punchtime,'YYYY-MM-DD') between ? and ? "+sqlWhere.toString()+ 
 				"group by lg.gs_day ,lg.GS_HR_Employee_ID ,lg.gs_year ,lg.gs_month,lg.GS_DayOfTheWeek "+ 
 				"order by GS_HR_Employee_ID,gs_year ,gs_month ,gs_day ";
 		try

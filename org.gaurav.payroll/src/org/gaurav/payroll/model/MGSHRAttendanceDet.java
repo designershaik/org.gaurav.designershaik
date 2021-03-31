@@ -45,6 +45,11 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 	Timestamp endDate = null;
 	public boolean calculate(int monthlySalary_Trans_ID) 
 	{
+		int GS_HR_EmployeeMonthlySalary_ID = DB.getSQLValue(get_TrxName(), "Select GS_HR_EmployeeMonthlySalary_ID From GS_HR_EmployeeMonthlySalary "
+				+ "Where GS_HR_MonthlySalary_ID= ? and GS_HR_Employee_ID = ?  ",monthlySalary_Trans_ID,getGS_HR_Employee_ID());
+		
+		DB.executeUpdate("Delete from GS_HR_EmployeeMonthlySalary Where GS_HR_EmployeeMonthlySalary_ID="+GS_HR_EmployeeMonthlySalary_ID, get_TrxName());
+		
 		setVariables();
 		employee_ID = getGS_HR_Employee_ID();
 		totalDaysInMonth = TimeUtil.getDaysBetween(startDate,endDate)+1;
@@ -103,7 +108,7 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 				dependantOn = dependantOn==null ? "":dependantOn;
 				BigDecimal calculatedAmt = Env.ZERO;
 				BigDecimal alreadyCalculatedSalary = getCalculatedSalary(dependantOn,monthSal.getGS_HR_EmployeeMonthlySalary_ID(),comp.isGS_HR_CalculateOnActuals(),employee_ID);
-				BigDecimal perDayAmt = empComp.getAmt().divide(new BigDecimal(totalDaysInMonth), 10, RoundingMode.CEILING);
+				BigDecimal perDayAmt = empComp.getAmt().divide(new BigDecimal(totalDaysInMonth), 6, RoundingMode.HALF_UP);
 				if(!empComp.isGS_HR_IsPercent())
 					calculatedAmt = perDayAmt.multiply(presentDays);
 				
@@ -111,36 +116,42 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 				{
 					if(comp.getGS_HR_CompensationType().equalsIgnoreCase("OTI"))
 					{
-						BigDecimal perHour = alreadyCalculatedSalary.divide(new BigDecimal(totalDaysInMonth), 10, RoundingMode.CEILING).divide(averageWorkingHour, 10, RoundingMode.CEILING);
+						System.out.print("Comp: "+comp.getName()+" Comp Dependant On: "+comp.getGS_HR_CompDependantOn()+" Comp ID: "+comp.getGS_HR_CompensationType());
+						BigDecimal perHour = alreadyCalculatedSalary.divide(new BigDecimal(totalDaysInMonth), 6, RoundingMode.HALF_UP).divide(averageWorkingHour, 6, RoundingMode.HALF_UP);
+						System.out.println("Employee Name: "+empComp.getGS_HR_Employee().getName()+"Overtime Type: "+comp.getDS_OvertimeType()+" Comp Type: "+comp.getName()+" Comp Value: "+comp.getValue());
 						if(comp.getDS_OvertimeType().equalsIgnoreCase(MGSHRCompensationMaster.DS_OVERTIMETYPE_OvertimeRegular1) && OT1.compareTo(Env.ZERO)>0)
-							calculatedAmt = perHour.multiply(OT1).multiply(empComp.getPercent()).divide(Env.ONEHUNDRED,  10, RoundingMode.CEILING);
+							calculatedAmt = perHour.multiply(OT1).multiply(empComp.getPercent()).divide(Env.ONEHUNDRED,  6, RoundingMode.HALF_UP);
 						if(comp.getDS_OvertimeType().equalsIgnoreCase(MGSHRCompensationMaster.DS_OVERTIMETYPE_OvertimePremium1) && OT2.compareTo(Env.ZERO)>0)
-							calculatedAmt = perHour.multiply(OT2).multiply(empComp.getPercent()).divide(Env.ONEHUNDRED,  10, RoundingMode.CEILING);
+							calculatedAmt = perHour.multiply(OT2).multiply(empComp.getPercent()).divide(Env.ONEHUNDRED,  6, RoundingMode.HALF_UP);
 						if(comp.getDS_OvertimeType().equalsIgnoreCase(MGSHRCompensationMaster.DS_OVERTIMETYPE_OvertimeRegular2) && OT3.compareTo(Env.ZERO)>0)
-							calculatedAmt = perHour.multiply(OT3).multiply(empComp.getPercent()).divide(Env.ONEHUNDRED,  10, RoundingMode.CEILING);
+							calculatedAmt = perHour.multiply(OT3).multiply(empComp.getPercent()).divide(Env.ONEHUNDRED,  6, RoundingMode.HALF_UP);
 						if(comp.getDS_OvertimeType().equalsIgnoreCase(MGSHRCompensationMaster.DS_OVERTIMETYPE_OvertimePremium2) && OT4.compareTo(Env.ZERO)>0)
-							calculatedAmt = perHour.multiply(OT4).multiply(empComp.getPercent()).divide(Env.ONEHUNDRED,  10, RoundingMode.CEILING);
+							calculatedAmt = perHour.multiply(OT4).multiply(empComp.getPercent()).divide(Env.ONEHUNDRED,  6, RoundingMode.HALF_UP);
 						if(comp.getDS_OvertimeType().equalsIgnoreCase(MGSHRCompensationMaster.DS_OVERTIMETYPE_OvertimeRegular3) && OT5.compareTo(Env.ZERO)>0)
-							calculatedAmt = perHour.multiply(OT5).multiply(empComp.getPercent()).divide(Env.ONEHUNDRED,  10, RoundingMode.CEILING);
+							calculatedAmt = perHour.multiply(OT5).multiply(empComp.getPercent()).divide(Env.ONEHUNDRED,  6, RoundingMode.HALF_UP);
 				}
 					else
-						calculatedAmt = alreadyCalculatedSalary.max(empComp.getPercent()).divide(Env.ONEHUNDRED,  10, RoundingMode.CEILING);
+						calculatedAmt = alreadyCalculatedSalary.multiply(empComp.getPercent()).divide(Env.ONEHUNDRED,  6, RoundingMode.HALF_UP);
 				}
 				if(comp.getGS_HR_CompensationType().equalsIgnoreCase("AVL"))
 				{
-					perDayAmt = alreadyCalculatedSalary.divide(new BigDecimal(totalDaysInMonth), 10, RoundingMode.CEILING);
+					perDayAmt = alreadyCalculatedSalary.divide(new BigDecimal(totalDaysInMonth), 6, RoundingMode.HALF_UP);
 					calculatedAmt = perDayAmt.multiply(avlDays);
 				}
-				if(calculatedAmt.compareTo(Env.ZERO)!=0)
-					setSalaryDetails(monthSal,calculatedAmt.setScale(precision, RoundingMode.CEILING),compensation_id,comp.isGS_HR_IsEarning());
+ 				if(calculatedAmt.compareTo(Env.ZERO)!=0)
+					setSalaryDetails(monthSal,calculatedAmt.setScale(precision, RoundingMode.HALF_UP),compensation_id,comp.isGS_HR_IsEarning());
 			}
 			calculateGeneralCalculations(monthSal);
 		}
-		monthSal.setGS_HR_GrossAmt(grossSalary);
-		monthSal.setGS_HR_NetAmt(grossSalary.subtract(totalDeduction));
-		monthSal.setProcessed(true);
-		monthSal.saveEx();
-		
+		if(grossSalary.compareTo(Env.ZERO)==0 && totalDeduction.compareTo(Env.ZERO)==0)
+			monthSal.delete(true);
+		else
+		{
+			monthSal.setGS_HR_GrossAmt(grossSalary);
+			monthSal.setGS_HR_NetAmt(grossSalary.subtract(totalDeduction));
+			monthSal.setProcessed(true);
+			monthSal.saveEx();
+		}
 		return false;
 	}
 

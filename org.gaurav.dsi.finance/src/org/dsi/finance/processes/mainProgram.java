@@ -2,6 +2,8 @@ package org.dsi.finance.processes;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -128,7 +130,14 @@ public class mainProgram {
 		System.out.println(zero.toEngineeringString());
 		System.out.println(1==2
 				&& 2==2 ? 1:0);
-		 System.out.println("Hours "+620/60);
+		
+		    Integer[] arr = new Integer[1000];
+		    for (int i = 0; i < arr.length; i++) {
+		        arr[i] = i;
+		    }
+		    Collections.shuffle(Arrays.asList(arr));
+		    System.out.println(Arrays.toString(arr));
+
 	   }
 	}
 
