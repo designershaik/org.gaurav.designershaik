@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import org.adempiere.exceptions.AdempiereException;
@@ -133,7 +134,7 @@ public class CreateAUBSalaryFile extends SvrProcess
 		int totalCount = 0 ;
 		BigDecimal totalSalaryPaid = Env.ZERO;
 		sql = new StringBuilder("select 'S2,',bpacc.dsi_transfermethod ||',' as TransferMethod,empmnth.gs_hr_netamt as net_amount ,','||cc.iso_code||',' as Currency ,',' as ExchangeRate,',' as DealRefNo,',' as PrefDate,',' as DebitAccount,"
-				+ "coalesce(bpacc.AccountNo,bpacc.iban)||',' as EmpAccountNo,mnth.documentno||empmnth.gs_hr_employeemonthlysalary_id as UniqueTransRef,"
+				+ "coalesce(bpacc.AccountNo,bpacc.iban)||',' as EmpAccountNo,substr(generate_uuid(),1,30) as UniqueTransRef,"
 				+ "trim(coalesce(SUBSTR(mnth.Description,1,35),''))||',' DBNar1, ',' DBNar2,"
 				+ "	trim(coalesce(SUBSTR(mnth.Description,1,35),''))||',' CRNar,trim(coalesce(SUBSTR(mnth.Description,1,35),''))||',' as PaymentDetail1,','PaymentDetail12,','PaymentDetail3,','PaymentDetail4,"
 				+ "	SUBSTR(bpacc.A_Name,1,35)||',' as BusinessPartner,coalesce(SUBSTR(bpacc.A_Street,1,35),'')||',' as Adress1,trim(coalesce(SUBSTR(bpacc.A_City,1,35),''))||',' as Adress2,bank.name||',' as BankName,',',"
@@ -173,10 +174,8 @@ public class CreateAUBSalaryFile extends SvrProcess
 			{
 				int C_BPartner_ID = dRs.getInt("C_BPartner_ID");
 				StringBuilder countOfBusinessPartnerAccounts = new StringBuilder("select count(bpacc.*),bp.c_bpartner_id " + 
-						"from GS_HR_MonthlySalary mnth,GS_HR_EmployeeMonthlySalary empmnth, GS_HR_Employee emp, C_BPartner bp,C_BP_BankAccount bpacc " + 
-						"where mnth.gs_hr_monthlysalary_id = empmnth.gs_hr_monthlysalary_id " + 
-						"and empmnth.gs_hr_employee_id = emp.gs_hr_employee_id " + 
-						"and emp.c_bpartner_id = bp.c_bpartner_id " + 
+						"from GS_HR_Employee emp, C_BPartner bp,C_BP_BankAccount bpacc " + 
+						"where emp.c_bpartner_id = bp.c_bpartner_id " + 
 						"and bp.c_bpartner_id = bpacc.c_bpartner_id " + 
 						"and bpacc.gs_hr_salaryaccount ='Y' " + 
 						"and bpacc.IsActive ='Y' " + 
@@ -190,6 +189,7 @@ public class CreateAUBSalaryFile extends SvrProcess
 				BigDecimal dividedAmt = Amount.divide(new BigDecimal(totalBankAccountNo), 3, RoundingMode.HALF_UP);
 				String roundedAmt=df.format(dividedAmt);
 //				System.out.println(roundedAmt);
+				String uniqueReference = UUID.randomUUID().toString().substring(1, 30);
 				S2 = S2.concat(roundedAmt); // Credit Amount
 				S2 = S2.concat(dRs.getString(4)); // Credit Currency
 				S2 = S2.concat(dRs.getString(5)); // Exchange Rate
@@ -197,7 +197,7 @@ public class CreateAUBSalaryFile extends SvrProcess
 				S2 = S2.concat(dRs.getString(7)); // Preferred Value Date
 				S2 = S2.concat(dRs.getString(8)); // Debit Account Number
 				S2 = S2.concat(dRs.getString(9)); // Beneficiary Account Number
-				S2 = S2.concat(dRs.getString(10)+totalCount+","); // Unique Transaction Ref No
+				S2 = S2.concat(uniqueReference+","); // Unique Transaction Ref No
 				S2 = S2.concat(dRs.getString(11)); // Debit Narrative 1
 				S2 = S2.concat(dRs.getString(12)); // Debit Narrative 2
 				S2 = S2.concat(dRs.getString(13)); // Credit Narrative

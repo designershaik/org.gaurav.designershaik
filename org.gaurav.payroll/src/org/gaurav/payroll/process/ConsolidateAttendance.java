@@ -61,11 +61,12 @@ public class ConsolidateAttendance extends SvrProcess
 		int existingEmployee_ID = 0 ;
 		PreparedStatement pstmt = null; 
 		ResultSet rs = null;
-		StringBuilder sqlWhere = new StringBuilder(" and lg.AD_Client_ID = "+getAD_Client_ID());
+		StringBuilder sqlWhere = new StringBuilder(" and lg.AD_Client_ID = "+getAD_Client_ID()+ " and exists "
+				+ "(select * from GS_HR_Employee hr where lg.GS_HR_Employee_ID=hr.GS_HR_Employee_ID and hr.IsActive='Y') ");
 		if(p_Employee_ID>0)
 			sqlWhere = sqlWhere.append(" and lg.GS_HR_Employee_ID = ?  ");
 		String sql = "select (select max(gs_punchtime) from GS_HR_DailyAttendance_Log " + 
-				"where gs_day =lg.gs_day and gs_month =lg.gs_month and gs_year=lg.gs_year and gs_hr_employee_id =lg.gs_hr_employee_id " + 
+				"where gs_day =lg.gs_day and gs_month =lg.gs_month and gs_year=lg.gs_year and gs_hr_employee_id =lg.gs_hr_employee_id " +
 				"and gs_triggertype ='OUT' group by gs_day ,gs_hr_employee_id) as OutTime," + 
 				"(select min(gs_punchtime) from GS_HR_DailyAttendance_Log " + 
 				"where gs_day =lg.gs_day and gs_month =lg.gs_month and gs_year=lg.gs_year and gs_hr_employee_id =lg.gs_hr_employee_id " + 

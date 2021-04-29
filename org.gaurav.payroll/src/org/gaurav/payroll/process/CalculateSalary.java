@@ -1,10 +1,12 @@
 package org.gaurav.payroll.process;
 
+import java.sql.Timestamp;
 import java.util.logging.Level;
 
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
+import org.compiere.util.TimeUtil;
 import org.gaurav.payroll.model.MGSHRAttendanceDet;
 import org.gaurav.payroll.model.MGSHRMonthlySalary;
 
@@ -41,6 +43,9 @@ public class CalculateSalary extends SvrProcess
 	@Override
 	protected String doIt() throws Exception 
 	{
+		Timestamp startDate = sal.getGS_HR_SalaryMonths().getStartDate();
+		Timestamp endDate = sal.getGS_HR_SalaryMonths().getEndDate();
+		Integer totalDaysInMonth = TimeUtil.getDaysBetween(startDate,endDate)+1;
 		String whereClause = "  ";
 		if(p_GS_HR_Employee_ID>0)
 			whereClause += " and det.GS_HR_Employee_ID =  "+p_GS_HR_Employee_ID;
@@ -49,9 +54,8 @@ public class CalculateSalary extends SvrProcess
 				"from GS_HR_MonthlyAttendance mnth,GS_HR_Attendance_Det det " + 
 				"where mnth.gs_hr_monthlyattendance_id = det.gs_hr_monthlyattendance_id "+
 				"and mnth.C_Year_ID = ? " +
-				"and NOT EXISTS (select sal.* from GS_HR_EmployeeMonthlySalary sal "
-				+ "where sal.GS_HR_Employee_ID=det.GS_HR_Employee_ID and sal.GS_HR_MonthlySalary_ID!= ? ) "+
-				"and mnth.GS_HR_SalaryMonths_ID = ? "+whereClause , year_ID,MonthlySalary_ID,salaryMonth_ID);
+				" and mnth.AD_Client_ID = ? "+
+				"and mnth.GS_HR_SalaryMonths_ID = ? "+whereClause , year_ID,sal.getAD_Client_ID(),salaryMonth_ID);
 		for(int det_id : monthlyAttendanceDetails_ID)
 		{
 			MGSHRAttendanceDet det = new MGSHRAttendanceDet(getCtx(), det_id, get_TrxName());
@@ -62,7 +66,7 @@ public class CalculateSalary extends SvrProcess
 			
 			if((GS_HR_EmployeeMonthlySalary_ID>0 && recalculate) || GS_HR_EmployeeMonthlySalary_ID<=0)
 			{
-				boolean calculated = det.calculate(MonthlySalary_ID);
+				boolean calculated = det.calculate(MonthlySalary_ID,startDate,endDate,totalDaysInMonth);
 				log.info("Is Salary Calculated: "+calculated);
 			}
 		}

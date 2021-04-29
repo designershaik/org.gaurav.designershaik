@@ -56,7 +56,7 @@ td.z-listcell {
 }
 
 .desktop-header-username {
-    color: #fff !important;
+    color: #0400FC !important;
     text-decoration: none;
 }
 
@@ -81,7 +81,7 @@ td.z-listcell {
 }
 
 .desktop-header-username {
-	padding-right: 6px;
+	padding-right: 15px;
 }
 
 .desktop-header-username:hover {
