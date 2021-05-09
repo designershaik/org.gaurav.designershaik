@@ -33,7 +33,7 @@ public class CreateLoanPayment extends SvrProcess{
 	int p_User1_ID = 0 ;
 	int p_User2_ID =0 ;
 	int p_C_DocType_ID = 0 ;
-	
+	int p_C_Tax_ID = 0 ;
 	@Override
 	protected void prepare() 
 	{
@@ -57,6 +57,8 @@ public class CreateLoanPayment extends SvrProcess{
 				p_User2_ID =para[i].getParameterAsInt();
 			else if (name.equals("C_DocType_ID"))
 				p_C_DocType_ID =para[i].getParameterAsInt();
+			else if (name.equals("C_Tax_ID"))
+				p_C_Tax_ID =para[i].getParameterAsInt();
 			else
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
 		}
@@ -94,6 +96,8 @@ public class CreateLoanPayment extends SvrProcess{
 		line.setC_Activity_ID(p_C_Activity_ID);
 		line.setUser1_ID(p_User1_ID);
 		line.setUser2_ID(p_User2_ID);
+		line.set_ValueNoCheck("C_BPartner_ID", C_BPartner_ID);
+		line.setC_Tax_ID(p_C_Tax_ID);
 		line.saveEx();
 		
 		invoice.processIt(MInvoice.ACTION_Complete);

@@ -1,0 +1,46 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.9.6
+Created-By: 1.8.0_171-8u171-b11-0ubuntu0.16.04.1-b11 (Oracle Corporati
+ on)
+Eclipse-RegisterBuddy: org.adempiere.base
+Bundle-SymbolicName: org.adempiere.ui.swing;singleton:=true
+Require-Bundle: org.adempiere.base;bundle-version="0.0.0",org.adempier
+ e.ui;bundle-version="0.0.0",org.restlet;bundle-version="0.0.0",org.re
+ stlet.ext.servlet;bundle-version="0.0.0",groovy-all;bundle-version="0
+ .0.0"
+Bundle-ManifestVersion: 2
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Import-Package: javax.net.ssl,net.sf.jasperreports.engine,org.apache.e
+ cs,org.apache.ecs.xhtml,org.apache.poi.hssf.usermodel,org.compiere.cs
+ s,org.eclipse.core.runtime;version="3.4.0",org.eclipse.equinox.app,or
+ g.osgi.framework;version="1.5.0"
+Service-Component: OSGI-INF/*.xml
+Eclipse-ExtensibleAPI: true
+Export-Package: com.jgoodies.looks,com.jgoodies.looks.common,com.jgood
+ ies.looks.plastic,com.jgoodies.looks.plastic.theme,com.jgoodies.looks
+ .windows,de.schaeffer.compiere.tools,net.miginfocom.layout,net.miginf
+ ocom.swing,org.adempiere.apps.graph,org.adempiere.pdf.viewer,org.adem
+ piere.plaf,org.adempiere.ui.swing.factory,org.compiere,org.compiere.a
+ cct,org.compiere.apps,org.compiere.apps.form,org.compiere.apps.search
+ ,org.compiere.apps.wf,org.compiere.grid,org.compiere.grid.ed,org.comp
+ iere.grid.tree,org.compiere.images,org.compiere.install,org.compiere.
+ minigrid,org.compiere.plaf,org.compiere.pos,org.compiere.print,org.co
+ mpiere.swing,org.eevolution.form,org.jdesktop.beans,org.jdesktop.swin
+ gx,org.jdesktop.swingx.action,org.jdesktop.swingx.auth,org.jdesktop.s
+ wingx.autocomplete,org.jdesktop.swingx.border,org.jdesktop.swingx.cal
+ endar,org.jdesktop.swingx.color,org.jdesktop.swingx.combobox,org.jdes
+ ktop.swingx.decorator,org.jdesktop.swingx.error,org.jdesktop.swingx.e
+ vent,org.jdesktop.swingx.geom,org.jdesktop.swingx.graphics,org.jdeskt
+ op.swingx.hyperlink,org.jdesktop.swingx.icon,org.jdesktop.swingx.imag
+ e,org.jdesktop.swingx.multislider,org.jdesktop.swingx.multisplitpane,
+ org.jdesktop.swingx.painter,org.jdesktop.swingx.painter.effects,org.j
+ desktop.swingx.plaf,org.jdesktop.swingx.renderer,org.jdesktop.swingx.
+ rollover,org.jdesktop.swingx.search,org.jdesktop.swingx.sort,org.jdes
+ ktop.swingx.table,org.jdesktop.swingx.tips,org.jdesktop.swingx.tree,o
+ rg.jdesktop.swingx.treetable,org.jdesktop.swingx.util
+Bundle-Name: iDempiere Swing Client
+Bundle-Version: 4.1.0.v20180721-1307
+Bundle-ClassPath: client.jar,swingx-1.6.jar,looks-2.0.4.jar,miglayout-
+ 3.7.1-swing.jar,jpedal.jar
+

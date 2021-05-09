@@ -148,7 +148,9 @@ public class FinanceEventHandler extends AbstractEventHandler
 			{
 				Integer C_Tax_ID = line.getC_Tax_ID();
 				MTax tax = new MTax(ctx,C_Tax_ID,null);
-				if(tax.getRate().compareTo(Env.ZERO)>0 && (invoice.getC_BPartner().getTaxID()==null || invoice.getC_BPartner().getTaxID().isBlank()))
+				int C_BPartner_ID = invoice.getC_BPartner_ID();
+				MBPartner bp = new MBPartner(ctx, C_BPartner_ID, trxName);
+				if(tax.getRate().compareTo(Env.ZERO)>0 && (bp.getTaxID()==null || bp.getTaxID().isBlank()))
 					throw new AdempiereException("Business partner is not tax registered");
 			}
 		}

@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.9.6
+Created-By: 1.8.0_171-8u171-b11-0ubuntu0.16.04.1-b11 (Oracle Corporati
+ on)
+Bundle-SymbolicName: org.adempiere.install;singleton:=true
+Export-Package: org.adempiere.install,org.compiere.install
+Bundle-Name: iDempiere Setup
+Bundle-Version: 4.1.0.v20180721-1307
+Bundle-ClassPath: install.jar,ant-contrib-1.0b3.jar
+Require-Bundle: org.adempiere.base;bundle-version="0.0.0"
+Bundle-ManifestVersion: 2
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: org.adempiere.install.InstallBundleActivator
+Import-Package: javax.mail;version="1.5",javax.mail.internet;version="
+ 1.5",org.apache.tools.ant,org.eclipse.ant.core,org.eclipse.core.runti
+ me;version="3.4.0",org.eclipse.equinox.app,org.osgi.framework
+

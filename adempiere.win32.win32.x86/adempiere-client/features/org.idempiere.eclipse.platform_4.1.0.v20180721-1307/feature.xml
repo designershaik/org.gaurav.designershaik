@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- contextQualifierLength=14 -->
+<feature
+      id="org.idempiere.eclipse.platform"
+      label="Eclipse Platform for iDempiere"
+      version="4.1.0.v20180721-1307"
+      provider-name="www.idempiere.org">
+
+   <description url="http://www.example.com/description">
+      Eclipse runtime for iDempiere
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <includes
+         id="org.eclipse.equinox.server.core"
+         version="1.3.2.v20150203-1939"/>
+
+   <includes
+         id="org.eclipse.equinox.server.p2"
+         version="1.2.101.v20141203-1327"/>
+
+   <includes
+         id="org.eclipse.equinox.executable"
+         version="3.6.102.v20150204-1316"/>
+
+   <includes
+         id="org.eclipse.ecf.core.feature"
+         version="1.1.0.v20141221-2352"/>
+
+   <includes
+         id="org.eclipse.ecf.core.ssl.feature"
+         version="1.0.0.v20141221-2352"/>
+
+   <includes
+         id="org.eclipse.ecf.filetransfer.feature"
+         version="3.9.2.v20141221-2352"/>
+
+   <includes
+         id="org.eclipse.ecf.filetransfer.httpclient4.feature"
+         version="3.9.2.v20141221-2352"/>
+
+   <includes
+         id="org.eclipse.ecf.filetransfer.httpclient4.ssl.feature"
+         version="1.0.0.v20141221-2352"/>
+
+   <includes
+         id="org.eclipse.ecf.filetransfer.ssl.feature"
+         version="1.0.0.v20141221-2352"/>
+
+   <includes
+         id="org.eclipse.osgi.compatibility.plugins.feature"
+         version="1.0.0.v20140416-1648"/>
+
+   <plugin
+         id="org.eclipse.core.runtime"
+         download-size="0"
+         install-size="0"
+         version="3.10.0.v20140318-2214"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.contenttype"
+         download-size="0"
+         install-size="0"
+         version="3.4.200.v20140207-1251"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ant.core"
+         download-size="0"
+         install-size="0"
+         version="3.3.1.v20150123-1553"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.event"
+         download-size="0"
+         install-size="0"
+         version="1.3.100.v20140115-1647"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.ds"
+         download-size="0"
+         install-size="0"
+         version="1.4.200.v20131126-2331"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.osgi.services"
+         download-size="0"
+         install-size="0"
+         version="3.4.0.v20140312-2051"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.variables"
+         download-size="0"
+         install-size="0"
+         version="3.2.800.v20130819-1716"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.core.net"
+         download-size="0"
+         install-size="0"
+         version="1.2.200.v20140124-2013"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.launcher"
+         os="linux,macosx,win32"
+         ws="cocoa,gtk,win32"
+         arch="x86,x86_64"
+         download-size="0"
+         install-size="0"
+         version="1.3.0.v20140415-2008"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.p2.director.app"
+         download-size="0"
+         install-size="0"
+         version="1.0.300.v20150129-0838"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.concurrent"
+         download-size="0"
+         install-size="0"
+         version="1.1.0.v20130327-1442"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.httpcomponents.httpclient"
+         download-size="0"
+         install-size="0"
+         version="4.3.6.v201411290715"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.httpcomponents.httpcore"
+         download-size="0"
+         install-size="0"
+         version="4.3.3.v201411290715"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.console"
+         download-size="0"
+         install-size="0"
+         version="1.1.0.v20140131-1639"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.felix.gogo.command"
+         download-size="0"
+         install-size="0"
+         version="0.10.0.v201209301215"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.felix.gogo.runtime"
+         download-size="0"
+         install-size="0"
+         version="0.10.0.v201209301036"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.felix.gogo.shell"
+         download-size="0"
+         install-size="0"
+         version="0.10.0.v201212101605"
+         unpack="false"/>
+
+</feature>

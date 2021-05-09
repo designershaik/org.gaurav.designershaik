@@ -15,7 +15,8 @@ public class CallOutSetTaxRateBasedOnBPGroup implements IColumnCallout{
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue)
 	{
 		int C_BPartner_ID = Env.getContextAsInt(ctx, WindowNo, "C_BPartner_ID");
-		if(C_BPartner_ID>0)
+		boolean IsSOTrx = "Y".equals(Env.getContext(ctx, WindowNo, "IsSOTrx"));
+		if(C_BPartner_ID>0 && !IsSOTrx)
 		{
 			MBPartner bp = new MBPartner(ctx, C_BPartner_ID, null);
 			MBPGroup grp = (MBPGroup)bp.getC_BP_Group();

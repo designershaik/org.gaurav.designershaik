@@ -1,0 +1,8 @@
+eclipse.preferences.version=1
+repositories/file\:_home_administrator_buckminster.output_org.adempiere.ui.swing_4.1.0-eclipse.feature_site.p2/enabled=true
+repositories/file\:_home_administrator_buckminster.output_org.adempiere.ui.swing_4.1.0-eclipse.feature_site.p2/isSystem=false
+repositories/file\:_home_administrator_buckminster.output_org.adempiere.ui.swing_4.1.0-eclipse.feature_site.p2/name=Adempiere Swing Client
+repositories/file\:_home_administrator_buckminster.output_org.adempiere.ui.swing_4.1.0-eclipse.feature_site.p2/suffix=content.xml
+repositories/file\:_home_administrator_buckminster.output_org.adempiere.ui.swing_4.1.0-eclipse.feature_site.p2/type=org.eclipse.equinox.internal.p2.metadata.repository.LocalMetadataRepository
+repositories/file\:_home_administrator_buckminster.output_org.adempiere.ui.swing_4.1.0-eclipse.feature_site.p2/uri=file\:/home/administrator/buckminster.output/org.adempiere.ui.swing_4.1.0-eclipse.feature/site.p2/
+repositories/file\:_home_administrator_buckminster.output_org.adempiere.ui.swing_4.1.0-eclipse.feature_site.p2/version=1.0.0
