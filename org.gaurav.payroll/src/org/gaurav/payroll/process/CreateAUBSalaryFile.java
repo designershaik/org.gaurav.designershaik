@@ -136,7 +136,7 @@ public class CreateAUBSalaryFile extends SvrProcess
 		sql = new StringBuilder("select 'S2,',bpacc.dsi_transfermethod ||',' as TransferMethod,empmnth.gs_hr_netamt as net_amount ,','||cc.iso_code||',' as Currency ,',' as ExchangeRate,',' as DealRefNo,',' as PrefDate,',' as DebitAccount,"
 				+ "coalesce(bpacc.AccountNo,bpacc.iban)||',' as EmpAccountNo,substr(generate_uuid(),1,30) as UniqueTransRef,"
 				+ "trim(coalesce(SUBSTR(mnth.Description,1,35),''))||',' DBNar1, ',' DBNar2,"
-				+ "	trim(coalesce(SUBSTR(mnth.Description,1,35),''))||',' CRNar,trim(coalesce(SUBSTR(mnth.Description,1,35),''))||',' as PaymentDetail1,','PaymentDetail12,','PaymentDetail3,','PaymentDetail4,"
+				+ "	trim(coalesce(SUBSTR(mnth.Description,1,35),''))||',' CRNar,'SAL,' as PaymentDetail1,trim(coalesce(SUBSTR(mnth.Description,1,35),''))||',' as PaymentDetail12,trim(coalesce(SUBSTR(mnth.Description,36,70),''))||',' as PaymentDetail3,','PaymentDetail4,"
 				+ "	SUBSTR(bpacc.A_Name,1,35)||',' as BusinessPartner,coalesce(SUBSTR(bpacc.A_Street,1,35),'')||',' as Adress1,trim(coalesce(SUBSTR(bpacc.A_City,1,35),''))||',' as Adress2,bank.name||',' as BankName,',',"
 				+ "	',',',',coalesce(bank.SwiftCode,bpacc.swiftcode) ||',' as SwiftCode ,',' IntermediateAccount,',' IntermediatSwift,','IntermediateName,',' IntermediateAd1,"
 				+ "',' IntermediateAd2,',' IntermediateAd3,'A,' ChargeType,',' SortCode,',' BIC,bp.C_BPartner_ID "

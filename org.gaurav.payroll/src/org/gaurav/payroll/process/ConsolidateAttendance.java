@@ -105,12 +105,26 @@ public class ConsolidateAttendance extends SvrProcess
 			        if(existingEmployee_ID==0 || existingEmployee_ID!=employee_ID)
 			        {
 			        	existingEmployee_ID = employee_ID;
-			        	det = new MGSHRAttendanceDet(getCtx(), 0, get_TrxName());
-			        	det.setGS_HR_Employee_ID(existingEmployee_ID);
-			        	det.setGS_HR_SalaryMonths_ID(mAtt.getGS_HR_SalaryMonths_ID());
-			        	det.setGS_HR_MonthlyAttendance_ID(getRecord_ID());
-			        	det.setYear(mAtt.getYear());
-			        	det.saveEx();
+			        	int attendanceDetails_ID = DB.getSQLValue(get_TrxName(),
+				        		"Select GS_HR_Attendance_Det_ID From GS_HR_Attendance_Det "
+				        		+ "Where GS_HR_MonthlyAttendance_ID = ? and GS_HR_Employee_ID = ? ",monthlyAttendance_ID,employee_ID);
+			        	if(attendanceDetails_ID>0)
+			        	{
+			        		det = new MGSHRAttendanceDet(getCtx(), attendanceDetails_ID, get_TrxName());
+			        		det.setGS_HR_PresentDays(Env.ZERO);
+			        		det.setGS_HR_AbsentDays(Env.ZERO);
+			        		det.setGS_HR_Holidays(Env.ZERO);
+			        		det.saveEx();
+			        	}
+			        	else
+			        	{
+			        		det = new MGSHRAttendanceDet(getCtx(), 0, get_TrxName());
+				        	det.setGS_HR_Employee_ID(existingEmployee_ID);
+				        	det.setGS_HR_SalaryMonths_ID(mAtt.getGS_HR_SalaryMonths_ID());
+				        	det.setGS_HR_MonthlyAttendance_ID(getRecord_ID());
+				        	det.setYear(mAtt.getYear());
+				        	det.saveEx();
+			        	}
 			        }
 			       	MGSHRAttendanceDayWise daywise = new MGSHRAttendanceDayWise(getCtx(), 0, get_TrxName());
 					daywise.setDS_In(inTime);
