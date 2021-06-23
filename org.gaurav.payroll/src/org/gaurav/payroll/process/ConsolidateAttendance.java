@@ -110,6 +110,7 @@ public class ConsolidateAttendance extends SvrProcess
 				        		+ "Where GS_HR_MonthlyAttendance_ID = ? and GS_HR_Employee_ID = ? ",monthlyAttendance_ID,employee_ID);
 			        	if(attendanceDetails_ID>0)
 			        	{
+			        		DB.executeUpdate("delete from GS_HR_AttendanceDayWise where GS_HR_Attendance_Det_ID = "+attendanceDetails_ID, get_TrxName());
 			        		det = new MGSHRAttendanceDet(getCtx(), attendanceDetails_ID, get_TrxName());
 			        		det.setGS_HR_PresentDays(Env.ZERO);
 			        		det.setGS_HR_AbsentDays(Env.ZERO);
@@ -226,9 +227,9 @@ public class ConsolidateAttendance extends SvrProcess
 				MGSHRTimeSlot slot = new MGSHRTimeSlot(getCtx(), slot_ID, get_TrxName());
 				weekDays = getWorkingDaysBetweenTwoDates(slot.getWeekDay(), weekDays,employeeEndDate);
 			}
-			BigDecimal totalPresentDays = det.getGS_HR_PresentDays().add(new BigDecimal((weekDays)));
 			BigDecimal holidays = new BigDecimal(totalHolidays);
-			BigDecimal remainingDaysWhichAreConsideredAsAbsent =TotalMonthDays.subtract(totalPresentDays).subtract(new BigDecimal(totalHolidays)).subtract(totalLeaves);
+			BigDecimal totalPresentDays = det.getGS_HR_PresentDays().add(new BigDecimal((weekDays))).add(holidays);
+			BigDecimal remainingDaysWhichAreConsideredAsAbsent =TotalMonthDays.subtract(totalPresentDays).subtract(totalLeaves);
 			det.setGS_HR_PresentDays(totalPresentDays);
 			det.setGS_HR_Holidays(holidays);
 			det.setGS_HR_AbsentDays(remainingDaysWhichAreConsideredAsAbsent.compareTo(Env.ZERO)<=0?Env.ZERO:remainingDaysWhichAreConsideredAsAbsent);

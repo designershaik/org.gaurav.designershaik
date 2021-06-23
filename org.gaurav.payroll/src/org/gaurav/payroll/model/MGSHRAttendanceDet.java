@@ -14,7 +14,6 @@ import org.compiere.model.MCurrency;
 import org.compiere.model.Query;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
-import org.compiere.util.TimeUtil;
 
 public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det 
 {
@@ -230,7 +229,7 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 		BigDecimal totalLeaves = DB.getSQLValueBD(get_TrxName(), 
 				"Select coalesce(sum(GS_HR_LeavesConsumed),0) From GS_HR_MonthlyLeaves Where GS_HR_Attendance_Det_ID = ? ", getGS_HR_Attendance_Det_ID());
 		
-		BigDecimal totalDays =  getGS_HR_AbsentDays().add(getGS_HR_PresentDays()).add(getGS_HR_Holidays()).add(totalLeaves);
+		BigDecimal totalDays =  getGS_HR_AbsentDays().add(getGS_HR_PresentDays()).add(totalLeaves);
 		
 		if(totalDays.compareTo(TotalMonthDays)>0)
 			throw new AdempiereException(" Employee: "+getGS_HR_Employee().getName()+"Absent Days: "+getGS_HR_AbsentDays()+" Present Days: "+getGS_HR_PresentDays()
