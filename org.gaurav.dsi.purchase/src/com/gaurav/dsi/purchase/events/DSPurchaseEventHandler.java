@@ -8,9 +8,12 @@ import org.adempiere.base.event.IEventTopics;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MBankAccount;
 import org.compiere.model.MDocType;
+import org.compiere.model.MInOut;
+import org.compiere.model.MInOutLine;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MOrder;
 import org.compiere.model.MPayment;
+import org.compiere.model.MProduct;
 import org.compiere.model.MRequest;
 import org.compiere.model.PO;
 import org.compiere.util.DB;
@@ -175,6 +178,25 @@ public class DSPurchaseEventHandler extends AbstractEventHandler {
 				}
 			}
 		}
+		
+		if(po instanceof MInOut)
+		{
+			MInOut inout = (MInOut)po;
+			if(event.getTopic().equals(IEventTopics.DOC_BEFORE_COMPLETE))
+			{
+				MInOutLine[] lines = inout.getLines();
+				for(MInOutLine line : lines)
+				{
+					MProduct prod = (MProduct)line.getM_Product();
+					if(prod.get_ValueAsBoolean("DSI_EvaluationRequired"))
+					{
+						int evaluationRecords = DB.getSQLValue(trxName, "select count(*) From DS_ReceiptLineEvaluation Where M_InOutLine_ID = ? ",line.getM_InOutLine_ID());
+						if(evaluationRecords<=0)
+							throw new AdempiereException("Following line has no evaluation: "+line.getLine()+" Product Code/Name "+prod.getValue()+" / "+prod.getName());
+					}
+				}
+			}
+		}
 	}
 	
 	
@@ -203,6 +225,8 @@ public class DSPurchaseEventHandler extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, MInvoice.Table_Name);	
 		
 		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, MOrder.Table_Name);
+		
+		registerTableEvent(IEventTopics.DOC_BEFORE_COMPLETE, MInOut.Table_Name);
 	}
 
 }

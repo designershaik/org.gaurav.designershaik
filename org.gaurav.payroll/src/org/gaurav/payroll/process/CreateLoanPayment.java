@@ -8,11 +8,9 @@ import org.compiere.model.MBPartner;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MPInstance;
-import org.compiere.model.MPayment;
 import org.compiere.model.MProcess;
 import org.compiere.model.Query;
 import org.compiere.model.X_AD_Process;
-import org.compiere.model.X_C_DocType;
 import org.compiere.process.ProcessCall;
 import org.compiere.process.ProcessInfo;
 import org.compiere.process.ProcessInfoParameter;
@@ -26,7 +24,7 @@ public class CreateLoanPayment extends SvrProcess{
 
 	String TenderType = null;
 	String CheckNo = null;
-	int C_BP_BankAccount_ID = 0;
+	int p_C_BP_BankAccount_ID = 0;
 	MGSHREmployeeAdvance advance = null;
 	MBPartner bp = null;
 	int p_C_Activity_ID = 0 ;
@@ -44,7 +42,7 @@ public class CreateLoanPayment extends SvrProcess{
 			if (para[i].getParameter() == null)
 				;
 			else if (name.equals("C_BP_BankAccount_ID"))
-				C_BP_BankAccount_ID =para[i].getParameterAsInt();
+				p_C_BP_BankAccount_ID =para[i].getParameterAsInt();
 			else if (name.equals("CheckNo"))
 				CheckNo =para[i].getParameterAsString();
 			else if (name.equals("TenderType"))
@@ -74,19 +72,23 @@ public class CreateLoanPayment extends SvrProcess{
 		int C_BPartner_ID = advance.getGS_HR_Employee().getC_BPartner_ID();
 		MBPartner bp = new MBPartner(getCtx(), C_BPartner_ID, get_TrxName());
 		MGSHRCompensationMaster compensation = new MGSHRCompensationMaster(getCtx(), advance.getGS_HR_Compensation_Master_ID(), get_TrxName());
-	
+		
 		int M_PriceList_ID = bp.getPO_PriceList_ID();
 		if(M_PriceList_ID<=0)
 			M_PriceList_ID = DB.getSQLValue(get_TrxName(), "Select M_PriceList_ID from M_PriceList "
 					+ "Where C_Currency_ID = ? and IsSoPriceList='N' "
 					+ "and AD_Client_ID=? Order By IsDefault desc ",advance.getC_BankAccount().getC_Currency_ID(),getAD_Client_ID());
 	
+		if(p_C_BP_BankAccount_ID<=0)
+			throw new AdempiereException("Bank account mandatory");
+		
 		MInvoice invoice = new MInvoice(getCtx(), 0, get_TrxName());
 		invoice.setIsSOTrx(false);
 		invoice.setBPartner(bp);
 		invoice.setC_DocType_ID(p_C_DocType_ID);
 		invoice.setM_PriceList_ID(M_PriceList_ID);
 		invoice.setDescription(advance.getGS_HR_Reason());
+		invoice.set_ValueNoCheck("C_BankAccount_ID", p_C_BP_BankAccount_ID);
 		invoice.saveEx();
 		
 		MInvoiceLine line = new MInvoiceLine(invoice);
@@ -99,37 +101,40 @@ public class CreateLoanPayment extends SvrProcess{
 		line.set_ValueNoCheck("C_BPartner_ID", C_BPartner_ID);
 		line.setC_Tax_ID(p_C_Tax_ID);
 		line.saveEx();
-		
-		invoice.processIt(MInvoice.ACTION_Complete);
-		if(invoice.save())
-		{
-			addLog(invoice.getC_Invoice_ID(), null, null, invoice.getDocumentNo(), MInvoice.Table_ID, invoice.getC_Invoice_ID());
-			if(advance.getC_BankAccount_ID()<=0)
-				throw new AdempiereException("Bank account mandatory");
-			
-			int C_DocTypePayment_ID = DB.getSQLValue(get_TrxName(), "SELECT C_DocType_ID FROM C_DocType "
-					+ "Where BankAccountType LIKE ( ? ) and AD_Client_ID = ? AND DocBaseType = ? ", 
-					"%"+advance.getC_BankAccount().getBankAccountType()+"%",getAD_Client_ID(),X_C_DocType.DOCBASETYPE_APPayment);
-			
-			MPayment payment = new MPayment(getCtx(), 0, get_TrxName());
-			payment.setC_BankAccount_ID(advance.getC_BankAccount_ID());
-			payment.setAmount(advance.getC_BankAccount().getC_Currency_ID(), advance.getDS_HR_ApprovedAmt());
-			payment.setC_DocType_ID(C_DocTypePayment_ID);
-			payment.setTenderType(TenderType);
-			payment.setCheckNo(CheckNo);
-			payment.setC_BP_BankAccount_ID(C_BP_BankAccount_ID);
-			payment.setC_BPartner_ID(C_BPartner_ID);
-			payment.setDescription(advance.getGS_HR_Reason());
-			payment.setC_Invoice_ID(invoice.getC_Invoice_ID());
-			payment.saveEx();
-			
-			advance.setC_Payment_ID(payment.getC_Payment_ID());
-			advance.setPayDate(payment.getDateAcct());
-			advance.setProcessed(true);
-			advance.saveEx();
-			
-			addLog(payment.getC_Payment_ID(), null, null, payment.getDocumentNo(), MPayment.Table_ID, payment.getC_Payment_ID());
-		}
+		addLog(invoice.getC_Invoice_ID(), null, null, invoice.getDocumentNo(), MInvoice.Table_ID, invoice.getC_Invoice_ID());
+		advance.set_ValueNoCheck("C_Invoice_ID", invoice.getC_Invoice_ID());
+		advance.setPayDate(invoice.getDateAcct());
+		advance.setProcessed(true);
+		advance.setC_BankAccount_ID(p_C_BP_BankAccount_ID);
+		advance.saveEx();
+//		invoice.processIt(MInvoice.ACTION_Complete);
+//		if(invoice.save())
+//		{
+//			
+//			
+//			int C_DocTypePayment_ID = DB.getSQLValue(get_TrxName(), "SELECT C_DocType_ID FROM C_DocType "
+//					+ "Where BankAccountType LIKE ( ? ) and AD_Client_ID = ? AND DocBaseType = ? ", 
+//					"%"+advance.getC_BankAccount().getBankAccountType()+"%",getAD_Client_ID(),X_C_DocType.DOCBASETYPE_APPayment);
+//			
+//			MPayment payment = new MPayment(getCtx(), 0, get_TrxName());
+//			payment.setC_BankAccount_ID(advance.getC_BankAccount_ID());
+//			payment.setAmount(advance.getC_BankAccount().getC_Currency_ID(), advance.getDS_HR_ApprovedAmt());
+//			payment.setC_DocType_ID(C_DocTypePayment_ID);
+//			payment.setTenderType(TenderType);
+//			payment.setCheckNo(CheckNo);
+//			payment.setC_BP_BankAccount_ID(C_BP_BankAccount_ID);
+//			payment.setC_BPartner_ID(C_BPartner_ID);
+//			payment.setDescription(advance.getGS_HR_Reason());
+//			payment.setC_Invoice_ID(invoice.getC_Invoice_ID());
+//			payment.saveEx();
+//			
+//			advance.setC_Payment_ID(payment.getC_Payment_ID());
+//			advance.setPayDate(payment.getDateAcct());
+//			advance.setProcessed(true);
+//			advance.saveEx();
+//			
+//			addLog(payment.getC_Payment_ID(), null, null, payment.getDocumentNo(), MPayment.Table_ID, payment.getC_Payment_ID());
+//		}
 		
 		return "@OK@";
 	}
