@@ -13,6 +13,8 @@ import org.compiere.apps.IStatusBar;
 import org.compiere.grid.CreateFrom;
 import org.compiere.minigrid.IMiniTable;
 import org.compiere.model.GridTab;
+import org.compiere.model.MDocType;
+import org.compiere.model.MInvoice;
 import org.compiere.model.MPayment;
 import org.compiere.util.DB;
 import org.compiere.util.DisplayType;
@@ -44,7 +46,7 @@ public class WCreateFromPayment extends CreateFrom{
 		StringBuilder sql = new StringBuilder();
 		sql.append("select p.DateAcct,p.C_Invoice_ID,(p.DocumentNo||'-'||COALESCE(p.description,'')), p.C_Currency_ID,c.ISO_Code, p.GrandTotal,");
 		sql.append("p.GrandTotal, bp.Name ");
-		sql.append("FROM C_Invoice p INNER JOIN C_Currency c ON (p.C_Currency_ID=c.C_Currency_ID) LEFT OUTER JOIN C_BPartner bp ON (p.C_BPartner_ID=bp.C_BPartner_ID) ");
+		sql.append("FROM C_Invoice_v p INNER JOIN C_Currency c ON (p.C_Currency_ID=c.C_Currency_ID) LEFT OUTER JOIN C_BPartner bp ON (p.C_BPartner_ID=bp.C_BPartner_ID) ");
 		sql.append(getSQLWhere(BPartner, DocumentNo, DateFrom, DateTo, AmtFrom, AmtTo, IsSoTrx));
 		sql.append(" ORDER BY p.DateAcct Desc ");
 		PreparedStatement pstmt = null;
@@ -115,6 +117,7 @@ public class WCreateFromPayment extends CreateFrom{
 				inv.setLine(maxLine);
 				inv.setTrxAmt(TrxAmt);
 				inv.saveEx();
+				
 				MPayment newPayment = createReferencePayment(inv.getC_Invoice_ID(), payment.getDateAcct(), payment, inv.getTrxAmt(), 
 						inv.getC_Invoice().getC_BPartner_ID(), inv.getLine(),inv.getC_Invoice().getDescription(), trxName);
 				inv.setRef_Payment_ID(newPayment.getC_Payment_ID());
@@ -276,7 +279,7 @@ public class WCreateFromPayment extends CreateFrom{
 		newPayment.setC_BPartner_ID(C_BPartner_ID);
 		if(C_Invoice_ID>0)
 			newPayment.setC_Invoice_ID(C_Invoice_ID);
-		newPayment.setC_Currency_ID(payment.getC_Currency_ID());			
+		newPayment.setC_Currency_ID(payment.getC_Currency_ID());	
 		newPayment.setC_DocType_ID(false);
 		newPayment.setDocumentNo(payment.getDocumentNo().concat("-").concat(Integer.toString(line)));
 		newPayment.setPayAmt(payAmt);
