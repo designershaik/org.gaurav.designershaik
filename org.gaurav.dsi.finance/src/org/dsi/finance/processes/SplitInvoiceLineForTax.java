@@ -3,7 +3,6 @@ package org.dsi.finance.processes;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.logging.Level;
-
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
@@ -52,7 +51,9 @@ public class SplitInvoiceLineForTax extends SvrProcess{
 		BigDecimal taxAmt = line.getTaxAmt();
 		int precision = lineNetAmt.scale();
 		
-		BigDecimal percentAmt = (lineNetAmt.multiply(percent)).divide(Env.ONEHUNDRED,precision,RoundingMode.CEILING);
+		//BigDecimal percentAmt = (lineNetAmt.multiply(percent)).divide(Env.ONEHUNDRED,precision,RoundingMode.HALF_UP);
+		
+		BigDecimal percentAmt = (lineNetAmt.multiply(percent)).divide(Env.ONEHUNDRED);
 		
 		MInvoice invoice = new MInvoice(getCtx(), line.getC_Invoice_ID(), get_TrxName());
 		

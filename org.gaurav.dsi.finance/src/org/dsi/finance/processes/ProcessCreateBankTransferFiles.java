@@ -297,16 +297,16 @@ public class ProcessCreateBankTransferFiles extends SvrProcess
 		String sql = "select SECTIONHEADER,TRANSFERMETHOD,sum(CREDITAMOUNT) as CreditAmount,CURRENCY,EXCHANGERATE,DEALREFNO," +
 				"PREFEREDVALUEDATE,DEBITACCOUNTNO, BENBANKACCOUNTNUMBER,max(UNIQTRANSREF) as UniqueReference," +
 				"coalesce(replace(SUBSTR(Description,1,35), ','::text, ''::text),'') ||',' as DebNar1,coalesce(replace(SUBSTR(Description,36,35), ','::text, ''::text),'') ||',' as DebNar2, " +
-				"coalesce(replace(SUBSTR(Description,1,35), ','::text, ''::text),'') ||',' as CredNar,coalesce(replace(SUBSTR(Description,1,35), ','::text, ''::text),'') ||',' as PayDet1," +
-				" coalesce(replace(SUBSTR(Description,36,35), ','::text, ''::text),'') ||',' as PayDet2,coalesce(replace(SUBSTR(Description,71,35), ','::text, ''::text),'') ||',' as PayDet3," +
-				" coalesce(replace(SUBSTR(Description,106,35), ','::text, ''::text),'') ||',' as PayDet4,ACCOUNTNAME,BENADRESS1,BENADRESS2,BENIFICIARYBANK," +
-				" BENBANKADRESS1,BENBANKADRESS2,BENBANKADDRESS3,SWIFTCODE,ACCOUNTNO,INTERBANKSWIFTCODE, INTERMEDIATEBANKNAME," +
+				"coalesce(replace(SUBSTR(Description,1,35), ','::text, ''::text),'') ||',' as CredNar,coalesce(replace(SUBSTR(PayDet1,1,35), ','::text, ''::text),'') ||',' as PayDet1, " +
+				"coalesce(replace(SUBSTR(Description,36,35), ','::text, ''::text),'') ||',' as PayDet2,coalesce(replace(SUBSTR(Description,71,35), ','::text, ''::text),'') ||',' as PayDet3," +
+				"coalesce(replace(SUBSTR(Description,106,35), ','::text, ''::text),'') ||',' as PayDet4,ACCOUNTNAME,BENADRESS1,BENADRESS2,BENIFICIARYBANK," +
+				"BENBANKADRESS1,BENBANKADRESS2,BENBANKADDRESS3,SWIFTCODE,ACCOUNTNO,INTERBANKSWIFTCODE, INTERMEDIATEBANKNAME," +
 				"INTERMEDIATEBANKADDRES1,INTERMEDIATEBANKADDRESS2,INTERMEDIATEBANKADDRES3, CHARGESTYPE,SORTCODE,BIC,ROUTINGNO," +
 				"DSI_EXPORTPAYMENTS_ID from DSI_ExportVendorPayment  where DSI_EXPORTPAYMENTS_ID="+exportBatch_ID +
 				"group by SECTIONHEADER,TRANSFERMETHOD,CURRENCY,EXCHANGERATE,DEALREFNO,PREFEREDVALUEDATE," +
 				"DEBITACCOUNTNO,BENBANKACCOUNTNUMBER,ACCOUNTNAME,BENADRESS1,BENADRESS2,BENIFICIARYBANK,BENBANKADRESS1," +
 				"BENBANKADRESS2,BENBANKADDRESS3,SWIFTCODE,ACCOUNTNO,INTERBANKSWIFTCODE,INTERMEDIATEBANKNAME,INTERMEDIATEBANKADDRES1," +
-				"INTERMEDIATEBANKADDRESS2,INTERMEDIATEBANKADDRES3,CHARGESTYPE,SORTCODE,BIC,ROUTINGNO,DSI_EXPORTPAYMENTS_ID,description";
+				"INTERMEDIATEBANKADDRESS2,INTERMEDIATEBANKADDRES3,CHARGESTYPE,SORTCODE,BIC,ROUTINGNO,DSI_EXPORTPAYMENTS_ID,description,PayDet1";
 
 		addDetails(sql, true); 
 		sql = "select 'S3,' as Sindex ,1 || ',' as TotalCount,sum(cp.PAYAMT) as TotalPay from DSI_EXPORTPAYMENTSLINE line," +

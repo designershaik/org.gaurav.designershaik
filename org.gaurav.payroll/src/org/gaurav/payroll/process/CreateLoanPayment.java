@@ -32,6 +32,7 @@ public class CreateLoanPayment extends SvrProcess{
 	int p_User2_ID =0 ;
 	int p_C_DocType_ID = 0 ;
 	int p_C_Tax_ID = 0 ;
+	int bankAccount_ID = 0 ; 
 	@Override
 	protected void prepare() 
 	{
@@ -62,6 +63,7 @@ public class CreateLoanPayment extends SvrProcess{
 		}
 		advance = new MGSHREmployeeAdvance(getCtx(), getRecord_ID(), get_TrxName());
 		bp = new MBPartner(getCtx(), advance.getGS_HR_Employee().getC_BPartner_ID(), get_TrxName());
+		bankAccount_ID = advance.getC_BankAccount_ID();
 	}
 
 	@Override
@@ -79,7 +81,7 @@ public class CreateLoanPayment extends SvrProcess{
 					+ "Where C_Currency_ID = ? and IsSoPriceList='N' "
 					+ "and AD_Client_ID=? Order By IsDefault desc ",advance.getC_BankAccount().getC_Currency_ID(),getAD_Client_ID());
 	
-		if(p_C_BP_BankAccount_ID<=0)
+		if(bankAccount_ID<=0)
 			throw new AdempiereException("Bank account mandatory");
 		
 		MInvoice invoice = new MInvoice(getCtx(), 0, get_TrxName());
@@ -88,7 +90,7 @@ public class CreateLoanPayment extends SvrProcess{
 		invoice.setC_DocType_ID(p_C_DocType_ID);
 		invoice.setM_PriceList_ID(M_PriceList_ID);
 		invoice.setDescription(advance.getGS_HR_Reason());
-		invoice.set_ValueNoCheck("C_BankAccount_ID", p_C_BP_BankAccount_ID);
+		invoice.set_ValueNoCheck("C_BankAccount_ID", bankAccount_ID);
 		invoice.saveEx();
 		
 		MInvoiceLine line = new MInvoiceLine(invoice);
@@ -105,7 +107,6 @@ public class CreateLoanPayment extends SvrProcess{
 		advance.set_ValueNoCheck("C_Invoice_ID", invoice.getC_Invoice_ID());
 		advance.setPayDate(invoice.getDateAcct());
 		advance.setProcessed(true);
-		advance.setC_BankAccount_ID(p_C_BP_BankAccount_ID);
 		advance.saveEx();
 //		invoice.processIt(MInvoice.ACTION_Complete);
 //		if(invoice.save())

@@ -119,7 +119,7 @@ public class DSPurchaseEventHandler extends AbstractEventHandler {
 						if (invoice.isCreditMemo())
 							payment.setPayAmt(invoice.getGrandTotal().negate());
 						else
-							payment.setPayAmt(invoice.getGrandTotal());
+						payment.setPayAmt(invoice.getGrandTotal());
 						payment.setIsPrepayment(false);					
 						payment.setDateAcct(invoice.getDateAcct());
 						payment.setDateTrx(invoice.getDateInvoiced());

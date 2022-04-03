@@ -45,8 +45,10 @@ import org.gaurav.dsi.model.MDSFundMovement;
 import org.gaurav.dsi.model.MDSIBoxLabelsT;
 import org.gaurav.dsi.model.MDSIExportPayments;
 import org.gaurav.dsi.model.MDSIExportPaymentsLine;
+import org.gaurav.dsi.model.MDSIManufacturingPlan;
 import org.gaurav.dsi.model.MDSIRefillEntryMain;
 import org.gaurav.dsi.model.MDSIRefillPrintForm;
+import org.gaurav.dsi.model.MDSISalesForecast;
 import org.gaurav.dsi.model.MDSISerialNoTrx;
 import org.gaurav.dsi.model.MDSISerialNumberMaster;
 import org.gaurav.dsi.model.MDSISrNoProduct;
@@ -315,6 +317,13 @@ public class DSIModelFactories implements IModelFactory{
 		
 		if(tableName.equals(MDSCashPositionSetup.Table_Name))
 			return MDSCashPositionSetup.class;
+		
+		if(tableName.equals(MDSIManufacturingPlan.Table_Name))
+			return MDSIManufacturingPlan.class;
+		
+		if(tableName.equals(MDSISalesForecast.Table_Name))
+			return MDSISalesForecast.class;
+			
 			
 		return null;
 	}
@@ -547,6 +556,12 @@ public class DSIModelFactories implements IModelFactory{
 		if(tableName.equals(MDSCashPositionSetup.Table_Name))
 			return new MDSCashPositionSetup(Env.getCtx(), Record_ID, trxName);
 		
+		if(tableName.equals(MDSIManufacturingPlan.Table_Name))
+			return new MDSIManufacturingPlan(Env.getCtx(), Record_ID, trxName);
+		
+		if(tableName.equals(MDSISalesForecast.Table_Name))
+			return new MDSISalesForecast(Env.getCtx(), Record_ID, trxName);
+		
 		return null;
 	}
 
@@ -777,6 +792,12 @@ public class DSIModelFactories implements IModelFactory{
 		
 		if(tableName.equals(MDSCashPositionSetup.Table_Name))
 			return new MDSCashPositionSetup(Env.getCtx(), rs, trxName);
+		
+		if(tableName.equals(MDSIManufacturingPlan.Table_Name))
+			return new MDSIManufacturingPlan(Env.getCtx(), rs, trxName);
+		
+		if(tableName.equals(MDSISalesForecast.Table_Name))
+			return new MDSISalesForecast(Env.getCtx(), rs, trxName);
 		
 		return null;
 	}

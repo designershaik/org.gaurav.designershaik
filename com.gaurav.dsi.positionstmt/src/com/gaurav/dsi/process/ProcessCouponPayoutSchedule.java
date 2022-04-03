@@ -37,12 +37,13 @@ public class ProcessCouponPayoutSchedule extends SvrProcess{
 		for (int i = 0; i < para.length; i++)
 		{
 			String name = para[i].getParameterName();
-			if (para[i].getParameter() == null)
-				;
+			if (para[i].getParameter() == null);
 			else if (name.equals("DS_Amortization"))
 				p_amortization = para[i].getParameterAsBigDecimal();
 			else if (name.equals("DS_FirstPayOutDate"))
 				p_firstPayoutDate = para[i].getParameterAsTimestamp();
+			else if (name.equals("DS_LastPayOutDate"))
+				p_SecondPayOutDate = para[i].getParameterAsTimestamp();
 			else if (name.equals("DS_NominalValue"))
 				p_NominalValue = para[i].getParameterAsBigDecimal();
 			else if (name.equals("Recreate"))

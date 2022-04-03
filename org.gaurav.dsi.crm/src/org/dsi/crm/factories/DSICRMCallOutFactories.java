@@ -20,6 +20,7 @@ import org.compiere.model.MUser;
 import org.dsi.crm.callouts.CallOutBPartnerLocationSetBillLocation;
 import org.dsi.crm.callouts.CallOutCopyContactMasterToUser;
 import org.dsi.crm.callouts.CallOutCopyServiceRequestDetails;
+import org.dsi.crm.callouts.CallOutGetPriceForProduct;
 import org.dsi.crm.callouts.CallOutLeadCopyNameToValue;
 import org.dsi.crm.callouts.CallOutLeadOrgMaster;
 import org.dsi.crm.callouts.CallOutMovementBPartner;
@@ -164,7 +165,13 @@ public class DSICRMCallOutFactories implements IColumnCalloutFactory{
 				&& columnName.equalsIgnoreCase(MOrder.COLUMNNAME_C_BPartner_Location_ID))
 			list.add(new CallOutBPartnerLocationSetBillLocation());
 		
+		if(tableName.equalsIgnoreCase(MDSProductRequest.Table_Name) 
+				&& columnName.equalsIgnoreCase(MDSProductRequest.COLUMNNAME_M_Product_ID))
+			list.add(new CallOutGetPriceForProduct());
 		
+		if(tableName.equalsIgnoreCase(MDSProductRequest.Table_Name) 
+				&& columnName.equalsIgnoreCase(MDSProductRequest.COLUMNNAME_QtyRequired))
+			list.add(new CallOutGetPriceForProduct());
 		
 		return list!=null ? list.toArray(new IColumnCallout[0]): new IColumnCallout[0];
 	}

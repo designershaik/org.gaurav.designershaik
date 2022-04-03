@@ -11,9 +11,11 @@ import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MRequest;
 import org.compiere.model.MUser;
+import org.gaurav.dsi.model.MDSIManufacturingPlan;
 import org.gaurav.dsi.model.MDSOrgMaster;
 import com.gaurav.dsi.purchase.callout.CallOutApprovedPurchaseRequest;
 import com.gaurav.dsi.purchase.callout.CallOutCopyPRDetailsToInvoice;
+import com.gaurav.dsi.purchase.callout.CallOutCopySalesForecastDetToManufacturePlan;
 import com.gaurav.dsi.purchase.callout.CallOutPurchaseRequestDetails;
 import com.gaurav.dsi.purchase.callout.CallOutRequest;
 import com.gaurav.dsi.purchase.callout.CallOutSetBPartnerLocation;
@@ -25,6 +27,14 @@ import com.gaurav.dsi.purchase.callout.CallOutVerifyPaymentAmt;
 import com.gaurav.dsi.purchase.callout.SetSalesRepInRequest;
 
 public class DSIPurchaseCallOutFactory implements IColumnCalloutFactory{
+
+	public class CallOutApplySOReserveQty {
+
+		public CallOutApplySOReserveQty() {
+			// TODO Auto-generated constructor stub
+		}
+
+	}
 
 	@Override
 	public IColumnCallout[] getColumnCallouts(String tableName,
@@ -83,6 +93,14 @@ public class DSIPurchaseCallOutFactory implements IColumnCalloutFactory{
 		if(tableName.equalsIgnoreCase(MOrderLine.Table_Name) 
 				&& columnName.equalsIgnoreCase("RelatedProduct_ID"))
 			list.add(new CallOutSetPriceListForOrderRelatedProduct());
+		
+		if(tableName.equalsIgnoreCase(MDSIManufacturingPlan.Table_Name) 
+				&& columnName.equalsIgnoreCase("DSI_SalesForecast_ID"))
+			list.add(new CallOutCopySalesForecastDetToManufacturePlan());
+		
+		if(tableName.equalsIgnoreCase(MDSIManufacturingPlan.Table_Name) 
+				&& columnName.equalsIgnoreCase("M_Warehouse_ID"))
+			list.add(new CallOutCopySalesForecastDetToManufacturePlan());
 		
 		return list!=null ? list.toArray(new IColumnCallout[0]): new IColumnCallout[0];
 	}

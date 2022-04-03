@@ -49,14 +49,39 @@ public class WCreateFromPackage extends CreateFrom
 		if(!sqlWhere.toString().isEmpty())
 			sqlWhere.append(")");
 		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
-		String sql = "select l.M_InOutLine_ID,l.Line||'-'||m.DocumentNo as LineDescription,l.movementqty,l.M_Product_ID ,coalesce(mp.UnitsPerPack,0)UnitsPerPack ,mp.value ||'-'||mp.name as Description ,mp.m_product_category_id  " + 
+		
+		/*String sql = "select mi.m_inout_id, mi.documentno,mi2.m_product_id, mp.m_product_id, mp.name, sum(mi2.qtyentered) as qtyentered,co2.priceentered,co2.linenetamt,mp.DSI_HSCode,mp.upc,mp.Weight " +
+		"from m_inout mi, m_inoutline mi2, m_product mp, c_order co, c_orderline co2   " +
+		"where mi.m_inout_id = mi2.m_inout_id   " +
+		"and co.c_order_id = mi.c_order_id   " +
+		"and co.c_order_id = co2.c_order_id   " +
+		"and mi2.c_orderline_id = co2.c_orderline_id  " + 
+		"and mi2.m_product_id = mp.m_product_id   " +
+		"and  mi.documentno "+sqlWhere+ 
+		"group by mi.m_inout_id, mi.documentno,mi2.m_product_id, mp.m_product_id, mp.name,co2.priceentered,co2.linenetamt";
+		*/
+
+		
+		/*String sql = "select l.M_InOutLine_ID,l.Line||'-'||m.DocumentNo as LineDescription,l.movementqty,l.M_Product_ID ,coalesce(mp.UnitsPerPack,0)UnitsPerPack ,mp.value ||'-'||mp.name as Description ,mp.m_product_category_id  " + 
 				"from m_inoutline l,m_product mp,M_InOut m  " + 
 				"where l.m_product_id = mp.m_product_id  " + 
 				"and l.M_InOut_ID=m.M_InOut_ID "+ 
 				"and l.m_inout_id  "+sqlWhere+
 				"order by m_product_category_id,m_product_id ";
+		*/
+		
+		String sql = "select null as M_InOutLine_ID,0 as LineDescription,sum(l.movementqty) as movementqty,l.M_Product_ID ,0 as UnitsPerPack ,mp.value ||'-'||mp.name as Description " + 
+				"from m_inoutline l,m_product mp,M_InOut m  " + 
+				"where l.m_product_id = mp.m_product_id  " + 
+				"and l.M_InOut_ID=m.M_InOut_ID "+ 
+				"and l.m_inout_id  "+sqlWhere+
+				"group by l.m_product_id,mp.name, mp.value";
+		
+		
+		
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+	
 		try
 		{
 			pstmt = DB.prepareStatement(sql,null);
@@ -64,7 +89,7 @@ public class WCreateFromPackage extends CreateFrom
 			int totalBox = 1;
 			while(rs.next())
 			{
-				int M_InOutLine_ID = rs.getInt("M_InOutLine_ID");
+				Integer M_InOutLine_ID = rs.getInt("M_InOutLine_ID");
 				String documentNo = rs.getString("LineDescription");
 				BigDecimal movementQty = rs.getBigDecimal("MovementQty");
 				int M_Product_ID = rs.getInt("M_Product_ID");
@@ -75,7 +100,9 @@ public class WCreateFromPackage extends CreateFrom
 				int totalBoxRequired = movementQty.divide(unitsPerPack, 2, RoundingMode.DOWN).intValue();
 				BigDecimal totalPackagedQty = Env.ZERO;
 				BigDecimal remainingQty = Env.ZERO;
-				for(int i =0 ;i<totalBoxRequired;i++)
+				
+				//int totalBoxRequired = 0;
+ 				for(int i =0 ;i<totalBoxRequired;i++)
 				{
 					BigDecimal packagedQty = unitsPerPack;
 					totalPackagedQty = totalPackagedQty.add(packagedQty);
@@ -123,6 +150,7 @@ public class WCreateFromPackage extends CreateFrom
 			DB.close(rs,pstmt);
 		}	
 		return data;
+	
 	}
 	
 	
