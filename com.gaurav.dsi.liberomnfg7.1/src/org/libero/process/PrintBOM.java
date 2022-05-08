@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -34,6 +35,7 @@ import org.compiere.process.SvrProcess;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.compiere.util.KeyNamePair;
 import org.compiere.util.Language;
 import org.compiere.util.ValueNamePair;
 import org.libero.tables.X_T_BOMLine;
@@ -123,34 +125,34 @@ public class PrintBOM extends SvrProcess
 		int pfid = 0;
 		
 		// get print format for client, else copy system to client  
-		RowSet pfrs = (RowSet) MPrintFormat.getAccessiblePrintFormats(X_RV_PP_Product_BOMLine_Table_ID, -1, null, false);
-		pfrs.next();
-		pfid = pfrs.getInt("AD_PrintFormat_ID");
-		
-		if(pfrs.getInt("AD_Client_ID") != 0) pf = MPrintFormat.get(getCtx(), pfid, false);
-		else pf = MPrintFormat.copyToClient(getCtx(), pfid, getAD_Client_ID());
-		pfrs.close();		
-
-		if (pf == null) raiseError("Error: ","No Print Format");
-
-		pf.setLanguage(language);
-		pf.setTranslationLanguage(language);
-		// query
-		MQuery query = MQuery.get(getCtx(), AD_PInstance_ID, X_RV_PP_Product_BOMLine_Table_Name);
-		query.addRestriction("AD_PInstance_ID", MQuery.EQUAL, AD_PInstance_ID);
-
-		PrintInfo info = new PrintInfo(X_RV_PP_Product_BOMLine_Table_Name, 
-				X_RV_PP_Product_BOMLine_Table_ID, getRecord_ID());
-		ReportEngine re = new ReportEngine(getCtx(), pf, query, info);
-
-		ReportCtl.preview(re);
-		// wait for report window to be closed as t_bomline   
-		// records are deleted when process ends 
-//red1 - no such method re.getView().isDisplayable()
-//		while (re.getView().isDisplayable()) 
-//		{
-//			Env.sleep(1);
-//		}	
+		List<KeyNamePair> printFormat =  MPrintFormat.getAccessiblePrintFormats(X_RV_PP_Product_BOMLine_Table_ID, -1, null, false);
+		if(printFormat.size()>0)
+		{
+			for(KeyNamePair kp : printFormat)
+			{
+				pfid = kp.getKey();
+				pf = new MPrintFormat(getCtx(), pfid, get_TrxName());
+			}
+	//		RowSet pfrs = (RowSet) MPrintFormat.getAccessiblePrintFormats(X_RV_PP_Product_BOMLine_Table_ID, -1, null, false);
+	//		pfrs.next();
+			
+			if(pf.getAD_Client_ID() != 0) pf = MPrintFormat.get(getCtx(), pfid, false);
+			else pf = MPrintFormat.copyToClient(getCtx(), pfid, getAD_Client_ID());
+			
+			if (pf == null) raiseError("Error: ","No Print Format");
+	
+			pf.setLanguage(language);
+			pf.setTranslationLanguage(language);
+			// query
+			MQuery query = MQuery.get(getCtx(), AD_PInstance_ID, X_RV_PP_Product_BOMLine_Table_Name);
+			query.addRestriction("AD_PInstance_ID", MQuery.EQUAL, AD_PInstance_ID);
+	
+			PrintInfo info = new PrintInfo(X_RV_PP_Product_BOMLine_Table_Name, 
+					X_RV_PP_Product_BOMLine_Table_ID, getRecord_ID());
+			ReportEngine re = new ReportEngine(getCtx(), pf, query, info);
+	
+			ReportCtl.preview(re);
+		}
 	}
 
 	/**

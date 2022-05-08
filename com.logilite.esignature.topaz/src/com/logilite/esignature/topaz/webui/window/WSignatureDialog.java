@@ -170,6 +170,10 @@ public class WSignatureDialog extends Window implements EventListener<Event>
 	 */
 	private void cmd_new()
 	{
+		System.out.println("signatureApp.initSignaturePad('" + image.getUuid() + "', '" + center.getUuid() + "', '"
+				+ this.getUuid() + "', '" + confirmPanel.getButton(ConfirmPanel.A_DELETE).getUuid() + "', '"
+				+ confirmPanel.getButton(ConfirmPanel.A_OK).getUuid() + "', '"
+				+ confirmPanel.getButton(ConfirmPanel.A_CANCEL).getUuid() + "')");
 		Clients.evalJavaScript("signatureApp.initSignaturePad('" + image.getUuid() + "', '" + center.getUuid() + "', '"
 				+ this.getUuid() + "', '" + confirmPanel.getButton(ConfirmPanel.A_DELETE).getUuid() + "', '"
 				+ confirmPanel.getButton(ConfirmPanel.A_OK).getUuid() + "', '"

@@ -419,47 +419,47 @@ public class FinanceEventHandler extends AbstractEventHandler
 		
 		if(po instanceof MOrder)
 		{
-			if(event.getTopic().equalsIgnoreCase(IEventTopics.DOC_AFTER_PREPARE))
-			{
-				MOrder order = (MOrder)po;
-				if (order.getGrandTotal().signum() != 0
-						&& (MOrder.PAYMENTRULE_OnCredit.equals(order.getPaymentRule()) || MOrder.PAYMENTRULE_DirectDebit.equals(order.getPaymentRule())) && !order.isSOTrx())
-				{
-					int C_PaymentTerm_ID = order.getC_PaymentTerm_ID();
-					MPaymentTerm term = new MPaymentTerm(ctx, C_PaymentTerm_ID, trxName);
-					if(term.isAfterDelivery())
-					{
-						int C_OrderPaySchedule_ID = DB.getSQLValue(trxName, "Select C_OrderPaySchedule_ID From C_OrderPaySchedule "
-								+ "Where C_Order_ID = ? and DueDate < ? Order by dueDate desc",order.getC_Order_ID(),order.getDatePromised());
-						if(C_OrderPaySchedule_ID>0)
-						{
-							MOrderPaySchedule payscheduleInOrder = new MOrderPaySchedule(ctx,C_OrderPaySchedule_ID,trxName);
-							payscheduleInOrder.setDueDate(order.getDatePromised());
-							payscheduleInOrder.saveEx();
-						}
-					}
-				}
-			}
-			if(event.getTopic().equalsIgnoreCase(IEventTopics.DOC_BEFORE_PREPARE))
-			{
-				MOrder order = (MOrder)po;
-				if (order.getGrandTotal().signum() != 0 && order.isSOTrx())
-				{
-					int C_PaymentTerm_ID = order.getC_PaymentTerm_ID();
-					MPaymentTerm term = new MPaymentTerm(ctx, C_PaymentTerm_ID, trxName);
-					MPaySchedule[] schedule = term.getSchedule(true);
-					int C_OrderPaySchedule_ID = DB.getSQLValue(trxName, "Select C_OrderPaySchedule_ID From C_OrderPaySchedule "
-								+ "Where C_Order_ID = ? and DueDate < ? Order by dueDate desc",order.getC_Order_ID(),order.getDatePromised());
-					if(C_OrderPaySchedule_ID>0)
-					{
-						MOrderPaySchedule payscheduleInOrder = new MOrderPaySchedule(ctx,C_OrderPaySchedule_ID,trxName);
-						payscheduleInOrder.setDueDate(order.getDatePromised());
-						if(schedule.length==1 && payscheduleInOrder.getDueAmt().compareTo(order.getGrandTotal())!=0)
-							payscheduleInOrder.setDueAmt(order.getGrandTotal());
-						payscheduleInOrder.saveEx();
-					}
-				}
-			}
+//			if(event.getTopic().equalsIgnoreCase(IEventTopics.DOC_AFTER_PREPARE))
+//			{
+//				MOrder order = (MOrder)po;
+//				if (order.getGrandTotal().signum() != 0
+//						&& (MOrder.PAYMENTRULE_OnCredit.equals(order.getPaymentRule()) || MOrder.PAYMENTRULE_DirectDebit.equals(order.getPaymentRule())) && !order.isSOTrx())
+//				{
+//					int C_PaymentTerm_ID = order.getC_PaymentTerm_ID();
+//					MPaymentTerm term = new MPaymentTerm(ctx, C_PaymentTerm_ID, trxName);
+//					if(term.isAfterDelivery())
+//					{
+//						int C_OrderPaySchedule_ID = DB.getSQLValue(trxName, "Select C_OrderPaySchedule_ID From C_OrderPaySchedule "
+//								+ "Where C_Order_ID = ? and DueDate < ? Order by dueDate desc",order.getC_Order_ID(),order.getDatePromised());
+//						if(C_OrderPaySchedule_ID>0)
+//						{
+//							MOrderPaySchedule payscheduleInOrder = new MOrderPaySchedule(ctx,C_OrderPaySchedule_ID,trxName);
+//							payscheduleInOrder.setDueDate(order.getDatePromised());
+//							payscheduleInOrder.saveEx();
+//						}
+//					}
+//				}
+//			}
+//			if(event.getTopic().equalsIgnoreCase(IEventTopics.DOC_BEFORE_PREPARE))
+//			{
+//				MOrder order = (MOrder)po;
+//				if (order.getGrandTotal().signum() != 0 && order.isSOTrx())
+//				{
+//					int C_PaymentTerm_ID = order.getC_PaymentTerm_ID();
+//					MPaymentTerm term = new MPaymentTerm(ctx, C_PaymentTerm_ID, trxName);
+//					MPaySchedule[] schedule = term.getSchedule(true);
+//					int C_OrderPaySchedule_ID = DB.getSQLValue(trxName, "Select C_OrderPaySchedule_ID From C_OrderPaySchedule "
+//								+ "Where C_Order_ID = ? and DueDate < ? Order by dueDate desc",order.getC_Order_ID(),order.getDatePromised());
+//					if(C_OrderPaySchedule_ID>0)
+//					{
+//						MOrderPaySchedule payscheduleInOrder = new MOrderPaySchedule(ctx,C_OrderPaySchedule_ID,trxName);
+//						payscheduleInOrder.setDueDate(order.getDatePromised());
+//						if(schedule.length==1 && payscheduleInOrder.getDueAmt().compareTo(order.getGrandTotal())!=0)
+//							payscheduleInOrder.setDueAmt(order.getGrandTotal());
+//						payscheduleInOrder.saveEx();
+//					}
+//				}
+//			}
 		}
 	}
 	

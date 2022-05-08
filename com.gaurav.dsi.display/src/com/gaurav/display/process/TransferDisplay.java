@@ -87,7 +87,8 @@ public class TransferDisplay extends SvrProcess {
 			boolean isDestinationIsCogs = warehouseTo.get_ValueAsBoolean("DS_IsUseCogsForMovement");
 			MProductCategoryAcct acct = MProductCategoryAcct.get(getCtx(), line.getM_Product().getM_Product_Category_ID(),asc.getC_AcctSchema_ID(), get_TrxName());
 			MAccount cogsAccount = new MAccount(getCtx(), acct.getP_COGS_Acct(), get_TrxName());
-			if(cogsAccount.getAccountType().equalsIgnoreCase(MElementValue.ACCOUNTTYPE_Asset))
+			System.out.println("Account type: "+cogsAccount.getAccountType()+"asdsa");
+			if(cogsAccount.getAccountType().equalsIgnoreCase(MElementValue.ACCOUNTTYPE_Expense))
 			{
 				if(!isSourceWarehouseIsCOgs && isDestinationIsCogs)
 					verifyExistingAssetOrCreateAsset(line, locator, locatorTo);
@@ -367,6 +368,8 @@ public class TransferDisplay extends SvrProcess {
 		asset.setAssetActivationDate(line.getM_Movement().getMovementDate());
 		asset.setDateAcct(line.getM_Movement().getMovementDate());
 		asset.setA_Asset_Group_ID(A_Asset_Group_ID);
+		int DS_AssetGroup_ID = DB.getSQLValue(get_TrxName(), "Select DS_AssetGroup_ID  from M_Product_Category cat where cat.M_Product_Category_ID = ? ",line.getM_Product().getM_Product_Category_ID());
+		asset.setA_Asset_Group_ID(DS_AssetGroup_ID);
 		asset.setHelp(Msg.getMsg(MClient.get(Env.getCtx()).getAD_Language(), "CreatedFromInvoiceLine",
 				new Object[] { line.getM_Movement().getDocumentNo(), line.getLine() }));
 
