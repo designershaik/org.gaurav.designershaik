@@ -14,6 +14,9 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.osgi.service.event.Event;
 
+import com.gaurav.display.model.MDSMovement;
+import com.gaurav.display.model.MDSMovementLine;
+
 public class DisplayEventHandler extends AbstractEventHandler
 {
 
@@ -53,6 +56,23 @@ public class DisplayEventHandler extends AbstractEventHandler
 				}
 			}
 		}
+		if(po instanceof MMovement)
+		{
+			MMovement mov = (MMovement)po;
+			if(event.getTopic().equalsIgnoreCase(IEventTopics.DOC_AFTER_COMPLETE))
+			{
+				int[] movementLineID = DB.getIDsEx(trxName, "Select M_MovementLine_ID From M_MovementLine Where M_Movement_ID = ? ", mov.getM_Movement_ID());
+				
+				for(int line_ID : movementLineID)
+				{
+					MDSMovementLine line = new MDSMovementLine(ctx, line_ID, trxName);
+					if(line.get_ValueAsBoolean("IsGenerated"))
+						log.info("Already generated: "+line.getLine());
+					else
+						line.generateAssetAndTransferDisplay(line,trxName);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -60,6 +80,10 @@ public class DisplayEventHandler extends AbstractEventHandler
 
 		registerTableEvent(IEventTopics.PO_AFTER_NEW, MMovement.Table_Name);
 		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, MMovement.Table_Name);
+		
+		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, MDSMovement.Table_Name);
+		
+		
 	}
 
 
