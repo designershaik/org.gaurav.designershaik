@@ -32,7 +32,7 @@ public class ProcessCouponPayoutSchedule extends SvrProcess{
 	private Timestamp p_SecondPayOutDate = null ; 
 	@Override
 	protected void prepare() {
-	
+		
 		ProcessInfoParameter[] para = getParameter();
 		for (int i = 0; i < para.length; i++)
 		{
