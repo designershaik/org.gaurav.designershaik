@@ -67,6 +67,7 @@ public class ProductRecall extends SvrProcess {
 
 	private void recallProductFromThisBatch(int M_AttributeSetInstance_ID, int M_Product_ID) 
 	{
+		System.out.println("asdas");
 		MAttributeSetInstance msi = new MAttributeSetInstance(getCtx(), M_AttributeSetInstance_ID, get_TrxName());
 		List<MAttributeSetInstance> instances = new Query(getCtx(), MAttributeSetInstance.Table_Name, " lot like ? and M_AttributeSet_ID IN "
 				+ "(SELECT M_AttributeSet_ID FROM M_AttributeSetInstance Where M_AttributeSetInstance_ID=?)", get_TrxName())

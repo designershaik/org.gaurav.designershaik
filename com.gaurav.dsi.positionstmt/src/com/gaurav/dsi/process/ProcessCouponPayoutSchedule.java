@@ -87,9 +87,14 @@ public class ProcessCouponPayoutSchedule extends SvrProcess{
 				{
 					int daysBetween = TimeUtil.getDaysBetween(p_firstPayoutDate,msi.getGuaranteeDate());
 					int totalPayouts = (new BigDecimal(daysBetween).divide(new BigDecimal(payOutPeriod),0,RoundingMode.UP)).intValue();
-					BigDecimal annualReturn = p_amortization.add(p_NominalValue).multiply(couponRate).divide(Env.ONEHUNDRED, invoice.getC_Currency().getStdPrecision(), RoundingMode.CEILING);
+					//BigDecimal annualReturn = p_amortization.add(p_NominalValue).multiply(couponRate).divide(Env.ONEHUNDRED, invoice.getC_Currency().getStdPrecision(), RoundingMode.CEILING);
+					BigDecimal annualReturn = p_NominalValue.multiply(couponRate).divide(Env.ONEHUNDRED, invoice.getC_Currency().getStdPrecision(), RoundingMode.CEILING);
+					System.out.println(p_NominalValue);
+					System.out.println(annualReturn);
 					BigDecimal totalInstallmentinyear = new BigDecimal(365/payOutPeriod);
+					System.out.println(totalInstallmentinyear);
 					BigDecimal payoutPeriodBasedCoupon = annualReturn.divide(totalInstallmentinyear, invoice.getC_Currency().getStdPrecision(), RoundingMode.CEILING);
+					System.out.println(payoutPeriodBasedCoupon);
 					BigDecimal amortizationAmtOverPeriod = Env.ZERO;
 					if(p_amortization.compareTo(Env.ZERO)!=0)
 						amortizationAmtOverPeriod = p_amortization.divide(new BigDecimal(totalPayouts), invoice.getC_Currency().getStdPrecision(), RoundingMode.CEILING);
@@ -101,7 +106,7 @@ public class ProcessCouponPayoutSchedule extends SvrProcess{
 						int month = dateTime.getMonthOfYear();
 						int Day = couponPayOutDate.getDay();
 						SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-					    Date parsedDate = dateFormat.parse(year+"-"+month+"="+Day);
+					    Date parsedDate = dateFormat.parse(year+"-"+month+"-"+Day);
 					    Timestamp RevisedCouponPayOutDate = new java.sql.Timestamp(parsedDate.getTime());
 						
 						MDSCouponSchedule sc = new MDSCouponSchedule(getCtx(), 0, get_TrxName());
