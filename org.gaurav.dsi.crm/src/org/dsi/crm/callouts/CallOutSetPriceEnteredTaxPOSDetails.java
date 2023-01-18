@@ -71,6 +71,7 @@ public class CallOutSetPriceEnteredTaxPOSDetails implements IColumnCallout{
 				mTab.setValue("LineNetAmt", lineNetAmt.setScale(precision, RoundingMode.CEILING));
 				mTab.setValue("TaxAmt", taxAmt.setScale(precision, RoundingMode.CEILING));
 				mTab.setValue("LineTotalAmt", (lineNetAmt.add(taxAmt)).setScale(precision, RoundingMode.CEILING));
+				//mTab.setValue("LineTotalAmt", lineNetAmt.setScale(precision, RoundingMode.CEILING));
 				mTab.setValue("Rate", rate);
 			}
 		}

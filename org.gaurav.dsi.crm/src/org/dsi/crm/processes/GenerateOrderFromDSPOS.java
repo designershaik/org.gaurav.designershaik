@@ -55,6 +55,7 @@ public class GenerateOrderFromDSPOS extends SvrProcess{
 		String description = "";
 		MOrder order = new MOrder(getCtx(), 0, get_TrxName());
 		order.setIsSOTrx(true);
+		order.setC_DocType_ID(1000030);
 		order.setBPartner(bp);
 		order.setClientOrg(header.getAD_Client_ID(), header.getAD_Org_ID());
 		order.setC_OrderSource_ID(header.getC_OrderSource_ID());
