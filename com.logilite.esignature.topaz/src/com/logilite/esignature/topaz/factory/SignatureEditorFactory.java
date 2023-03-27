@@ -1,5 +1,6 @@
 package com.logilite.esignature.topaz.factory;
 
+import org.adempiere.webui.editor.IEditorConfiguration;
 import org.adempiere.webui.editor.WEditor;
 import org.adempiere.webui.factory.IEditorFactory;
 import org.compiere.model.GridField;
@@ -32,6 +33,17 @@ public class SignatureEditorFactory implements IEditorFactory
 				&& gridField.getDisplayType() == Utils.getDisplayTypeSignature())
 			return new WSignatureEditor(gridField);
 
+		return null;
+	}
+
+	@Override
+	public WEditor getEditor(GridTab gridTab, GridField gridField, boolean tableEditor,
+			IEditorConfiguration editorConfiguration) {
+		
+		if (Utils.getDisplayTypeSignature() > 0 && gridField != null
+				&& gridField.getDisplayType() == Utils.getDisplayTypeSignature())
+			return new WSignatureEditor(gridField);
+		
 		return null;
 	}
 }

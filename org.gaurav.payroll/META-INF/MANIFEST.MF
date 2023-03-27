@@ -1,26 +1,24 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
+Automatic-Module-Name: org.gaurav.payroll
+Bundle-ActivationPolicy: lazy
 Bundle-Name: Payroll
 Bundle-SymbolicName: org.gaurav.payroll
-Bundle-Version: 1.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: org.adempiere.base;bundle-version="5.1.0",
- org.adempiere.plugin.utils;bundle-version="5.1.0",
- org.eclipse.osgi.services;bundle-version="3.6.0",
+Bundle-Version: 1.0.1.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Require-Bundle: org.adempiere.base;bundle-version="10.0.0",
+ org.adempiere.plugin.utils;bundle-version="10.0.0",
+ org.eclipse.osgi.services;bundle-version="3.10.200",
  org.gaurav.designershaik;bundle-version="1.0.0",
- joda-time,
- org.adempiere.ui.zk;bundle-version="5.1.0",
- zk;bundle-version="8.0.2",
- zul;bundle-version="8.0.2",
- org.adempiere.ui;bundle-version="5.1.0",
- org.apache.commons.logging;bundle-version="1.2.0",
- javax.wsdl;bundle-version="1.6.2"
+ joda-time;bundle-version="2.10.8",
+ org.adempiere.ui.zk;bundle-version="10.0.0",
+ zk;bundle-version="9.6.3",
+ zul;bundle-version="9.6.3",
+ org.adempiere.ui;bundle-version="10.0.0",
+ org.apache.commons.logging;bundle-version="1.2.0"
 Service-Component: OSGI-INF/PayrollProcessFactory.xml,OSGI-INF/PayrollModelFactory.xml,OSGI-INF/PayrollCallOutFactory.xml,OSGI-INF/PayrollEventHandlerFactory.xml,
  OSGI-INF/PayrollCreateFromFactory.xml
 Bundle-ClassPath: .,
- lib/axis.jar,
- lib/commons-discovery-0.5.jar,
- lib/jaxrpc-api.jar,
  lib/jsch-0.1.54.jar
 Export-Package: org.gaurav.payroll.model
-Import-Package: javax.xml.soap;version="1.4.1"
+Import-Package: javax.xml.soap;version="1.4.2"

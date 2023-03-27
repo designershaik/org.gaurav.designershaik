@@ -6,4 +6,4 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: LOGILITE
 Fragment-Host: org.adempiere.ui.zk;bundle-version="3.1.0"
 Automatic-Module-Name: com.logilite.esignature.topaztheme
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11

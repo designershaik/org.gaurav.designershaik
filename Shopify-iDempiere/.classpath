@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="tika-app-2.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="com.fasterxml.jackson.core.jackson-core_2.10.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="com.fasterxml.jackson.core.jackson-databind_2.10.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="org.apache.commons.codec_1.13.0.v20200108-0001.jar"/>

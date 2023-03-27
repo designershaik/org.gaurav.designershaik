@@ -1,20 +1,20 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Crm
+Bundle-Name: CRM
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-SymbolicName: com.gaurav.dsi.crm
-Bundle-Version: 7.1.0.qualifier
+Bundle-Version: 10.1.1.qualifier
 Bundle-Vendor: GAURAV
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: org.adempiere.base;bundle-version="7.1.0",
- org.adempiere.plugin.utils;bundle-version="7.1.0",
+Require-Bundle: org.adempiere.base;bundle-version="10.0.0",
+ org.adempiere.plugin.utils;bundle-version="10.0.0",
  org.eclipse.osgi.services;bundle-version="3.7.100",
- org.adempiere.ui;bundle-version="7.1.0",
- org.adempiere.ui.zk;bundle-version="7.1.0",
+ org.adempiere.ui;bundle-version="10.0.0",
+ org.adempiere.ui.zk;bundle-version="10.0.0",
+ zel;bundle-version="9.6.3",
+ zk;bundle-version="9.6.3",
+ zul;bundle-version="9.6.3",
+ zcommon;bundle-version="9.6.3",
  org.gaurav.designershaik;bundle-version="1.0.0",
- zel;bundle-version="8.6.0",
- zk;bundle-version="8.6.0",
- zul;bundle-version="8.6.0",
- zcommon;bundle-version="8.6.0",
  com.gaurav.dsi.liberomnfg7.1;bundle-version="1.0.0"
 Service-Component: OSGI-INF/DSICRMProcessFactory.xml,OSGI-INF/DSICRMEventHandlerFactory.xml,OSGI-INF/DSICRMCallOutFactory.xml,
  OSGI-INF/DSICRMCreateFromFactory.xml

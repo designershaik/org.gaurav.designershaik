@@ -1,17 +1,18 @@
 package org.dsi.finance.processes;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Date;
 
-import org.compiere.util.Env;
 public class mainProgram {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ParseException {
 		
 //		BigDecimal QtyRequired = new BigDecimal(59);
 //		BigDecimal QtyAvailable = new BigDecimal(80);
@@ -126,18 +127,27 @@ public class mainProgram {
 ////		 System.out.println("Opent Amt: "+openAmt+" penalty Rate: "+penaltyRate+" Aging in months: "+months+" Actual Penalty: "+penalty.setScale(2, RoundingMode.HALF_UP));
 //		 System.out.println(abc.abs()+" "+ss.abs()+" "+abc.abs().subtract(ss.abs()));
 //		 System.out.println(0%2+" remainder "+1%2+" remainder "+4%2);
-		BigDecimal zero =new BigDecimal(0);
-		System.out.println(zero.toEngineeringString());
-		System.out.println(1==2
-				&& 2==2 ? 1:0);
-		
-		    Integer[] arr = new Integer[1000];
-		    for (int i = 0; i < arr.length; i++) {
-		        arr[i] = i;
-		    }
-		    Collections.shuffle(Arrays.asList(arr));
-		    System.out.println(Arrays.toString(arr));
-
+//		BigDecimal zero =new BigDecimal(0);
+//		System.out.println(zero.toEngineeringString());
+//		System.out.println(1==2
+//				&& 2==2 ? 1:0);
+//
+//		Integer[] arr = new Integer[1000];
+//		for (int i = 0; i < arr.length; i++) {
+//			arr[i] = i;
+//		}
+//		Collections.shuffle(Arrays.asList(arr));
+//		System.out.println(Arrays.toString(arr));
+//		SimpleDateFormat dateFormat = new SimpleDateFormat("mm/dd/yyyy hh:mm:ss.SSS");
+//		Date parsedDate = dateFormat.parse("01/01/2023 00:00:00.000");
+//		Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
+//		System.out.println(timestamp);
+//
+//		String details = "Hello \"world\"!";
+//		System.out.println(details);
+//		details = details.replace("\"","");
+//		System.out.println(details);   
+		    
 	   }
 	}
 

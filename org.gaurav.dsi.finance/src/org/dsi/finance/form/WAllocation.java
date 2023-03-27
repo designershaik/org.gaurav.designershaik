@@ -688,9 +688,6 @@ public class WAllocation extends Allocation
 		modelI.addTableModelListener(this);
 		invoiceTable.setData(modelI, columnNames);
 		setInvoiceColumnClass(invoiceTable, multiCurrency.isSelected());
-		//
-		
-		calculate(multiCurrency.isSelected());
 		
 		//  Calculate Totals
 		calculate();
