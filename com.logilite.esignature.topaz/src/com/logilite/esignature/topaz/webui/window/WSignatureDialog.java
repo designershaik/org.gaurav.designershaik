@@ -96,16 +96,20 @@ public class WSignatureDialog extends Window implements EventListener<Event>
 
 		Script jsSignTopazPad = new Script();
 		Script jsSignApp = new Script();
+		Script jsSignPad = new Script();
 		try
 		{
 			URL url1 = Utils.getJSResource("signature_app.js");
 			URL url2 = Utils.getJSResource("SignWebTablet.js");
-
+			URL url5 = Utils.getJSResource("signature_pad.min.js");
+			
 			byte[] byte1 = Files.readAll(url1.openStream());
 			byte[] byte2 = Files.readAll(url2.openStream());
+			byte[] byte5 = Files.readAll(url5.openStream());
 
 			jsSignApp.setContent(new String(byte1));
 			jsSignTopazPad.setContent(new String(byte2));
+			jsSignPad.setContent(new String(byte5));
 		}
 		catch (IOException e)
 		{
@@ -115,6 +119,7 @@ public class WSignatureDialog extends Window implements EventListener<Event>
 
 		this.appendChild(jsSignApp);
 		this.appendChild(jsSignTopazPad);
+		this.appendChild(jsSignApp);
 
 		mainLayout.setParent(this);
 		mainLayout.setHflex("1");

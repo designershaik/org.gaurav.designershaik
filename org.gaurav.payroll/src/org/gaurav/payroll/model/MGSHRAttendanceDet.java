@@ -112,7 +112,10 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 				BigDecimal perDayAmt = empComp.getAmt().divide(new BigDecimal(totalDaysInMonth), 6, RoundingMode.HALF_UP);
 				if(!empComp.isGS_HR_IsPercent())
 					calculatedAmt = perDayAmt.multiply(presentDays);
-				
+				if(comp.getGS_HR_CompensationType().equalsIgnoreCase("GOS"))
+					calculatedAmt = empComp.getAmt();
+				if(comp.getGS_HR_CompensationType().equalsIgnoreCase("COM"))
+					calculatedAmt = empComp.getAmt();
 				if(empComp.isGS_HR_IsPercent())
 				{
 					if(comp.getGS_HR_CompensationType().equalsIgnoreCase("OTI"))

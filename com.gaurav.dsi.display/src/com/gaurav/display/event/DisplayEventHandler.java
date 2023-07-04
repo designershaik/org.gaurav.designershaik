@@ -78,10 +78,9 @@ public class DisplayEventHandler extends AbstractEventHandler
 	@Override
 	protected void initialize() {
 
-		registerTableEvent(IEventTopics.PO_AFTER_NEW, MMovement.Table_Name);
-		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, MMovement.Table_Name);
-		
-		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, MDSMovement.Table_Name);
+		registerEvent(IEventTopics.PO_AFTER_NEW, MMovement.Table_Name);
+		registerEvent(IEventTopics.PO_AFTER_CHANGE, MMovement.Table_Name);
+		registerEvent(IEventTopics.DOC_AFTER_COMPLETE, MDSMovement.Table_Name);
 		
 		
 	}

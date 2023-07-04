@@ -271,11 +271,10 @@ public final class SfOrder {
 	}
 
 	public int getProductId(String sku) {
-		int m_Product_ID = DB.getSQLValue(trxName, "select m_product_id " + "from m_product mp " + "where upper(value) like ?",
-				sku.toUpperCase());
-		
+		int m_Product_ID = DB.getSQLValue(trxName, "select m_product_id " + "from m_product" + "where upper(value) like ? AND AD_Client_ID = ? ",
+				sku.toUpperCase(),Env.getAD_Client_ID(Env.getCtx()));
 		return m_Product_ID;
-	}
+		}
 
 	public void createShippingCharge(Map<?, ?> orderWc) {
 		BigDecimal shippingCost = getShippingCost(orderWc);

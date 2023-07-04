@@ -3,6 +3,24 @@
 
 	var baseUri = makeUri();
 	var	ctx;
+	
+	function IsSigWebInstalled(){
+		var xhr = new XMLHttpRequest();
+		try{
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState == 4 && xhr.status == 0) {
+					console.log("Unknown Error Occured. SigWeb Service response not received.");
+					return false;
+				}
+			};
+			xhr.open("GET", baseUri+"TabletState"+"?noCache="+generateUUID(), false);
+			xhr.send();
+		}catch(e){
+			console.log('catch', e);
+		}
+
+		return (xhr.status != 404 && xhr.status != 0);
+	}
 
 	function isIE() {
 		return ((navigator.appName == 'Microsoft Internet Explorer') || ((navigator.appName == 'Netscape') && (new RegExp("Trident/.*rv:([0-9]{1,}[\.0-9]{0,})").exec
