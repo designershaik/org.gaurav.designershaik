@@ -73,9 +73,11 @@ public final class SfOrder {
 		order.setC_DocTypeTarget_ID((int)sfDefaults.get_Value("C_DocType_ID"));
 		order.setPaymentRule(MOrder.PAYMENTRULE_CreditCard);
 		order.setC_OrderSource_ID((int)sfDefaults.get_Value("C_OrderSource_ID"));
-		order.setDeliveryRule("O");
+		//order.setDeliveryRule("O");
+		order.setDeliveryViaRule("S");
 		order.setInvoiceRule("I");
-		
+		order.setFreightCostRule("F");
+		order.set_ValueNoCheck("DS_ShippingTerms", "DAP");
 		if (!order.save()) {
 			throw new IllegalStateException("Could not create order");
 		}
@@ -271,11 +273,15 @@ public final class SfOrder {
 	}
 
 	public int getProductId(String sku) {
-		int m_Product_ID = DB.getSQLValue(trxName, "select m_product_id " + "from m_product" + "where upper(value) like ? AND AD_Client_ID = ? ",
-				sku.toUpperCase(),Env.getAD_Client_ID(Env.getCtx()));
+		int m_Product_ID = DB.getSQLValue(trxName, "select m_product_id " + "from m_product " + "where upper(value) like ? AND AD_Client_ID = ? ",
+		sku.toUpperCase(),Env.getAD_Client_ID(Env.getCtx()));
+		
+		//int m_Product_ID = DB.getSQLValue(trxName, "select m_product_id " + "from m_product" + "where upper(value) == ?",
+		//sku.toUpperCase());
 		return m_Product_ID;
-		}
-
+			}
+	
+	
 	public void createShippingCharge(Map<?, ?> orderWc) {
 		BigDecimal shippingCost = getShippingCost(orderWc);
 		if (shippingCost.compareTo(BigDecimal.ZERO) == 0) {
