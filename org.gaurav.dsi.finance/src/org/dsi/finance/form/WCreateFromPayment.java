@@ -13,8 +13,6 @@ import org.compiere.apps.IStatusBar;
 import org.compiere.grid.CreateFrom;
 import org.compiere.minigrid.IMiniTable;
 import org.compiere.model.GridTab;
-import org.compiere.model.MDocType;
-import org.compiere.model.MInvoice;
 import org.compiere.model.MPayment;
 import org.compiere.util.DB;
 import org.compiere.util.DisplayType;
@@ -46,7 +44,8 @@ public class WCreateFromPayment extends CreateFrom{
 		StringBuilder sql = new StringBuilder();
 		sql.append("select p.DateAcct,p.C_Invoice_ID,(p.DocumentNo||'-'||COALESCE(p.description,'')), p.C_Currency_ID,c.ISO_Code, p.GrandTotal,");
 		sql.append("p.GrandTotal, bp.Name ");
-		sql.append("FROM C_Invoice_v p INNER JOIN C_Currency c ON (p.C_Currency_ID=c.C_Currency_ID) LEFT OUTER JOIN C_BPartner bp ON (p.C_BPartner_ID=bp.C_BPartner_ID) ");
+		sql.append("FROM C_Invoice_v p INNER JOIN C_Currency c ON (p.C_Currency_ID=c.C_Currency_ID)"
+				+ "  LEFT OUTER JOIN C_BPartner bp ON (p.C_BPartner_ID=bp.C_BPartner_ID)");
 		sql.append(getSQLWhere(BPartner, DocumentNo, DateFrom, DateTo, AmtFrom, AmtTo, IsSoTrx));
 		sql.append(" ORDER BY p.DateAcct Desc ");
 		PreparedStatement pstmt = null;
@@ -176,7 +175,7 @@ public class WCreateFromPayment extends CreateFrom{
 		sql.append(" AND p.DocStatus IN ('CO','CL','RE','VO') AND p.GrandTotal<>0"); 
 	    sql.append(" AND NOT EXISTS (SELECT * FROM DS_Settled_Invoices l,C_Payment cp "
 	    		+ "WHERE l.C_Payment_ID=cp.C_Payment_ID and cp.DocStatus='CO' and p.C_Invoice_ID=l.C_Invoice_ID)");
-	    	    
+	    
 	    if(IsSoTrx != null)
 			sql.append(" AND p.isSOTrx = ? ");
 	  	if(BPartner != null)
@@ -208,6 +207,7 @@ public class WCreateFromPayment extends CreateFrom{
 			else if(from != null && to != null)
 				sql.append(" AND TRUNC(p.DateAcct) BETWEEN ? AND ?");
 		}
+		sql.append(" AND p.AD_Client_ID = " + Env.getAD_Client_ID(Env.getCtx()));
 
 		if (log.isLoggable(Level.FINE)) log.fine(sql.toString());
 		return sql.toString();

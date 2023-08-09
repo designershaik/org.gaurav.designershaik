@@ -161,8 +161,9 @@ public class DSCustomDunningRunCreate extends SvrProcess
 							sql.append("FROM C_BPartner bp");
 							sql.append(" INNER JOIN C_BP_Group bpg ON (bp.C_BP_Group_ID=bpg.C_BP_Group_ID) ");
 							sql.append("WHERE i.C_BPartner_ID=bp.C_BPartner_ID");
-								sql.append(" AND (bp.DunningGrace IS NULL OR bp.DunningGrace<?)))");
-									
+							sql.append(" AND (bp.DunningGrace IS NULL OR bp.DunningGrace<?)))");
+							//sql.append(" AND (bp.DunningGrace IS NULL OR bp.DunningGrace<?)))");
+							System.out.println(sql);						
 		if (p_C_BPartner_ID != 0)
 			sql.append(" AND i.C_BPartner_ID=?");	//	##5
 		else if (p_C_BP_Group_ID != 0)
@@ -202,7 +203,7 @@ public class DSCustomDunningRunCreate extends SvrProcess
 			+ " INNER JOIN C_DunningRunEntry dre ON (dr.C_DunningRun_ID=dre.C_DunningRun_ID)"
 			+ " INNER JOIN C_DunningRunLine drl ON (dre.C_DunningRunEntry_ID=drl.C_DunningRunEntry_ID) "
 			+ "WHERE dr2.C_DunningRun_ID=? AND drl.C_Invoice_ID=?"; // ##1 ##2
-		
+		System.out.println(sql2);
 		BigDecimal DaysAfterDue = level.getDaysAfterDue();
 		int DaysBetweenDunning = level.getDaysBetweenDunning();
 		
@@ -226,6 +227,9 @@ public class DSCustomDunningRunCreate extends SvrProcess
 			//
 			pstmt2 = DB.prepareStatement (sql2.toString(), get_TrxName());
 			//
+			System.out.println(pstmt);
+			System.out.println(pstmt2);
+			
 			rs = pstmt.executeQuery ();
 			while (rs.next ())	
 			{
@@ -283,8 +287,9 @@ public class DSCustomDunningRunCreate extends SvrProcess
 					continue;
 				
 				// We don't want to show non due documents
-				if (DaysDue<0 && !level.isShowNotDue ())
-					continue;
+				
+			//	if (DaysDue<0 && !level.isShowNotDue ())
+			//		continue; //Commented on 18-May-2023 for showing all Invoices
 							
 				// We will minus the timesDunned if this is the DaysBetweenDunning is not fullfilled.
 				// Remember in checkup later we must reset them!

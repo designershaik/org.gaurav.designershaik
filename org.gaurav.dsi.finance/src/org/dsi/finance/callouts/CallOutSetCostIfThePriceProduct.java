@@ -8,6 +8,7 @@ import java.util.Properties;
 import org.adempiere.base.IColumnCallout;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
+import org.compiere.model.MAcctSchema;
 import org.compiere.model.MConversionRate;
 import org.compiere.model.MCost;
 import org.compiere.model.MInvoice;
@@ -16,8 +17,9 @@ import org.compiere.model.MProduct;
 import org.compiere.util.Env;
 import org.gaurav.dsi.model.GetProductCosts;
 
-
 public class CallOutSetCostIfThePriceProduct implements IColumnCallout{
+
+	private static final int AD_Client_ID = 0;
 
 	@Override
 	public String start(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value, Object oldValue) 
@@ -56,14 +58,17 @@ public class CallOutSetCostIfThePriceProduct implements IColumnCallout{
 		}
 		GetProductCosts productCost = new GetProductCosts();
 		MProduct product = new MProduct(ctx, M_Product_ID, null);
+		
+		MAcctSchema[] schema=MAcctSchema.getClientAcctSchema(Env.getCtx(),Env.getAD_Client_ID(Env.getCtx()));
+		int id =schema[0].getC_Currency_ID();
+		
 		MCost assemblyCost = productCost.getProductCost(product);
 		BigDecimal cost = assemblyCost.getCurrentCostPrice().setScale(2, RoundingMode.HALF_UP);
-		BigDecimal convertedCost = MConversionRate.convert(ctx, cost, 200, C_Currency_ID, ConvDate, C_ConversionType_ID, Env.getAD_Client_ID(ctx), AD_Org_ID, false);
+		BigDecimal convertedCost = MConversionRate.convert(ctx, cost,id, C_Currency_ID, ConvDate, C_ConversionType_ID, Env.getAD_Client_ID(ctx), AD_Org_ID, false);
 		mTab.setValue("PriceCost", convertedCost);
 //		if(priceEntered.compareTo(Env.ZERO)==0)
 //			mTab.setValue("PriceEntered", convertedCost);
-		
-		
+				
 		return null;
 	}
 }
