@@ -9,6 +9,8 @@ package com.hectrix.www.ACTAtekAgent_service;
 
 public class ACTAtekAgentLocator extends org.apache.axis.client.Service implements com.hectrix.www.ACTAtekAgent_service.ACTAtekAgent {
 
+private static final long serialVersionUID = 1L;
+
 /**
  * WebService API for ACTAtek Agent
  */
