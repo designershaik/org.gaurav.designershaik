@@ -6,7 +6,8 @@ Bundle-SymbolicName: za.co.ntier.woocommerce;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Require-Bundle: org.adempiere.base;bundle-version="7.1.0",
- org.adempiere.plugin.utils;bundle-version="7.1.0"
+ org.adempiere.plugin.utils;bundle-version="7.1.0",
+ org.apache.commons.commons-codec;bundle-version="1.14.0"
 Service-Component: ProcessFactory.xml
 Bundle-Vendor: nTier Software Services
 Export-Package: za.co.ntier.factories,
