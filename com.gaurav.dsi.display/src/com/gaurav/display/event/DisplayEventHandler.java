@@ -1,8 +1,10 @@
 package com.gaurav.display.event;
 
 import java.util.Properties;
+
 import org.adempiere.base.event.AbstractEventHandler;
 import org.adempiere.base.event.IEventTopics;
+import org.compiere.model.I_M_Movement;
 import org.compiere.model.MAcctSchema;
 import org.compiere.model.MDocType;
 import org.compiere.model.MLocator;
@@ -14,7 +16,6 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.osgi.service.event.Event;
 
-import com.gaurav.display.model.MDSMovement;
 import com.gaurav.display.model.MDSMovementLine;
 
 public class DisplayEventHandler extends AbstractEventHandler
@@ -78,9 +79,9 @@ public class DisplayEventHandler extends AbstractEventHandler
 	@Override
 	protected void initialize() {
 
-		registerEvent(IEventTopics.PO_AFTER_NEW, MMovement.Table_Name);
-		registerEvent(IEventTopics.PO_AFTER_CHANGE, MMovement.Table_Name);
-		registerEvent(IEventTopics.DOC_AFTER_COMPLETE, MDSMovement.Table_Name);
+		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_M_Movement.Table_Name);
+		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, I_M_Movement.Table_Name);
+		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, I_M_Movement.Table_Name);
 		
 		
 	}

@@ -283,6 +283,7 @@ public class MDSMovementLine extends MMovementLine{
 
 				assetAdd.setA_Asset_ID(asset.getA_Asset_ID());
 				if (asset.getA_Asset_Status().equals(X_A_Asset.A_ASSET_STATUS_New)) {
+					@SuppressWarnings("deprecation")
 					List<MAssetGroupAcct> assetGrpAccounts = MAssetGroupAcct.forA_Asset_Group_ID(Env.getCtx(),
 							asset.getA_Asset_Group_ID(), assetAdd.getPostingType());
 					for(MAssetGroupAcct assetgrpacct:assetGrpAccounts)

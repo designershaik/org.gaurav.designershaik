@@ -185,7 +185,7 @@ public class CalloutOrder extends CalloutEngine
 		//
 		if (pp.getAD_Workflow_ID() <= 0)
 		{
-			if(bom.get_ValueAsInt("AD_Workflow_ID")>0)
+			if(bom!=null && bom.get_ValueAsInt("AD_Workflow_ID")>0)
 				pp.setAD_Workflow_ID(bom.get_ValueAsInt("AD_Workflow_ID"));
 		}
 		if (pp.getPP_Product_BOM_ID() <= 0)

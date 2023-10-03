@@ -52,6 +52,7 @@ public class AttendanceLogSheet extends SvrProcess
 	@Override
 	protected String doIt() throws Exception
 	{
+		System.out.println("Sachin Testing this process....");
 		Timestamp ts = null;
 		Log log ;
 		ACTAtekLocator locator = new ACTAtekLocator();

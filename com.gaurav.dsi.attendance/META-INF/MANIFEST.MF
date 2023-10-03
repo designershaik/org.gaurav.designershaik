@@ -2,16 +2,21 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Attendance
 Bundle-SymbolicName: com.gaurav.dsi.attendance
-Bundle-Version: 1.0.1.qualifier
+Bundle-Version: 1.0.2.qualifier
 Require-Bundle: org.adempiere.base;bundle-version="10.0.0",
  org.adempiere.plugin.utils;bundle-version="10.0.0",
- org.gaurav.payroll;bundle-version="1.0.0"
+ org.gaurav.payroll;bundle-version="1.0.0",
+ org.apache.commons.logging;bundle-version="1.2.0",
+ jakarta.xml.soap-api;bundle-version="1.4.2"
 Bundle-Vendor: GAURAV
 Automatic-Module-Name: com.gaurav.dsi.attendance
 Bundle-ActivationPolicy: lazy
+Bundle-Activator: org.adempiere.plugin.utils.Incremental2PackActivator
 Bundle-ClassPath: .,
  lib/axis.jar,
  lib/commons-discovery-0.5.jar,
  lib/jaxrpc-api.jar,
- lib/jsch-0.1.54.jar
+ lib/jsch-0.1.54.jar,
+ lib/wsdl4j-1.6.3.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Service-Component: OSGI-INF/*.xml
