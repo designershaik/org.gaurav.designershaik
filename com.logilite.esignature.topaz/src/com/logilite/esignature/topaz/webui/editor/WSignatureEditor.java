@@ -4,7 +4,6 @@ import java.util.logging.Level;
 
 import org.adempiere.webui.editor.WEditor;
 import org.adempiere.webui.editor.WImageEditor;
-import org.adempiere.webui.event.DialogEvents;
 import org.adempiere.webui.event.ValueChangeEvent;
 import org.compiere.model.GridField;
 import org.compiere.model.MImage;
@@ -12,11 +11,9 @@ import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.zkoss.image.AImage;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zul.Image;
 
-import com.logilite.esignature.topaz.webui.window.WSignatureDialog;
+import com.logilite.esignature.topaz.webui.component.SignatureImgBox;
 
 /**
  * Digital Signature Editor
@@ -37,20 +34,21 @@ public class WSignatureEditor extends WEditor
 
 	public WSignatureEditor(GridField gridField)
 	{
-		super(new Image(), gridField);
+		super(new SignatureImgBox(true), gridField);
 		init();
 	}
 
 	@Override
-	public Image getComponent()
+	public SignatureImgBox getComponent()
 	{
-		return (Image) component;
+		return (SignatureImgBox) component;
 	}
 
 	private void init()
 	{
-		AImage img = null;
-		getComponent().setContent(img);
+		getComponent().setContent(null);
+		getComponent().setMImage(null);
+		getComponent().addEventListener(Events.ON_CHANGE, this);
 	}
 
 	@Override
@@ -64,7 +62,7 @@ public class WSignatureEditor extends WEditor
 	{
 		if (m_mImage == null || m_mImage.get_ID() == 0)
 			return null;
-		return new Integer(m_mImage.get_ID());
+		return Integer.valueOf(m_mImage.get_ID());
 	}
 
 	@Override
@@ -89,10 +87,7 @@ public class WSignatureEditor extends WEditor
 	public void setReadWrite(boolean readWrite)
 	{
 		this.readwrite = readWrite;
-		if (readWrite)
-			getComponent().setStyle("cursor: pointer; border: 1px solid;");
-		else
-			getComponent().setStyle("cursor: default; border: none;");
+		getComponent().setReadWrite(readWrite);
 	}
 
 	@Override
@@ -104,8 +99,8 @@ public class WSignatureEditor extends WEditor
 		if (newValue == 0)
 		{
 			m_mImage = null;
-			AImage img = null;
-			getComponent().setContent(img);
+			getComponent().setContent(null);
+			getComponent().setMImage(null);
 			return;
 		}
 		// Get/Create Image
@@ -127,6 +122,7 @@ public class WSignatureEditor extends WEditor
 			}
 		}
 		getComponent().setContent(img);
+		getComponent().setMImage(m_mImage);
 
 	}
 
@@ -139,31 +135,19 @@ public class WSignatureEditor extends WEditor
 	@Override
 	public void onEvent(Event event) throws Exception
 	{
-		if (Events.ON_CLICK.equals(event.getName()))
+		if (Events.ON_CHANGE.equals(event.getName()))
 		{
-			final WSignatureDialog sign = new WSignatureDialog(m_mImage);
-			sign.addEventListener(DialogEvents.ON_WINDOW_CLOSE, new EventListener<Event>() {
-
-				@Override
-				public void onEvent(Event event) throws Exception
-				{
-					if (!sign.isCancel())
-					{
-						int AD_Image_ID = sign.getAD_Image_ID();
-						Object oldValue = getValue();
-						Integer newValue = null;
-						if (AD_Image_ID != 0)
-							newValue = new Integer(AD_Image_ID);
-						//
-						m_mImage = null; // force reload
-						setValue(newValue); // set explicitly
-						//
-						ValueChangeEvent vce = new ValueChangeEvent(this, gridField.getColumnName(), oldValue, newValue);
-						fireValueChange(vce);
-					}
-					
-				}
-			});
+			int AD_Image_ID = getComponent().getAD_Image_ID();
+			Object oldValue = getValue();
+			Integer newValue = null;
+			if (AD_Image_ID != 0)
+				newValue = Integer.valueOf(AD_Image_ID);
+			//
+			m_mImage = null; // force reload
+			setValue(newValue); // set explicitly
+			//
+			ValueChangeEvent vce = new ValueChangeEvent(this, gridField.getColumnName(), oldValue, newValue);
+			fireValueChange(vce);
 		}
 	}
 }

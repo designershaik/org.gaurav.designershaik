@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.6"?>
+<target name="build-target-platform" sequenceNumber="0">
+<locations>
+	<location path="${workspace_loc}\com.logilite.esignature.p2\target\repository" type="Directory"/>
+</locations>
+</target>

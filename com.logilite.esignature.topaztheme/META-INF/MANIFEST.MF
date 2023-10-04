@@ -2,8 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Topaztheme
 Bundle-SymbolicName: com.logilite.esignature.topaztheme
-Bundle-Version: 1.0.1.qualifier
-Bundle-Vendor: LOGILITE
+Bundle-Version: 7.2.1.qualifier
+Bundle-ClassPath: .
+Bundle-Vendor: Gaurav
 Fragment-Host: org.adempiere.ui.zk;bundle-version="3.1.0"
-Automatic-Module-Name: com.logilite.esignature.topaztheme
 Bundle-RequiredExecutionEnvironment: JavaSE-11
+Automatic-Module-Name: com.logilite.esignature.topaztheme

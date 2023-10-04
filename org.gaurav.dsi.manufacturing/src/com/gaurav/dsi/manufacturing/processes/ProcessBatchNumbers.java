@@ -218,7 +218,7 @@ public class ProcessBatchNumbers extends SvrProcess {
 			rs = null;
 			pstmt = null;
 		}
-		bomLine.delete(true, get_TrxName());
+//		bomLine.delete(true, get_TrxName());
 		return true;
 	}
 }
