@@ -39,7 +39,11 @@ public class SignatureEditorFactory implements IEditorFactory
 	@Override
 	public WEditor getEditor(GridTab gridTab, GridField gridField, boolean tableEditor,
 			IEditorConfiguration editorConfiguration) {
-		// TODO Auto-generated method stub
+		
+		if (Utils.getDisplayTypeSignature() > 0 && gridField != null
+				&& gridField.getDisplayType() == Utils.getDisplayTypeSignature())
+			return new WSignatureEditor(gridField);
+		
 		return null;
 	}
 }
