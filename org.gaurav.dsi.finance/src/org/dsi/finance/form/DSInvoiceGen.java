@@ -292,6 +292,10 @@ public class DSInvoiceGen extends GenForm
 		int counter = 0;
 		for(Integer selectedId : getSelection())
 		{
+			int countexist = DB.getSQLValue(trxName, "select count(*) from T_Selection Where AD_PINSTANCE_ID = ? and T_SELECTION_ID= ? ",instance.getAD_PInstance_ID(),selectedId);
+			System.out.println(countexist);
+			if(countexist>0)
+				continue ;
 			counter++;
 			if (counter > 1)
 				insert.append(" UNION ");

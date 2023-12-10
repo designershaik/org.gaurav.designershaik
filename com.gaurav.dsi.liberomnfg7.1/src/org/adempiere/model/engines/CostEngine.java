@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 
 import org.adempiere.exceptions.AdempiereException;
@@ -324,10 +325,12 @@ public class CostEngine
 	{
 		final String whereClause = MCostDetail.COLUMNNAME_PP_Cost_Collector_ID+"=?"
 		+" AND "+MCostDetail.COLUMNNAME_M_CostElement_ID+"=?";
-		MCostDetail cd = new Query(cc.getCtx(), MCostDetail.Table_Name, whereClause, cc.get_TrxName())
-		.setParameters(new Object[]{cc.getPP_Cost_Collector_ID(), M_CostElement_ID})
-		.firstOnly();
-		return cd;
+		List<MCostDetail> cd = new Query(cc.getCtx(), MCostDetail.Table_Name, whereClause, cc.get_TrxName())
+		.setParameters(new Object[]{cc.getPP_Cost_Collector_ID(), M_CostElement_ID}).list();
+		if(cd.size()>0)
+			return cd.get(0);
+		
+		return null;
 	}
 
 	private MPPCostCollector createVarianceCostCollector(MPPCostCollector cc, String CostCollectorType)

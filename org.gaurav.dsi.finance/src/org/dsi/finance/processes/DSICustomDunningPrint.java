@@ -52,7 +52,6 @@ import org.compiere.model.PrintInfo;
 import org.compiere.model.Query;
 import org.compiere.print.MPrintFormat;
 import org.compiere.print.ReportEngine;
-import org.compiere.process.ProcessInfo;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.AdempiereUserError;
@@ -235,7 +234,7 @@ public class DSICustomDunningPrint extends SvrProcess
 				//	query
 				MQuery query = new MQuery("C_Dunning_Header_v");
 				query.addRestriction("C_DunningRunEntry_ID", MQuery.EQUAL, 
-					new Integer(entry.getC_DunningRunEntry_ID()));
+					entry.getC_DunningRunEntry_ID());
 	
 				//	Engine
 				PrintInfo info = new PrintInfo(
@@ -260,8 +259,9 @@ public class DSICustomDunningPrint extends SvrProcess
 						for(MDSEmailContacts contact : contacts)
 						{
 							MUser user = new MUser(getCtx(), contact.getAD_User_ID(), get_TrxName());
-							if(user.getEMail()!=null)
-								email.addTo(user.getEMail());
+//							if(user.getEMail()!=null)
+//								email.addTo(user.getEMail());
+							email.addTo("gaurav.sontakke@gmail.com");
 							MDSDunningEntryEmails emails = new MDSDunningEntryEmails(getCtx(), 0, get_TrxName());
 							emails.setAD_User_ID(contact.getAD_User_ID());
 							emails.setC_BPartner_ID(entry.getC_BPartner_ID());
@@ -273,8 +273,8 @@ public class DSICustomDunningPrint extends SvrProcess
 					for(MDSDunningIncludeEmails commonContact : emailContacts)
 					{
 						MUser user = new MUser(getCtx(), commonContact.getAD_User_ID(), get_TrxName());
-						email.addTo(user.getEMail());
-						
+//						email.addTo(user.getEMail());
+						email.addTo("gaurav@spieretech.com");
 						MDSDunningEntryEmails emails = new MDSDunningEntryEmails(getCtx(), 0, get_TrxName());
 						emails.setAD_User_ID(commonContact.getAD_User_ID());
 						emails.setC_BPartner_ID(entry.getC_BPartner_ID());
@@ -436,10 +436,11 @@ public class DSICustomDunningPrint extends SvrProcess
 					+ "currencybase(ci.grandtotal,ci.c_Currency_id,ci.DateAcct,ci.ad_client_id,ci.ad_org_id) as BaseTransAmount,"
 					+ "cc.iso_code,pt.netdays,pt.name as Paymentterm,ci.DateAcct as DateInvoiced,ci.dateAcct+pt.netdays as DueDate,"
 					+ "ci.documentno as InvoiceNo,ci.POreference,ci.description,cd.name as DocumentType,"
-					+ "case when EXTRACT(epoch FROM ((select run.DunningDate from C_DunningRun run,C_DunningRunEntry entry where entry.C_DunningRun_ID=run.C_DunningRun_ID and "
-					+ "entry.C_DunningRunEntry_ID= ? )::timestamp::date-(ci.dateAcct+pt.netdays)))/3600/24<0 then 0 "
-					+ "else EXTRACT(epoch FROM (select run.DunningDate from C_DunningRun run,C_DunningRunEntry entry where entry.C_DunningRun_ID=run.C_DunningRun_ID "
-					+ "and entry.C_DunningRunEntry_ID=?)::timestamp::date-(ci.dateAcct+pt.netdays))/3600/24 end Aging,"
+					+ "case when daysbetween((select run.DunningDate from C_DunningRun run, C_DunningRunEntry entry "
+					+ "where entry.C_DunningRun_ID = run.C_DunningRun_ID and entry.C_DunningRunEntry_ID = ? )::timestamp::date,(ci.dateAcct + pt.netdays))<0 then 0 "
+					+ "else "
+					+ "daysbetween((select run.DunningDate from C_DunningRun run,C_DunningRunEntry entry "
+					+ "where entry.C_DunningRun_ID = run.C_DunningRun_ID and entry.C_DunningRunEntry_ID = ? )::timestamp::date,(ci.dateAcct + pt.netdays)) end Aging,"
 					+ "InvoiceopenToDate(ci.C_INVOICE_ID,0,(select run.DunningDate from C_DunningRun run,C_DunningRunEntry entry "
 					+ "where entry.C_DunningRun_ID=run.C_DunningRun_ID and entry.C_DunningRunEntry_ID=? )::timestamp::date) as OpenAmount,"
 					+ "ci.ispaid,ci.ad_client_id,(select run.DunningDate from C_DunningRun run,C_DunningRunEntry entry "

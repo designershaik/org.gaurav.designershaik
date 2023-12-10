@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: CRM
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-SymbolicName: com.gaurav.dsi.crm
-Bundle-Version: 10.1.1.qualifier
+Bundle-Version: 10.1.2.qualifier
 Bundle-Vendor: GAURAV
 Require-Bundle: org.adempiere.base;bundle-version="10.0.0",
  org.adempiere.plugin.utils;bundle-version="10.0.0",

@@ -119,9 +119,12 @@ public class MPPCostCollector extends X_PP_Cost_Collector implements DocAction ,
 		cc.setDocAction(MPPCostCollector.DOCACTION_Complete);
 		cc.setDocStatus(MPPCostCollector.DOCSTATUS_Drafted);
 		cc.setIsActive(true);
-		cc.setM_Locator_ID(M_Locator_ID);
-		cc.setM_AttributeSetInstance_ID(M_AttributeSetInstance_ID);
-		cc.setS_Resource_ID(S_Resource_ID);
+		if(M_Locator_ID>0)
+			cc.setM_Locator_ID(M_Locator_ID);
+		if(M_AttributeSetInstance_ID>0)
+			cc.setM_AttributeSetInstance_ID(M_AttributeSetInstance_ID);
+		if(S_Resource_ID>0)
+			cc.setS_Resource_ID(S_Resource_ID);
 		cc.setMovementDate(movementdate);
 		cc.setDateAcct(movementdate);
 		cc.setMovementQty(qty);
@@ -145,6 +148,7 @@ public class MPPCostCollector extends X_PP_Cost_Collector implements DocAction ,
 			cc.setC_UOM_ID(0); // we set the BOM Line UOM on beforeSave
 		}
 		cc.saveEx(order.get_TrxName());
+		System.out.println(cc.getS_Resource_ID()+" Resource : "+S_Resource_ID);
 		if (!cc.processIt(MPPCostCollector.DOCACTION_Complete))
 		{
 			throw new AdempiereException(cc.getProcessMsg());

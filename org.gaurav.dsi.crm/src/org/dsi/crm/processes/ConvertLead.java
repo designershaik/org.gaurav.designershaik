@@ -61,7 +61,7 @@ public class ConvertLead extends SvrProcess {
 		if (p_AD_User_ID <= 0)
 			throw new FillMandatoryException("AD_User_ID");
 		
-		MUser lead = MUser.get(getCtx(), p_AD_User_ID);
+		MUser lead = new MUser(getCtx(), p_AD_User_ID,get_TrxName());
 		lead.set_TrxName(get_TrxName());
 		System.out.println(lead.getBPName());
 		if (!lead.isSalesLead() && lead.getC_BPartner_ID() != 0)

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<site>
-    <feature 
-    	url="features/com.logilite.esignature.feature_7.2.0.qualifier.jar" 
-    	id="com.logilite.esignature.feature" version="7.2.0.qualifier">
-	    <category name="com.logilite.esignature"/>
-    </feature>
-</site>

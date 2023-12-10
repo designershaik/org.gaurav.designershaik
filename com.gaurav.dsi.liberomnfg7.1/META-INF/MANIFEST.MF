@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: CoreManufacturing
 Bundle-SymbolicName: com.gaurav.dsi.liberomnfg7.1
-Bundle-Version: 10.0.4.qualifier
+Bundle-Version: 10.0.6.qualifier
 Bundle-Vendor: GAURAV
 Automatic-Module-Name: com.gaurav.dsi.liberomnfg7.1
 Bundle-ActivationPolicy: lazy
