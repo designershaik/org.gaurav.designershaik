@@ -28,9 +28,12 @@ import org.compiere.model.MProjectLine;
 import org.compiere.model.MStorageOnHand;
 import org.compiere.model.MTimeExpense;
 import org.compiere.model.MTimeExpenseLine;
+import org.compiere.process.DocAction;
+import org.compiere.process.ProcessInfo;
 import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
+import org.compiere.wf.MWorkflow;
 
 /**
  *  Issue to Project.
@@ -185,8 +188,13 @@ public class ProjectPhaseTaskIssue extends SvrProcess
 				pi.set_ValueNoCheck("C_ProjectPhase_ID", m_C_ProjectPhase_ID);
 			if(m_C_ProjectTasks_ID>0)
 				pi.set_ValueNoCheck("C_ProjectTask_ID", m_C_ProjectTasks_ID);
+//			pi.process();
 			
-			pi.process();
+			pi.saveEx();
+			ProcessInfo processInfo = MWorkflow.runDocumentActionWorkflow(pi, DocAction.ACTION_Complete);
+			if (processInfo.isError())
+				throw new RuntimeException(processInfo.getSummary());
+			pi.saveEx();
 
 			//	Find/Create Project Line
 			MProjectLine pl = null;
@@ -269,7 +277,13 @@ public class ProjectPhaseTaskIssue extends SvrProcess
 			if(m_C_ProjectTasks_ID>0)
 				pi.set_ValueNoCheck("C_ProjectTask_ID", m_C_ProjectTasks_ID);
 			
-			pi.process();
+//			pi.process();
+			pi.saveEx();
+			ProcessInfo processInfo = MWorkflow.runDocumentActionWorkflow(pi, DocAction.ACTION_Complete);
+			if (processInfo.isError())
+				throw new RuntimeException(processInfo.getSummary());
+			pi.saveEx();
+			
 			//	Find/Create Project Line
 			MProjectLine pl = new MProjectLine(m_project);
 			pl.setMProjectIssue(pi);		//	setIssue
@@ -314,7 +328,13 @@ public class ProjectPhaseTaskIssue extends SvrProcess
 		if(m_C_ProjectTasks_ID>0)
 			pi.set_ValueNoCheck("C_ProjectTask_ID", m_C_ProjectTasks_ID);
 		
-		pi.process();
+//		pi.process();
+		
+		pi.saveEx();
+		ProcessInfo processInfo = MWorkflow.runDocumentActionWorkflow(pi, DocAction.ACTION_Complete);
+		if (processInfo.isError())
+			throw new RuntimeException(processInfo.getSummary());
+		pi.saveEx();
 
 		//	Update Line
 		pl.setMProjectIssue(pi);
@@ -350,7 +370,12 @@ public class ProjectPhaseTaskIssue extends SvrProcess
 		if(m_C_ProjectTasks_ID>0)
 			pi.set_ValueNoCheck("C_ProjectTask_ID", m_C_ProjectTasks_ID);
 		
-		pi.process();
+//		pi.process();
+		pi.saveEx();
+		ProcessInfo processInfo = MWorkflow.runDocumentActionWorkflow(pi, DocAction.ACTION_Complete);
+		if (processInfo.isError())
+			throw new RuntimeException(processInfo.getSummary());
+		pi.saveEx();
 
 		//	Create Project Line
 		MProjectLine pl = new MProjectLine(m_project);
