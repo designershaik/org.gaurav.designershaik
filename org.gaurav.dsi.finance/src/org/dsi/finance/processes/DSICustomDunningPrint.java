@@ -259,9 +259,8 @@ public class DSICustomDunningPrint extends SvrProcess
 						for(MDSEmailContacts contact : contacts)
 						{
 							MUser user = new MUser(getCtx(), contact.getAD_User_ID(), get_TrxName());
-//							if(user.getEMail()!=null)
-//								email.addTo(user.getEMail());
-							email.addTo("gaurav.sontakke@gmail.com");
+							if(user.getEMail()!=null)
+								email.addTo(user.getEMail());
 							MDSDunningEntryEmails emails = new MDSDunningEntryEmails(getCtx(), 0, get_TrxName());
 							emails.setAD_User_ID(contact.getAD_User_ID());
 							emails.setC_BPartner_ID(entry.getC_BPartner_ID());
@@ -273,8 +272,7 @@ public class DSICustomDunningPrint extends SvrProcess
 					for(MDSDunningIncludeEmails commonContact : emailContacts)
 					{
 						MUser user = new MUser(getCtx(), commonContact.getAD_User_ID(), get_TrxName());
-//						email.addTo(user.getEMail());
-						email.addTo("gaurav@spieretech.com");
+						email.addTo(user.getEMail());
 						MDSDunningEntryEmails emails = new MDSDunningEntryEmails(getCtx(), 0, get_TrxName());
 						emails.setAD_User_ID(commonContact.getAD_User_ID());
 						emails.setC_BPartner_ID(entry.getC_BPartner_ID());
@@ -362,14 +360,24 @@ public class DSICustomDunningPrint extends SvrProcess
 				{
 					if(attachment!=null)
 					{
-						MAttachment ma= new MAttachment(getCtx(), 0, get_TrxName());
-						ma.setRecord_ID(entry.getC_DunningRunEntry_ID());
-						ma.addEntry(attachment);
-						ma.addEntry(outstandingBalanceInCSV);
-						ma.set_TrxName(get_TrxName());
-						ma.setAD_Table_ID(I_C_DunningRunEntry.Table_ID);
-						ma.addTextMsg(subject);
-						ma.saveEx();
+						MAttachment attach = MAttachment.get(getCtx(), I_C_DunningRunEntry.Table_ID, entry.getC_DunningRunEntry_ID(), get_TrxName());
+						if(attach==null)
+						{
+							MAttachment ma= new MAttachment(getCtx(), 0, get_TrxName());
+							ma.setRecord_ID(entry.getC_DunningRunEntry_ID());
+							ma.addEntry(attachment);
+							ma.addEntry(outstandingBalanceInCSV);
+							ma.set_TrxName(get_TrxName());
+							ma.setAD_Table_ID(I_C_DunningRunEntry.Table_ID);
+							ma.addTextMsg(subject);
+							ma.saveEx();
+						}
+						else
+						{
+							attach.addEntry(attachment);
+							attach.saveEx();
+						}
+						
 					}
 					entry.setProcessed (true);
 					entry.save ();

@@ -39,8 +39,8 @@ public class SendEmails {
 		int defaultMailTemplate = 0;
 		int AD_User_ID = Env.getContextAsInt(Env.getCtx(), "#AD_User_ID");
 		MUser from=new MUser(Env.getCtx(), AD_User_ID, ci.get_TrxName());
-		defaultMailTemplate=Integer.parseInt(MSysConfig.getValue("DEFAULT_CUSTOMERINVOICE_EMAILTEMPLATE"));
-		String defaultEmailID=MSysConfig.getValue("DEFAULT_ACCOUNT_EMAIL_ID","accounts@shaik.net");
+		defaultMailTemplate= MSysConfig.getIntValue("DEFAULT_CUSTOMERINVOICE_EMAILTEMPLATE", 1000003, ci.getAD_Client_ID()) ;
+		String defaultEmailID=MSysConfig.getValue("DEFAULT_ACCOUNT_EMAIL_ID","accounts@shaik.net", ci.getAD_Client_ID());
 		String sendTo=defaultEmailID;
 		DocAction doc = (DocAction)ci;
 		MMailText text = new MMailText (Env.getCtx(), defaultMailTemplate, null);
