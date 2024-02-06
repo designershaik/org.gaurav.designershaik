@@ -10,10 +10,7 @@ public class DSIAttendanceProcessFactory implements IProcessFactory{
 	public ProcessCall newProcessInstance(String className) {
 		
 		if(className.equalsIgnoreCase(AttendanceLogSheet.class.getName()))
-		{
-			System.out.println("Sachin - Testing this factory...");
 			return  new AttendanceLogSheet();
-		}
 		return null;
 	}
 

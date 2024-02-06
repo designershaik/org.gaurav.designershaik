@@ -6,9 +6,13 @@ import org.adempiere.base.event.AbstractEventHandler;
 import org.adempiere.base.event.IEventTopics;
 import org.compiere.model.I_M_Movement;
 import org.compiere.model.MAcctSchema;
+import org.compiere.model.MAssetAddition;
 import org.compiere.model.MDocType;
+import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MLocator;
+import org.compiere.model.MMatchInv;
 import org.compiere.model.MMovement;
+import org.compiere.model.MProductCategory;
 import org.compiere.model.MWarehouse;
 import org.compiere.model.PO;
 import org.compiere.util.CLogger;
@@ -74,6 +78,44 @@ public class DisplayEventHandler extends AbstractEventHandler
 				}
 			}
 		}
+//		if(po instanceof MMatchInv)
+//		{
+//			if(event.getTopic().equalsIgnoreCase(IEventTopics.PO_AFTER_NEW))
+//			{
+//				MMatchInv matchInv = (MMatchInv)po;
+//				int assetGroup_ID = DB.getSQLValue(trxName, "select cat.DS_AssetGroup_ID from m_product prod,m_product_category cat where prod.M_Product_Category_ID = cat.M_Product_Category_ID and prod.M_Product_ID = ? ",matchInv.getM_Product_ID());
+//				if(matchInv.getC_InvoiceLine_ID()>0)
+//				{
+//					MInvoiceLine line = (MInvoiceLine)matchInv.getC_InvoiceLine();
+//					line.setA_CapvsExp(MInvoiceLine.A_CAPVSEXP_Capital);
+//					line.setA_Asset_Group_ID(assetGroup_ID);
+//					line.saveEx();
+//				}
+//				if(matchInv.getM_Product().getM_Product_Category_ID()>0)
+//				{
+//					MProductCategory cat = new MProductCategory(Env.getCtx(),matchInv.getM_Product().getM_Product_Category_ID(),matchInv.get_TrxName());
+//					cat.setA_Asset_Group_ID(assetGroup_ID);
+//					cat.saveEx();
+//				}
+//				
+//				if(assetGroup_ID>0)
+//					MAssetAddition.createAsset(matchInv);
+//				
+//				if(matchInv.getM_Product().getM_Product_Category_ID()>0)
+//				{
+//					MProductCategory cat = new MProductCategory(Env.getCtx(),matchInv.getM_Product().getM_Product_Category_ID(),matchInv.get_TrxName());
+//					cat.setA_Asset_Group_ID(-1);
+//					cat.saveEx();
+//				}
+//			}
+//		}
+		if(po instanceof MProductCategory)
+		{
+			MProductCategory prodCat = (MProductCategory)po;
+			if(prodCat.get_ValueAsInt("DS_AssetGroup_ID")>0)
+				prodCat.setA_Asset_Group_ID(prodCat.get_ValueAsInt("DS_AssetGroup_ID"));
+			
+		}
 	}
 
 	@Override
@@ -82,6 +124,11 @@ public class DisplayEventHandler extends AbstractEventHandler
 		registerTableEvent(IEventTopics.PO_AFTER_NEW, I_M_Movement.Table_Name);
 		registerTableEvent(IEventTopics.PO_AFTER_CHANGE, I_M_Movement.Table_Name);
 		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, I_M_Movement.Table_Name);
+		
+		registerTableEvent(IEventTopics.PO_AFTER_NEW, MMatchInv.Table_Name);
+		
+		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, MProductCategory.Table_Name);
+		registerTableEvent(IEventTopics.PO_BEFORE_NEW, MProductCategory.Table_Name);
 		
 		
 	}

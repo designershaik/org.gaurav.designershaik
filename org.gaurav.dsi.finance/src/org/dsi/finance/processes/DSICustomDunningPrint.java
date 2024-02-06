@@ -47,7 +47,6 @@ import org.compiere.model.MMailText;
 import org.compiere.model.MQuery;
 import org.compiere.model.MSalesRegion;
 import org.compiere.model.MUser;
-import org.compiere.model.MUserMail;
 import org.compiere.model.PrintInfo;
 import org.compiere.model.Query;
 import org.compiere.print.MPrintFormat;
@@ -215,14 +214,14 @@ public class DSICustomDunningPrint extends SvrProcess
 				String toEmailIDs = "sherryl@shaik.net";
 				if (p_EMailPDF)
 				{
-					if (to.get_ID() == 0)
-					{
-						StringBuilder msglog = new StringBuilder("@NotFound@: @AD_User_ID@ - ").append(bp.getName());
-						addLog (entry.get_ID(), null, null,msglog.toString());
-						errors++;
-						continue;
-					}
-					else if (toEmailIDs == null || toEmailIDs.length() == 0)
+//					if (to.get_ID() == 0)
+//					{
+//						StringBuilder msglog = new StringBuilder("@NotFound@: @AD_User_ID@ - ").append(bp.getName());
+//						addLog (entry.get_ID(), null, null,msglog.toString());
+//						errors++;
+//						continue;
+//					}else 
+					if (toEmailIDs == null || toEmailIDs.length() == 0)
 					{
 						StringBuilder msglog = new StringBuilder("@NotFound@: @EMail@ - ").append(to.getName());
 						addLog (entry.get_ID(), null, null, msglog.toString());
@@ -331,8 +330,8 @@ public class DSICustomDunningPrint extends SvrProcess
 					//
 					String msg = email.send();
 					
-					MUserMail um = new MUserMail(mText, entry.getAD_User_ID(), email);
-					um.saveEx();
+//					MUserMail um = new MUserMail(mText, entry.getAD_User_ID(), email);
+//					um.saveEx();
 					if (msg.equals(EMail.SENT_OK))
 					{
 						StringBuilder msglog = new StringBuilder()

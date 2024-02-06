@@ -40,10 +40,7 @@ import org.compiere.model.MJournalLine;
 import org.compiere.model.MMovement;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
-import org.compiere.model.MOrderPaySchedule;
-import org.compiere.model.MPaySchedule;
 import org.compiere.model.MPayment;
-import org.compiere.model.MPaymentTerm;
 import org.compiere.model.MPeriod;
 import org.compiere.model.MPrivateAccess;
 import org.compiere.model.MProduct;
@@ -185,7 +182,7 @@ public class FinanceEventHandler extends AbstractEventHandler
 				int isChargeExistWithLockRecord = DB.getSQLValue(trxName, "select count(line.*) "
 						+ "from C_InvoiceLine line,C_Charge charge where line.C_Charge_ID = charge.C_Charge_ID "
 						+ "and charge.DS_AutoLockRecord='Y' and line.C_Invoice_ID = ? ",ci.getC_Invoice_ID());
-				if(isChargeExistWithLockRecord>=1)
+				if(isChargeExistWithLockRecord>=1 && ci.getReversal_ID()<=0)
 					lockParentRecord(Env.getAD_User_ID(ctx),MInvoice.Table_ID,ci.getC_Invoice_ID());
 			
 				int billPartnerLocationID=ci.getC_BPartner_Location_ID();

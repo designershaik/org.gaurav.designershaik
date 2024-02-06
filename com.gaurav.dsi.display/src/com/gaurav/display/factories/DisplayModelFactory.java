@@ -8,6 +8,7 @@ import org.compiere.model.MMovementLine;
 import org.compiere.model.PO;
 import org.compiere.util.Env;
 
+import com.gaurav.display.model.MDSAsset;
 import com.gaurav.display.model.MDSMovement;
 import com.gaurav.display.model.MDSMovementLine;
 
@@ -22,6 +23,9 @@ public class DisplayModelFactory implements IModelFactory{
 		if(MMovement.Table_Name.equalsIgnoreCase(tableName))
 			return MDSMovement.class;
 		
+		if(MDSAsset.Table_Name.equalsIgnoreCase(tableName))
+			return MDSAsset.class;
+		
 		return null;
 	}
 
@@ -34,6 +38,9 @@ public class DisplayModelFactory implements IModelFactory{
 		if(MMovement.Table_Name.equalsIgnoreCase(tableName))
 			return new MDSMovement(Env.getCtx(), Record_ID, trxName);
 		
+		if(MDSAsset.Table_Name.equalsIgnoreCase(tableName))
+			return new MDSAsset(Env.getCtx(), Record_ID, trxName);
+		
 		return null;
 	}
 
@@ -45,6 +52,9 @@ public class DisplayModelFactory implements IModelFactory{
 		
 		if(MMovement.Table_Name.equalsIgnoreCase(tableName))
 			return new MDSMovement(Env.getCtx(), rs, trxName);
+		
+		if(MDSAsset.Table_Name.equalsIgnoreCase(tableName))
+			return new MDSAsset(Env.getCtx(), rs, trxName);
 		
 		return null;
 	}
