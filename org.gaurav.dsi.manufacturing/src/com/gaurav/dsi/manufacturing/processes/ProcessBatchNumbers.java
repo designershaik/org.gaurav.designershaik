@@ -74,6 +74,7 @@ public class ProcessBatchNumbers extends SvrProcess {
 			if(checkIfEnoughStock(productID,qtyEntered))
 			{
 				setASI(productID, locatorID, qtyEntered, line);
+				line.delete(true, get_TrxName());
 			}
 		}
 		return "Success";
@@ -105,7 +106,6 @@ public class ProcessBatchNumbers extends SvrProcess {
 			BigDecimal qtyEntered, MPPOrderBOMLine bomLine) 
 	{
 		int attributeSet = 0;
-		boolean multipleBatchUpdated= false;
 		BigDecimal qtyRequired = qtyEntered;
 		String sql = "with t1 as ( SELECT M_AttributeSetInstance_ID,coalesce(sum(qtyonhand),0) as QtyOnHand "
 				+ "FROM M_StorageOnHand WHERE M_Product_ID=? "
@@ -175,7 +175,6 @@ public class ProcessBatchNumbers extends SvrProcess {
 						line.saveEx();
 						qtyRequired = Env.ZERO;
 						
-						bomLine.delete(true, get_TrxName());
 						break;
 					}
 					else
@@ -211,7 +210,6 @@ public class ProcessBatchNumbers extends SvrProcess {
 						line.setBackflushGroup(bomLine.getBackflushGroup());
 						line.saveEx();
 						qtyRequired = qtyRequired.subtract(qtyAvailable);
-						multipleBatchUpdated = true;
 					}
 						
 				}
@@ -223,8 +221,7 @@ public class ProcessBatchNumbers extends SvrProcess {
 			rs = null;
 			pstmt = null;
 		}
-		if(multipleBatchUpdated)
-			bomLine.delete(true, get_TrxName());
+		
 		return true;
 	}
 }

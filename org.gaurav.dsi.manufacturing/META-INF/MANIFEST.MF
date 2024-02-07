@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-ActivationPolicy: lazy
 Bundle-Name: Manufacturing
 Bundle-SymbolicName: com.gaurav.dsi.manufacturing
-Bundle-Version: 10.0.3.qualifier
+Bundle-Version: 10.0.4.qualifier
 Bundle-Vendor: GAURAV
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Require-Bundle: org.adempiere.base;bundle-version="5.1.0",

@@ -74,7 +74,8 @@ public class CreateCashRequestFromPurchaseRequest extends SvrProcess{
 			cashRequest.setR_RequestRelated_ID(request.getR_Request_ID());
 			cashRequest.setC_BPartner_ID(user.getC_BPartner_ID());
 			cashRequest.set_ValueNoCheck("C_Currency_ID", request.get_Value("C_Currency_ID"));
-			cashRequest.set_ValueOfColumn("C_BPartner_Location_ID", user.getC_BPartner_Location_ID());
+			if(user.getC_BPartner_Location_ID()>0)
+				cashRequest.set_ValueOfColumn("C_BPartner_Location_ID", user.getC_BPartner_Location_ID());
 			cashRequest.saveEx();
 			trx.commit();	
 			
