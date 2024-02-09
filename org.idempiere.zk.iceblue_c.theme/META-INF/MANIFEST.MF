@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Theme
+Bundle-SymbolicName: com.gaurav.dsi.iceblue_c.theme
+Bundle-Version: 7.1.3.qualifier
+Bundle-Vendor: Gaurav
+Fragment-Host: org.adempiere.ui.zk;bundle-version="7.1.0"
+Automatic-Module-Name: com.gaurav.dsi.iceblue_c.theme
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Jetty-WarPrependFragmentResourcePath: /
