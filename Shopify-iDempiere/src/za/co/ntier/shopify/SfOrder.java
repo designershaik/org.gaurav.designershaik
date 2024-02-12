@@ -115,10 +115,10 @@ public final class SfOrder {
 	public int getBPId(Map<?, ?> orderSf) {
 		String email = (String) orderSf.get("email");
 		String phone = (String) orderSf.get("phone");
-		int c_bpartner_id = DB.getSQLValue(trxName, "select c_bpartner_id from ad_user " + "where email like ?", email);
+		int c_bpartner_id = DB.getSQLValue(trxName, "select c_bpartner_id from ad_user " + "where email like ? and AD_Client_ID = ? ", email,Env.getAD_Client_ID(ctx));
 		if (c_bpartner_id < 0) {
 			//log.severe("BP with email : " + email + " does not exist on iDempiere");
-			c_bpartner_id = DB.getSQLValue(trxName, "select c_bpartner_id from ad_user " + "where phone like ?", phone);
+			c_bpartner_id = DB.getSQLValue(trxName, "select c_bpartner_id from ad_user " + "where phone like ? and AD_Client_ID = ? ", phone,Env.getAD_Client_ID(ctx));
 			if (c_bpartner_id < 0)
 			c_bpartner_id = createBP(orderSf);
 		}
@@ -128,7 +128,7 @@ public final class SfOrder {
 	int createBP(Map<?, ?> orderSf) {
 		Map<?, ?> customer = (Map<?, ?>) orderSf.get("customer");
 		Map<?, ?> defaultAddress = (Map<?, ?>) customer.get("default_address");
-		int C_BPartner_ID = DB.getSQLValue(trxName, "Select C_BPartner_ID From C_BPartner Where Upper(Value) like Upper(?) ",(String) defaultAddress.get("name"));
+		int C_BPartner_ID = DB.getSQLValue(trxName, "Select C_BPartner_ID From C_BPartner Where Upper(Value) like Upper(?) and AD_Client_ID = ?  ",(String) defaultAddress.get("name"),Env.getAD_Client_ID(ctx));
 		
 		String name = (String) defaultAddress.get("first_name");
 		String name2 = (String) defaultAddress.get("last_name");

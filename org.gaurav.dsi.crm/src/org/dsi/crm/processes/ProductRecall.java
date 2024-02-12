@@ -67,7 +67,6 @@ public class ProductRecall extends SvrProcess {
 
 	private void recallProductFromThisBatch(int M_AttributeSetInstance_ID, int M_Product_ID) 
 	{
-		System.out.println("asdas");
 		MAttributeSetInstance msi = new MAttributeSetInstance(getCtx(), M_AttributeSetInstance_ID, get_TrxName());
 		List<MAttributeSetInstance> instances = new Query(getCtx(), MAttributeSetInstance.Table_Name, " lot like ? and M_AttributeSet_ID IN "
 				+ "(SELECT M_AttributeSet_ID FROM M_AttributeSetInstance Where M_AttributeSetInstance_ID=?)", get_TrxName())
@@ -78,7 +77,7 @@ public class ProductRecall extends SvrProcess {
 			BigDecimal qty = DB.getSQLValueBD(get_TrxName(), "Select coalesce(sum(MovementQty),0) from M_Transaction "
 					+ "Where M_Product_ID = ? "
 					+ "and M_AttributeSetInstance_ID = ? "
-					+ "and MovementType='W+' ", M_Product_ID,instance.getM_AttributeSetInstance_ID());
+					+ "and MovementType in ('W+','V+') ", M_Product_ID,instance.getM_AttributeSetInstance_ID());
 			productionQty = productionQty.add(qty);
 			loopOnTheASI(instance.getM_AttributeSetInstance_ID(),M_Product_ID);
 		}
@@ -129,11 +128,16 @@ public class ProductRecall extends SvrProcess {
 					MInOutLine line = new MInOutLine(getCtx(), M_InOutLine_ID, get_TrxName());
 					recall.setC_OrderLine_ID(line.getC_OrderLine_ID());
 					recall.setM_InOutLine_ID(M_InOutLine_ID);
-					recall.setM_AttributeSetInstance_ID(line.getM_AttributeSetInstance_ID());
+					if(p_M_AttributeSetInstance_ID<=0)
+						recall.setM_AttributeSetInstance_ID(line.getM_AttributeSetInstance_ID());
+					else
+						recall.setM_AttributeSetInstance_ID(p_M_AttributeSetInstance_ID);
+						
 					recall.setMovementDate(line.getM_InOut().getMovementDate());
 					recall.set_ValueNoCheck("Qty", line.getMovementQty());
 					recall.set_ValueNoCheck("C_BPartner_ID", line.getM_InOut().getC_BPartner_ID());
 					recall.set_ValueNoCheck("C_BPartner_Location_ID", line.getM_InOut().getC_BPartner_Location_ID());
+					recall.set_ValueNoCheck("AD_PInstance_ID", getAD_PInstance_ID());
 				}
 				recall.saveEx();	
 			}
