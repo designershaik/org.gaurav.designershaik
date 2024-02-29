@@ -86,7 +86,7 @@ public class TaxFiling extends SvrProcess{
 					+ "currencybase(line.TaxAmt, ci.c_currency_id, ci.dateacct::timestamp with time zone, ci.ad_client_id, ci.ad_org_id) AS TaxAmtBHD,line.TaxAmt ," + 
 					" currencybase(line.LineNetAmt, ci.c_currency_id, ci.dateacct::timestamp with time zone, ci.ad_client_id, ci.ad_org_id) AS TaxBaseAmtBHD,"
 					+ "tax.name,tax.rate,tax.C_Tax_ID "
-					+ "FROM c_invoice_v ci ,C_InvoiceLine line,C_Tax tax "
+					+ "FROM c_invoice ci ,C_InvoiceLine line,C_Tax tax "
 					+ "WHERE ci.C_Invoice_ID=line.C_Invoice_ID "
 					+ "AND line.C_Tax_ID=tax.C_Tax_ID "
 					+ "AND ci.DateAcct BETWEEN ? AND ? "
@@ -168,7 +168,7 @@ public class TaxFiling extends SvrProcess{
 				+ "currencybase(line.LineTotalAmt, ci.c_currency_id, ci.dateacct::timestamp with time zone, ci.ad_client_id, ci.ad_org_id) AS LineTotalAmtInBHD, "
 				+ "line.TaxAmt,line.LineNetAmt,line.LineTotalAmt,tax.name,tax.rate,tax.C_Tax_ID,"
 				+ "ci.C_BPartner_ID,ci.C_Invoice_ID,line.C_InvoiceLine_ID,ci.DateAcct,ci.C_BPartner_Location_ID,tax.Rate,ci.C_Currency_ID,tax.DS_ImportZeroVAT "
-				+ "FROM c_invoice_v ci,C_InvoiceLine_v line ,C_Tax tax "
+				+ "FROM c_invoice ci,C_InvoiceLine line ,C_Tax tax "
 				+ "WHERE ci.C_Invoice_ID = line.C_Invoice_ID "
 				+ "AND ci.C_Invoice_ID=line.C_Invoice_ID "
 				+ "AND line.C_Tax_ID=tax.C_Tax_ID "
@@ -198,10 +198,10 @@ public class TaxFiling extends SvrProcess{
 				BigDecimal rate = rstd.getBigDecimal("Rate");
 				String isZeroImportVAT = rstd.getString("DS_ImportZeroVAT");
 				if(taxAmt.compareTo(Env.ZERO)==0 && parent_Tax_ID>0)
-					taxAmt = LineNetAmt.multiply(rate).divide(Env.ONEHUNDRED, 3);
+					taxAmt = LineNetAmt.multiply(rate).divide(Env.ONEHUNDRED, 3,RoundingMode.CEILING);
 				
 				if(taxAmtInBHD.compareTo(Env.ZERO)==0 && parent_Tax_ID>0)
-					taxAmtInBHD = lineNetBHD.multiply(rate).divide(Env.ONEHUNDRED, 3);
+					taxAmtInBHD = lineNetBHD.multiply(rate).divide(Env.ONEHUNDRED, 3,RoundingMode.CEILING);
 				
 				int C_BPartner_ID = rstd.getInt("C_BPartner_ID");
 				int C_Invoice_ID = rstd.getInt("C_Invoice_ID");
