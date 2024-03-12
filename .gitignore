@@ -4,3 +4,4 @@
 deployables/*.jar
 org.gaurav.payroll/6/.DS_Store
 *bin
+/com.gaurav.dsi.display/

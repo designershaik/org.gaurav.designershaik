@@ -15,15 +15,14 @@ import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MLocation;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
-import org.compiere.model.MPaymentTerm;
 import org.compiere.model.MUser;
 import org.compiere.model.PO;
 import org.compiere.model.X_C_POSPayment;
 import org.compiere.model.X_C_Payment;
+import org.compiere.process.DocAction;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
-import org.compiere.process.DocAction;
 
 /**
  *
@@ -115,14 +114,26 @@ public final class SfOrder {
 	public int getBPId(Map<?, ?> orderSf) {
 		String email = (String) orderSf.get("email");
 		String phone = (String) orderSf.get("phone");
-		int c_bpartner_id = DB.getSQLValue(trxName, "select c_bpartner_id from ad_user " + "where email like ? and AD_Client_ID = ? ", email,Env.getAD_Client_ID(ctx));
-		if (c_bpartner_id < 0) {
-			//log.severe("BP with email : " + email + " does not exist on iDempiere");
-			c_bpartner_id = DB.getSQLValue(trxName, "select c_bpartner_id from ad_user " + "where phone like ? and AD_Client_ID = ? ", phone,Env.getAD_Client_ID(ctx));
+		int c_bpartner_id = DB.getSQLValue(trxName, "select c_bpartner_id from ad_user where email like ? and AD_Client_ID = ? ", email,Env.getAD_Client_ID(ctx));
+		if (c_bpartner_id < 0) 
+		{
+			c_bpartner_id = DB.getSQLValue(trxName, "select c_bpartner_id from ad_user where replace(phone,'+','') like ? and AD_Client_ID = ? ", phone.replace("+", ""),Env.getAD_Client_ID(ctx));
 			if (c_bpartner_id < 0)
-			c_bpartner_id = createBP(orderSf);
+				c_bpartner_id = createBP(orderSf);
+			else
+				updateBPartner(c_bpartner_id,email,phone);
 		}
+		
 		return c_bpartner_id;
+	}
+
+	private void updateBPartner(int c_bpartner_id, String email, String phone)
+	{
+		int AD_User_ID = DB.getSQLValue(trxName, "Select AD_User_ID From AD_User Where C_BPartner_ID = ? ",c_bpartner_id);
+		MUser user = new MUser(Env.getCtx(),AD_User_ID,trxName);
+		user.setEMail(email);
+		user.setPhone(phone);
+		user.saveEx();
 	}
 
 	int createBP(Map<?, ?> orderSf) {
