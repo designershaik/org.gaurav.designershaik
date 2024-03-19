@@ -114,6 +114,10 @@ public final class SfOrder {
 	public int getBPId(Map<?, ?> orderSf) {
 		String email = (String) orderSf.get("email");
 		String phone = (String) orderSf.get("phone");
+		
+		email = email ==null ? "":email;
+		phone = phone ==null ? "":phone;
+		
 		int c_bpartner_id = DB.getSQLValue(trxName, "select c_bpartner_id from ad_user where email like ? and AD_Client_ID = ? ", email,Env.getAD_Client_ID(ctx));
 		if (c_bpartner_id < 0) 
 		{

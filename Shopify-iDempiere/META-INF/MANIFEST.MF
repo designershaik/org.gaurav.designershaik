@@ -3,7 +3,7 @@ Automatic-Module-Name: Shopify-ntier
 Bundle-ManifestVersion: 2
 Bundle-Name: Shopify-Spieretech
 Bundle-SymbolicName: com.gaurav.spieretech.shopify;singleton:=true
-Bundle-Version: 1.0.3.qualifier
+Bundle-Version: 1.0.4.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Require-Bundle: org.adempiere.base;bundle-version="7.1.0",
  org.adempiere.plugin.utils;bundle-version="7.1.0",
