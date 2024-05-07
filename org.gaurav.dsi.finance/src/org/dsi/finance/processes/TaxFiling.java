@@ -86,7 +86,7 @@ public class TaxFiling extends SvrProcess{
 					+ "currencybase(line.TaxAmt, ci.c_currency_id, ci.dateacct::timestamp with time zone, ci.ad_client_id, ci.ad_org_id) AS TaxAmtBHD,line.TaxAmt ," + 
 					" currencybase(line.LineNetAmt, ci.c_currency_id, ci.dateacct::timestamp with time zone, ci.ad_client_id, ci.ad_org_id) AS TaxBaseAmtBHD,"
 					+ "tax.name,tax.rate,tax.C_Tax_ID "
-					+ "FROM c_invoice ci ,C_InvoiceLine line,C_Tax tax "
+					+ "FROM c_invoice_v ci ,C_InvoiceLine_v line,C_Tax tax "
 					+ "WHERE ci.C_Invoice_ID=line.C_Invoice_ID "
 					+ "AND line.C_Tax_ID=tax.C_Tax_ID "
 					+ "AND ci.DateAcct BETWEEN ? AND ? "
@@ -168,7 +168,7 @@ public class TaxFiling extends SvrProcess{
 				+ "currencybase(line.LineTotalAmt, ci.c_currency_id, ci.dateacct::timestamp with time zone, ci.ad_client_id, ci.ad_org_id) AS LineTotalAmtInBHD, "
 				+ "line.TaxAmt,line.LineNetAmt,line.LineTotalAmt,tax.name,tax.rate,tax.C_Tax_ID,"
 				+ "ci.C_BPartner_ID,ci.C_Invoice_ID,line.C_InvoiceLine_ID,ci.DateAcct,ci.C_BPartner_Location_ID,tax.Rate,ci.C_Currency_ID,tax.DS_ImportZeroVAT "
-				+ "FROM c_invoice ci,C_InvoiceLine line ,C_Tax tax "
+				+ "FROM c_invoice_v ci,C_InvoiceLine_v line ,C_Tax tax "
 				+ "WHERE ci.C_Invoice_ID = line.C_Invoice_ID "
 				+ "AND ci.C_Invoice_ID=line.C_Invoice_ID "
 				+ "AND line.C_Tax_ID=tax.C_Tax_ID "
@@ -270,7 +270,7 @@ public class TaxFiling extends SvrProcess{
 		String sql = "with t1 as (select line.C_InvoiceLine_ID,line.C_Invoice_ID,cl.M_InOut_ID,cl.M_InOutLine_ID ,"
 				+ "impInv.Ref_Invoice_ID,case when impInv.Ref_Invoice_ID>0 then 'Y' else elem.DS_IsVAT end DS_IsVAT,"
 				+ "impInv.Ref_InvoiceLine_ID " + 
-				"from C_InvoiceLine line  " + 
+				"from C_InvoiceLine_v line  " + 
 				"left outer join C_LandedCost cl on  line.C_InvoiceLine_ID=cl.c_InvoiceLine_ID " + 
 				"left outer join DS_ImportInvoices impInv on line.C_InvoiceLine_ID=impInv.C_InvoiceLine_ID "+ 
 				"left outer join M_CostElement elem on cl.M_CostElement_ID=elem.M_CostElement_ID " +

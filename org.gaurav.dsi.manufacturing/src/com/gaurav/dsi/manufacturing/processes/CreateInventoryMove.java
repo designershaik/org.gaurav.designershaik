@@ -7,7 +7,6 @@ import java.util.logging.Level;
 
 import org.compiere.model.MMovement;
 import org.compiere.model.MMovementLine;
-import org.compiere.model.MProduct;
 import org.compiere.model.MStorageOnHand;
 import org.compiere.model.MUser;
 import org.compiere.process.ProcessInfoParameter;
@@ -22,7 +21,6 @@ public class CreateInventoryMove extends SvrProcess {
 	int PP_Order_ID = 0 ; 
 	MPPOrder order ; 
 	int C_MovementDocType_ID ;
-	int M_Warehouse_ID ; 
 	@Override
 	protected void prepare() {
 		
@@ -33,8 +31,6 @@ public class CreateInventoryMove extends SvrProcess {
 				;
 			else if (name.equals("C_DocType_ID"))
 				C_MovementDocType_ID = para[i].getParameterAsInt();
-			else if (name.equals("M_Warehouse_ID"))
-				M_Warehouse_ID = para[i].getParameterAsInt();
 			else
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
 		}
@@ -52,7 +48,6 @@ public class CreateInventoryMove extends SvrProcess {
 		
 		MMovement movement = new MMovement(getCtx(), 0, get_TrxName());
 		movement.setC_DocType_ID(C_MovementDocType_ID);
-		movement.set_ValueOfColumn("PP_Order_ID", PP_Order_ID);
 		movement.setDescription("Auto generated movement from the order by "+user.getName());
 		movement.setAD_Org_ID(order.getAD_Org_ID());
 		movement.setSalesRep_ID(AD_User_ID);

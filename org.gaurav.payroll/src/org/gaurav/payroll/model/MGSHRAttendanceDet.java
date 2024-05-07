@@ -103,6 +103,7 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 				String dependantOn = empComp.getGS_HR_CompDependantOn();
 				int compensation_id = empComp.getGS_HR_Compensation_Master_ID();
 				MGSHRCompensationMaster comp = (MGSHRCompensationMaster)empComp.getGS_HR_Compensation_Master();
+				System.out.println("Compensation Master: "+comp.getName());
 				if(dependantOn==null || dependantOn.isBlank())
 					dependantOn = comp.getGS_HR_CompDependantOn();
 				
@@ -120,16 +121,22 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 				{
 					if(comp.getGS_HR_CompensationType().equalsIgnoreCase("OTI"))
 					{
+						System.out.println(comp.getDS_OvertimeType());
 						BigDecimal perHour = alreadyCalculatedSalary.divide(new BigDecimal(totalDaysInMonth), 6, RoundingMode.HALF_UP).divide(averageWorkingHour, 6, RoundingMode.HALF_UP);
+						
 						if(comp.getDS_OvertimeType().equalsIgnoreCase(MGSHRCompensationMaster.DS_OVERTIMETYPE_OvertimeRegular1) && OT1.compareTo(Env.ZERO)>0)
 							calculatedAmt = perHour.multiply(OT1).multiply(empComp.getPercent()).divide(Env.ONEHUNDRED,  6, RoundingMode.HALF_UP);
-						if(comp.getDS_OvertimeType().equalsIgnoreCase(MGSHRCompensationMaster.DS_OVERTIMETYPE_OvertimePremium1) && OT2.compareTo(Env.ZERO)>0)
+						
+						if(comp.getDS_OvertimeType().equalsIgnoreCase(MGSHRCompensationMaster.DS_OVERTIMETYPE_OvertimeRegular2) && OT2.compareTo(Env.ZERO)>0)
 							calculatedAmt = perHour.multiply(OT2).multiply(empComp.getPercent()).divide(Env.ONEHUNDRED,  6, RoundingMode.HALF_UP);
-						if(comp.getDS_OvertimeType().equalsIgnoreCase(MGSHRCompensationMaster.DS_OVERTIMETYPE_OvertimeRegular2) && OT3.compareTo(Env.ZERO)>0)
+						
+						if(comp.getDS_OvertimeType().equalsIgnoreCase(MGSHRCompensationMaster.DS_OVERTIMETYPE_OvertimeRegular3) && OT3.compareTo(Env.ZERO)>0)
 							calculatedAmt = perHour.multiply(OT3).multiply(empComp.getPercent()).divide(Env.ONEHUNDRED,  6, RoundingMode.HALF_UP);
-						if(comp.getDS_OvertimeType().equalsIgnoreCase(MGSHRCompensationMaster.DS_OVERTIMETYPE_OvertimePremium2) && OT4.compareTo(Env.ZERO)>0)
+						
+						if(comp.getDS_OvertimeType().equalsIgnoreCase(MGSHRCompensationMaster.DS_OVERTIMETYPE_OvertimePremium1) && OT4.compareTo(Env.ZERO)>0)
 							calculatedAmt = perHour.multiply(OT4).multiply(empComp.getPercent()).divide(Env.ONEHUNDRED,  6, RoundingMode.HALF_UP);
-						if(comp.getDS_OvertimeType().equalsIgnoreCase(MGSHRCompensationMaster.DS_OVERTIMETYPE_OvertimeRegular3) && OT5.compareTo(Env.ZERO)>0)
+						
+						if(comp.getDS_OvertimeType().equalsIgnoreCase(MGSHRCompensationMaster.DS_OVERTIMETYPE_OvertimePremium2) && OT5.compareTo(Env.ZERO)>0)
 							calculatedAmt = perHour.multiply(OT5).multiply(empComp.getPercent()).divide(Env.ONEHUNDRED,  6, RoundingMode.HALF_UP);
 					}
 					else
