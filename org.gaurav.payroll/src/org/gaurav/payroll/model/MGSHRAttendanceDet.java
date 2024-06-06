@@ -150,7 +150,7 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
  				if(calculatedAmt.compareTo(Env.ZERO)!=0)
 					setSalaryDetails(monthSal,calculatedAmt.setScale(precision, RoundingMode.HALF_UP),compensation_id,comp.isGS_HR_IsEarning());
 			}
-			calculateGeneralCalculations(monthSal, startDate, endDate);
+			addLoanInstallments(monthSal, startDate, endDate);
 		}
 		if(grossSalary.compareTo(Env.ZERO)==0 && totalDeduction.compareTo(Env.ZERO)==0)
 			monthSal.delete(true);
@@ -164,7 +164,7 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 		return false;
 	}
 
-	private void calculateGeneralCalculations(MGSHREmployeeMonthlySalary monthSal,Timestamp startDate,Timestamp endDate) 
+	private void addLoanInstallments(MGSHREmployeeMonthlySalary monthSal,Timestamp startDate,Timestamp endDate) 
 	{
 		int[] installments_id = DB.getIDsEx(get_TrxName(), "select ins.gs_hr_installments_id from gs_hr_employeeadvance adv,gs_hr_installments ins "
 				+ "where adv.gs_hr_employeeadvance_id = ins.gs_hr_employeeadvance_id  "

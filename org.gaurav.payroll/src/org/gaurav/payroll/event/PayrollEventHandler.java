@@ -35,6 +35,7 @@ public class PayrollEventHandler extends AbstractEventHandler
 		
 		PO po = getPO(event);
 		trxName = po.get_TrxName();
+		int table_ID = po.get_Table_ID();
 		if(po instanceof MGSHREmployeeAdvance)
 		{
 			MGSHREmployeeAdvance advance = (MGSHREmployeeAdvance)po;
@@ -83,6 +84,25 @@ public class PayrollEventHandler extends AbstractEventHandler
 				advance.setGS_HR_RemainingInstallments(advance.getGS_HR_Installments().subtract(paidInstamments));
 				advance.saveEx();
 			}
+			if(inst.is_ValueChanged(MGSHRInstallments.COLUMNNAME_GS_InstallmentAmt))
+			{
+				BigDecimal oldInstallmentAmt = (BigDecimal) inst.get_ValueOld("GS_InstallmentAmt");
+				BigDecimal newInstallmentAmt = inst.getGS_InstallmentAmt();
+				BigDecimal difference = oldInstallmentAmt.subtract(newInstallmentAmt);
+				int maxInstallmentLine_ID = DB.getSQLValue(trxName, " Select GS_HR_Installments_ID "
+						+ "From GS_HR_Installments Where GS_HR_EmployeeAdvance_ID = ? order by line desc  ", inst.getGS_HR_EmployeeAdvance_ID());
+				MGSHRInstallments maxInst = new MGSHRInstallments(ctx,maxInstallmentLine_ID,trxName);
+				Timestamp newInstallmentDate = TimeUtil.addMonths(maxInst.getDate1(), 1);
+				
+				MGSHRInstallments newInst = new MGSHRInstallments(ctx,0,trxName);
+				newInst.setGS_HR_EmployeeAdvance_ID(inst.getGS_HR_EmployeeAdvance_ID());
+				newInst.setGS_InstallmentAmt(difference);
+				newInst.setLine(maxInst.getLine()+1);
+				newInst.setPayDate(newInstallmentDate);
+				newInst.saveEx();
+				
+			}
+			
 		}
 		if(po instanceof MHRContract)
 		{

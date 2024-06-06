@@ -59,6 +59,13 @@ public class CreateCashRequestFromPurchaseRequest extends SvrProcess{
 		if(getAD_User_ID()!=request.getSalesRep_ID())
 			throw new AdempiereException("You are not allowed to create cash Request");
 		
+		int AD_Org_ID = request.getAD_Org_ID() ; 
+		if(request.getAD_Org_ID()<=0)
+			AD_Org_ID = Env.getAD_Org_ID(getCtx());
+		
+		if(AD_Org_ID<=0)
+			AD_Org_ID = DB.getSQLValue(get_TrxName(), "Select AD_Org_ID From AD_Org Where AD_Org_ID > 0 and AD_Client_ID = ? ",Env.getAD_Client_ID(getCtx()));
+		
 		int AD_Process_ID = DB.getSQLValue(get_TrxName(), "Select AD_Process_ID From AD_Process Where AD_Process_UU='92c167bf-756b-4869-b086-06d62cd94a0b'");
 		MUser user = new MUser(getCtx(), getAD_User_ID(), get_TrxName());
 		RelatedCashRequest_ID = DB.getSQLValue(get_TrxName(), "Select R_Request_ID From R_Request Where R_RequestRelated_ID = ? ",R_Request_ID);
@@ -74,6 +81,7 @@ public class CreateCashRequestFromPurchaseRequest extends SvrProcess{
 			cashRequest.setR_RequestRelated_ID(request.getR_Request_ID());
 			cashRequest.setC_BPartner_ID(user.getC_BPartner_ID());
 			cashRequest.set_ValueNoCheck("C_Currency_ID", request.get_Value("C_Currency_ID"));
+			cashRequest.setAD_Org_ID(AD_Org_ID);
 			if(user.getC_BPartner_Location_ID()>0)
 				cashRequest.set_ValueOfColumn("C_BPartner_Location_ID", user.getC_BPartner_Location_ID());
 			cashRequest.saveEx();

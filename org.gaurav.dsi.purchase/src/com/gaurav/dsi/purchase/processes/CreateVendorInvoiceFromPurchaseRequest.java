@@ -11,6 +11,7 @@ import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
+import org.compiere.model.MOrg;
 import org.compiere.model.MRequest;
 import org.compiere.model.MRequestType;
 import org.compiere.model.Query;
@@ -51,6 +52,13 @@ public class CreateVendorInvoiceFromPurchaseRequest extends SvrProcess{
 	@Override
 	protected String doIt() throws Exception 
 	{
+		addLog("Organization: "+request.getAD_Org_ID());
+		int AD_Org_ID = request.getAD_Org_ID() ; 
+		if(request.getAD_Org_ID()<=0)
+			AD_Org_ID = Env.getAD_Org_ID(getCtx());
+		
+		if(AD_Org_ID<=0)
+			AD_Org_ID = DB.getSQLValue(get_TrxName(), "Select AD_Org_ID From AD_Org Where AD_Org_ID > 0 and AD_Client_ID = ? ",Env.getAD_Client_ID(getCtx()));
 		
 		if(request.getC_BPartner_ID()==0)
 			throw new AdempiereException(Msg.getMsg(getCtx(), "DS_BPartnerMandatory"));
@@ -92,6 +100,7 @@ public class CreateVendorInvoiceFromPurchaseRequest extends SvrProcess{
 				invoice.setC_DocTypeTarget_ID(type.get_ValueAsInt("C_DocType_ID"));
 				invoice.setC_BPartner_Location_ID(request.get_ValueAsInt("C_BPartner_Location_ID"));
 				invoice.setSalesRep_ID(request.getSalesRep_ID());
+				invoice.setAD_Org_ID(AD_Org_ID);
 				invoice.setDescription(request.getSummary());
 				invoice.setPaymentRule(paymentRule);
 				if(bpartner.getPO_PriceList_ID()<=0)
@@ -112,6 +121,7 @@ public class CreateVendorInvoiceFromPurchaseRequest extends SvrProcess{
 							priceEntered = product.getDS_Budget();
 						
 						MInvoiceLine line = new MInvoiceLine(invoice);
+						line.setAD_Org_ID(AD_Org_ID);
 						line.setC_Invoice_ID(invoice.getC_Invoice_ID());
 						line.setQtyEntered(product.getQtyRequired());
 						line.setQtyInvoiced(product.getQtyRequired());

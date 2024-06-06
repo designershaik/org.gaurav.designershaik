@@ -5,6 +5,9 @@ import java.sql.ResultSet;
 import org.adempiere.base.IModelFactory;
 import org.compiere.model.PO;
 import org.compiere.util.Env;
+import org.gaurav.payroll.model.I_GS_HR_Employee;
+import org.gaurav.payroll.model.MGSContractCalendar;
+import org.gaurav.payroll.model.MGSContractPeriod;
 import org.gaurav.payroll.model.MGSHRApprovals;
 import org.gaurav.payroll.model.MGSHRAttendanceAccess;
 import org.gaurav.payroll.model.MGSHRAttendanceDayWise;
@@ -17,13 +20,11 @@ import org.gaurav.payroll.model.MGSHRDeductionOnLate;
 import org.gaurav.payroll.model.MGSHRDocumentBaseType;
 import org.gaurav.payroll.model.MGSHREmpCompensation;
 import org.gaurav.payroll.model.MGSHREmpLeave;
-import org.gaurav.payroll.model.I_GS_HR_Employee;
-import org.gaurav.payroll.model.MGSContractCalendar;
-import org.gaurav.payroll.model.MGSContractPeriod;
 import org.gaurav.payroll.model.MGSHREmployee;
 import org.gaurav.payroll.model.MGSHREmployeeAdvance;
 import org.gaurav.payroll.model.MGSHREmployeeMonthlySalary;
 import org.gaurav.payroll.model.MGSHREmployeeSalaryDetails;
+import org.gaurav.payroll.model.MGSHRInstallments;
 import org.gaurav.payroll.model.MGSHRLeaveApplication;
 import org.gaurav.payroll.model.MGSHRLeaveMaster;
 import org.gaurav.payroll.model.MGSHRLogsImported;
@@ -147,6 +148,9 @@ public class PayrollModelFactories implements IModelFactory{
 		
 		if(tableName.equalsIgnoreCase(MGSHREmployeeSalaryDetails.Table_Name))
 			return MGSHREmployeeSalaryDetails.class;
+		
+		if(tableName.equalsIgnoreCase(MGSHRInstallments.Table_Name))
+			return MGSHRInstallments.class;
 
 		return null;
 	}
@@ -253,6 +257,9 @@ public class PayrollModelFactories implements IModelFactory{
 		if(tableName.equalsIgnoreCase(MGSHREmployeeSalaryDetails.Table_Name))
 			return new MGSHREmployeeSalaryDetails(Env.getCtx(), Record_ID, trxName);
 		
+		if(tableName.equalsIgnoreCase(MGSHRInstallments.Table_Name))
+			return new MGSHRInstallments(Env.getCtx(), Record_ID, trxName);
+		
 		return null;
 	}
 
@@ -357,6 +364,9 @@ public class PayrollModelFactories implements IModelFactory{
 		
 		if(tableName.equalsIgnoreCase(MGSHREmployeeSalaryDetails.Table_Name))
 			return new MGSHREmployeeSalaryDetails(Env.getCtx(), rs, trxName);
+		
+		if(tableName.equalsIgnoreCase(MGSHRInstallments.Table_Name))
+			return new MGSHRInstallments(Env.getCtx(), rs, trxName);
 		
 		return null;
 	}
