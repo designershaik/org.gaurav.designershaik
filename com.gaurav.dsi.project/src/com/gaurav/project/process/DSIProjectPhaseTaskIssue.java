@@ -41,7 +41,7 @@ import org.compiere.wf.MWorkflow;
  *	@author Jorg Janke
  *	@version $Id: ProjectIssue.java,v 1.2 2006/07/30 00:51:02 jjanke Exp $
  */
-public class ProjectPhaseTaskIssue extends SvrProcess
+public class DSIProjectPhaseTaskIssue extends SvrProcess
 {
 	/**	Project - Mandatory Parameter		*/
 	private int 		m_C_Project_ID = 0;
