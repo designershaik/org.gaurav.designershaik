@@ -1,13 +1,16 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
+Bundle-ActivationPolicy: lazy
 Bundle-Name: Positionstmt
 Bundle-SymbolicName: com.gaurav.dsi.positionstmt
-Bundle-Version: 10.0.1.qualifier
+Bundle-Version: 10.0.5.qualifier
 Bundle-Vendor: GAURAV
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Require-Bundle: org.adempiere.base;bundle-version="10.0.0",
  org.adempiere.plugin.utils;bundle-version="10.0.0",
  org.gaurav.designershaik;bundle-version="1.0.0",
- joda-time
-Service-Component: OSGI-INF/InvestmentProcessFactory.xml,
- OSGI-INF/InvestmentCallOutFactory.xml
+ joda-time,
+ org.eclipse.osgi.services;bundle-version="3.10.200"
+Service-Component: OSGI-INF/InvestmentCallOutFactory.xml,
+ OSGI-INF/InvestmentProcessFactory.xml,
+ OSGI-INF/com.gaurav.dsi.event.CouponScheduleEventHandler.xml

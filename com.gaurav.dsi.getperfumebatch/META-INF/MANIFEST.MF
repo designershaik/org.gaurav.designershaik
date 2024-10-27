@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Getperfumebatch
+Bundle-SymbolicName: com.gaurav.dsi.getperfumebatch
+Bundle-Version: 1.0.1.qualifier
+Require-Bundle: org.adempiere.base;bundle-version="10.0.0",
+ org.adempiere.plugin.utils;bundle-version="10.0.0",
+ org.eclipse.osgi.services;bundle-version="3.10.200",
+ org.gaurav.designershaik;bundle-version="1.0.0",
+ com.gaurav.dsi.liberomnfg7.1;bundle-version="10.0.6"
+Service-Component: OSGI-INF/com.dsi.getperfumebatch.factory.GetPerfumeProcessFactory.xml
+Bundle-Vendor: GAURAV
+Automatic-Module-Name: com.gaurav.dsi.getperfumebatch
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-11

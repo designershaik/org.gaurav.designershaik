@@ -6,7 +6,7 @@ Bundle-Activator: org.adempiere.plugin.utils.Incremental2PackActivator
 Bundle-Name: Payroll
 Bundle-SymbolicName: org.gaurav.payroll
 Bundle-Vendor: Gaurav
-Bundle-Version: 1.0.3.qualifier
+Bundle-Version: 1.0.5.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Require-Bundle: org.adempiere.base;bundle-version="10.0.0",
  org.adempiere.plugin.utils;bundle-version="10.0.0",

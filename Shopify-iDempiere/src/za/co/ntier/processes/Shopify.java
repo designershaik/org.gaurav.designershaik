@@ -88,63 +88,70 @@ public class Shopify extends SvrProcess {
 		List<?> wcOrders = (List<?>) mapWcOrders.get("orders");
 		// Iterate through each order
 		int count = 0 ;
-		for (int i = 0; i < wcOrders.size(); i++) {
-			Map<?, ?> order = (Map<?, ?>) wcOrders.get(i);
-			
-			int C_Order_ID = DB.getSQLValue(get_TrxName(),
-					"select c_order_id from c_order " + "where POReference = ? and ad_client_id = ? ",order.get("order_number").toString(), Env.getAD_Client_ID(getCtx()));
-			if (C_Order_ID >=0) 
-				notes.append("!!!! Order : " + order.get("order_number").toString() + " already exists "+"\n");
-			else
-			{
-				SfOrder sfOrder = new SfOrder(getCtx(), get_TrxName(), sfDefaults);
-				C_Order_ID = sfOrder.createOrder(order);
-				// Iterate through each order Line
-				List<?> lines = (List<?>) order.get("line_items");
-				for (int j = 0; j < lines.size(); j++) {
-					Map<?, ?> line = (Map<?, ?>) lines.get(j);
-					String orderLineDescription = sfOrder.createOrderLine(line, order);
-					Object name = line.get("name");
-					notes.append(orderLineDescription+"\n"+" Product Name: "+name);
-				}
-				sfOrder.createShippingCharge(order);
-				MOrder so = new MOrder(getCtx(), C_Order_ID, get_TrxName());
-				MNote note = new MNote(getCtx(), 0, get_TrxName());
-				note.setAD_Table_ID(MOrder.Table_ID);
-				note.setRecord_ID(C_Order_ID);
-				note.setAD_Message_ID("sales.order");
-				note.setAD_User_ID(sfDefaults.get_ValueAsInt("SalesRep_ID"));
-				note.setReference(so.getPOReference());
-				note.setTextMsg(notes.toString());
-				note.saveEx();
-				count ++ ;
+		try {
+			for (int i = 0; i < wcOrders.size(); i++) {
+				Map<?, ?> order = (Map<?, ?>) wcOrders.get(i);
 				
-				addLog("Sales Order Created: "+so.getDocumentNo());
-			}
-			
-//			sfOrder.createPosPayment(order);
-//			sfOrder.completeOrder();
+				int C_Order_ID = DB.getSQLValue(get_TrxName(),
+						"select c_order_id from c_order " + "where POReference = ? and ad_client_id = ? ",order.get("order_number").toString(), Env.getAD_Client_ID(getCtx()));
+				if (C_Order_ID >=0) 
+					notes.append("!!!! Order : " + order.get("order_number").toString() + " already exists "+"\n");
+				else
+				{
+					SfOrder sfOrder = new SfOrder(getCtx(), get_TrxName(), sfDefaults);
+					C_Order_ID = sfOrder.createOrder(order);
+					// Iterate through each order Line
+					List<?> lines = (List<?>) order.get("line_items");
+					for (int j = 0; j < lines.size(); j++) {
+						Map<?, ?> line = (Map<?, ?>) lines.get(j);
+						String orderLineDescription = sfOrder.createOrderLine(line, order);
+						Object name = line.get("name");
+						notes.append(orderLineDescription+"\n"+" Product Name: "+name);
+					}
+					sfOrder.createShippingCharge(order);
+					MOrder so = new MOrder(getCtx(), C_Order_ID, get_TrxName());
+					MNote note = new MNote(getCtx(), 0, get_TrxName());
+					note.setAD_Table_ID(MOrder.Table_ID);
+					note.setRecord_ID(C_Order_ID);
+					note.setAD_Message_ID("sales.order");
+					note.setAD_User_ID(sfDefaults.get_ValueAsInt("SalesRep_ID"));
+					note.setReference(so.getPOReference());
+					note.setTextMsg(notes.toString());
+					note.saveEx();
+					count ++ ;
+					
+					addLog("Sales Order Created: "+so.getDocumentNo());
+				}
+				
+//				sfOrder.createPosPayment(order);
+//				sfOrder.completeOrder();
 
-			/*
-			 * // Update syncedToIdempiere to 'yes' Map<String, Object> body = new
-			 * HashMap<>(); List<Map<String, String>> listOfMetaData = new ArrayList();
-			 * Map<String, String> metaData = new HashMap<>(); metaData.put("key",
-			 * "syncedToIdempiere"); metaData.put("value", "yes");
-			 * listOfMetaData.add(metaData);
-			 * 
-			 * body.put("meta_data", listOfMetaData); Map<?, ?> response =
-			 * wooCommerce.update(EndpointBaseType.ORDERS.getValue(), id, body);
-			 * System.out.println(response.toString());
-			 */
+				/*
+				 * // Update syncedToIdempiere to 'yes' Map<String, Object> body = new
+				 * HashMap<>(); List<Map<String, String>> listOfMetaData = new ArrayList();
+				 * Map<String, String> metaData = new HashMap<>(); metaData.put("key",
+				 * "syncedToIdempiere"); metaData.put("value", "yes");
+				 * listOfMetaData.add(metaData);
+				 * 
+				 * body.put("meta_data", listOfMetaData); Map<?, ?> response =
+				 * wooCommerce.update(EndpointBaseType.ORDERS.getValue(), id, body);
+				 * System.out.println(response.toString());
+				 */
+			}
+			// adjust startDateTime time to current time minus 10 min
+			startDateTime = LocalDateTime.now().minusMinutes(10).format(DateTimeFormatter.ISO_DATE_TIME);
+			Integer maxSize = 19;
+			if(startDateTime.length() > maxSize ){
+				startDateTime = startDateTime.substring(0, maxSize);
+			}
+			sfDefaults.set_ValueOfColumn("syncfrom", startDateTime);
+			sfDefaults.saveEx();
 		}
-		// adjust startDateTime time to current time minus 10 min
-		startDateTime = LocalDateTime.now().minusMinutes(10).format(DateTimeFormatter.ISO_DATE_TIME);
-		Integer maxSize = 19;
-		if(startDateTime.length() > maxSize ){
-			startDateTime = startDateTime.substring(0, maxSize);
+		catch(Exception e)
+		{
+			addLog("Issue with the Syncing one of the line: "+e);
 		}
-		sfDefaults.set_ValueOfColumn("syncfrom", startDateTime);
-		sfDefaults.saveEx();
+		
 		
 		return "Total orders synced: "+count;
 	}

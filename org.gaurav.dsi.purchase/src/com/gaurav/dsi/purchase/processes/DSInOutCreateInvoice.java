@@ -18,6 +18,7 @@ package com.gaurav.dsi.purchase.processes;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Timestamp;
 import java.util.logging.Level;
 
 import org.compiere.model.MCurrency;
@@ -76,6 +77,7 @@ public class DSInOutCreateInvoice extends SvrProcess
 	 */
 	protected String doIt () throws Exception
 	{
+		Timestamp date = Env.getContextAsDate(getCtx(), "#Date");
 		if (log.isLoggable(Level.INFO)) log.info("M_InOut_ID=" + p_M_InOut_ID 
 			+ ", M_PriceList_ID=" + p_M_PriceList_ID
 			+ ", InvoiceDocumentNo=" + p_InvoiceDocumentNo);
@@ -89,6 +91,8 @@ public class DSInOutCreateInvoice extends SvrProcess
 			throw new IllegalArgumentException("Shipment not completed");
 		
 		MInvoice invoice = new MInvoice (ship, null);
+		invoice.setDateAcct(date);
+		invoice.setDateInvoiced(date);
 		// Should not override pricelist for RMA
 		if (p_M_PriceList_ID != 0 && ship.getM_RMA_ID() == 0)
 			invoice.setM_PriceList_ID(p_M_PriceList_ID);

@@ -17,6 +17,7 @@ import org.libero.model.MPPOrder;
 
 public class ProductRecall extends SvrProcess {
 
+	int DSI_TrackProductBatch_ID = 0 ;
 	int DSI_SerialNoTrx_ID = 0 ;
 	int p_M_Product_ID = 0 ;
 	int p_M_AttributeSetInstance_ID = 0 ;
@@ -35,25 +36,20 @@ public class ProductRecall extends SvrProcess {
 			else if (name.equals("M_AttributeSetInstance_ID"))
 				p_M_AttributeSetInstance_ID = para[i].getParameterAsInt();
 		}
-		DSI_SerialNoTrx_ID = getRecord_ID();
+		DSI_TrackProductBatch_ID = getRecord_ID();
 	}
 
 	@Override
 	protected String doIt() throws Exception 
 	{
 		DB.executeUpdate("Delete from DSI_T_RecallProducts ", get_TrxName());
-		if(DSI_SerialNoTrx_ID>0)
+		if(DSI_TrackProductBatch_ID>0)
 		{
-			List<MDSITrackProductBatch> batchDetails = new Query(getCtx(), MDSITrackProductBatch.Table_Name, " 	DSI_SerialNoTrx_ID =  ? "
-															+ "and M_AttributeSetInstance_ID is not null ", get_TrxName())
-															.setParameters(DSI_SerialNoTrx_ID)
-															.list();
-			for(MDSITrackProductBatch det : batchDetails)
-			{
-				int M_AttributeSetInstance_ID = det.getM_AttributeSetInstance_ID();
-				int M_Product_ID = det.getM_Product_ID();
-				recallProductFromThisBatch(M_AttributeSetInstance_ID,M_Product_ID);
-			}
+			MDSITrackProductBatch det = new MDSITrackProductBatch(getCtx(),DSI_TrackProductBatch_ID,get_TrxName());
+			int M_AttributeSetInstance_ID = det.getM_AttributeSetInstance_ID();
+			int M_Product_ID = det.getM_Product_ID();
+			DSI_SerialNoTrx_ID = det.get_ValueAsInt("DSI_SerialNoTrx_ID");
+			recallProductFromThisBatch(M_AttributeSetInstance_ID,M_Product_ID);
 		}
 		else
 		{

@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Font Fragment
+Bundle-SymbolicName: com.gaurav.fragment.report.font;singleton:=true
+Bundle-Version: 7.1.0.qualifier
+Bundle-Vendor: GAURAV
+Fragment-Host: net.sf.jasperreports.engine;bundle-version="6.6.0"
+Automatic-Module-Name: com.gaurav.fragment.report.font
+Bundle-ClassPath: .,
+ lib/NotoSansArabic.jar
+Bundle-RequiredExecutionEnvironment: JavaSE-11

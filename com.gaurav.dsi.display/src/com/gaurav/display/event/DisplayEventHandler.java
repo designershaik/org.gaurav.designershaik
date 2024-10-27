@@ -6,12 +6,11 @@ import org.adempiere.base.event.AbstractEventHandler;
 import org.adempiere.base.event.IEventTopics;
 import org.compiere.model.I_M_Movement;
 import org.compiere.model.MAcctSchema;
-import org.compiere.model.MAssetAddition;
 import org.compiere.model.MDocType;
-import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MLocator;
 import org.compiere.model.MMatchInv;
 import org.compiere.model.MMovement;
+import org.compiere.model.MProduct;
 import org.compiere.model.MProductCategory;
 import org.compiere.model.MWarehouse;
 import org.compiere.model.PO;
@@ -45,7 +44,9 @@ public class DisplayEventHandler extends AbstractEventHandler
 				{
 					int C_BPartner_ID = mov.getC_BPartner_ID();
 					int C_BPartner_Location_ID = mov.getC_BPartner_Location_ID();
-					int M_Warehouse_ID = DB.getSQLValue(trxName, "Select M_Warehouse_ID From M_Warehouse Where DS_IsUseCogsForMovement='Y' and DS_IsCustomerWarehouse='Y' ");
+					int M_Warehouse_ID = DB.getSQLValue(trxName, "Select M_Warehouse_ID From M_Warehouse"
+							+ " Where DS_IsUseCogsForMovement='Y' and DS_IsCustomerWarehouse='Y' and AD_Client_ID = ?  ",mov.getAD_Client_ID());
+					
 					int M_Locator_ID = DB.getSQLValue(trxName, "Select loc.M_Locator_ID From M_Locator loc "
 							+ "where loc.C_BPartner_ID = ? and loc.C_BPartner_Location_ID = ? and loc.M_Warehouse_ID = ?  ",C_BPartner_ID,C_BPartner_Location_ID,M_Warehouse_ID);
 					if(M_Locator_ID<=0)
@@ -55,7 +56,7 @@ public class DisplayEventHandler extends AbstractEventHandler
 						MLocator loc = new MLocator(warehouse, mov.getC_BPartner().getValue().concat(" / ").concat(mov.getC_BPartner_Location().getName()));
 						loc.set_ValueNoCheck("C_BPartner_ID", C_BPartner_ID);
 						loc.set_ValueNoCheck("C_BPartner_Location_ID", C_BPartner_Location_ID);
-						loc.setX(mov.getC_BPartner_Location().getName());
+						loc.setX(mov.getC_BPartner().getValue().concat(" / ").concat(mov.getC_BPartner_Location().getName()));
 						loc.saveEx();
 					}
 				}
@@ -75,7 +76,7 @@ public class DisplayEventHandler extends AbstractEventHandler
 						log.info("Already generated: "+line.getLine());
 					else
 						line.generateAssetAndTransferDisplay(line,trxName);
-				}
+				}	
 			}
 		}
 //		if(po instanceof MMatchInv)

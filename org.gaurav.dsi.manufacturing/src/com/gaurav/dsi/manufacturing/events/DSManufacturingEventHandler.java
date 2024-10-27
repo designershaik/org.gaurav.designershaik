@@ -52,6 +52,7 @@ public class DSManufacturingEventHandler extends AbstractEventHandler {
 	String trxName ;
 	Properties ctx ;
 	MPPOrder pporder = null;
+	int perfumeBatch_ID = 0; 
 	@Override
 	protected void doHandleEvent(Event event) 
 	{
@@ -179,6 +180,12 @@ public class DSManufacturingEventHandler extends AbstractEventHandler {
 					
 				}
 				UpdateCost(pporder.getM_Product_ID());
+				loopOnManufacturingOrders(pporder);
+				if(perfumeBatch_ID>0)
+				{
+					pporder.set_ValueNoCheck("GS_PerfumeBatchMO_ID", perfumeBatch_ID);
+					pporder.saveEx();
+				}
 			}
 		}
 		if(po instanceof MPPOrderBOMLine)
@@ -373,6 +380,40 @@ public class DSManufacturingEventHandler extends AbstractEventHandler {
 				log.fine("BOM Line skiped - "+PP_Product_BOMline);
 			}
 		} 
+	}
+	
+	private void loopOnManufacturingOrders(MPPOrder order) 
+	{
+		if(perfumeBatch_ID<=0)
+		{
+			String sql = "select line.PP_Order_BOMLine_ID " + 
+					" from PP_Order_BOMLine line " + 
+					" where line.PP_Order_ID = ? "  ;
+			
+			System.out.println("Main PP Order: "+order.getDocumentNo());
+			int[] manufacturingLine_IDs = DB.getIDsEx(order.get_TrxName(), sql, order.getPP_Order_ID());
+			for(int ppBOMLine_ID : manufacturingLine_IDs)
+			{
+				if(perfumeBatch_ID>0)
+					continue;
+				MPPOrderBOMLine bomLine = new MPPOrderBOMLine(Env.getCtx(),ppBOMLine_ID,order.get_TrxName());
+				if(bomLine.getM_AttributeSetInstance_ID()>0)
+				{
+					MProduct prod = (MProduct)bomLine.getM_Product();
+					System.out.println(prod.getM_Product_ID()+" / ID / "+"Product: "+prod.getValue()+" Name: "+prod.getName()+" Order Ids: "+order.getDocumentNo()+" Main Batch"+prod.get_ValueAsBoolean("GS_MaintainBatchhierarchy"));
+					if(prod.get_ValueAsBoolean("GS_MaintainBatchhierarchy"))
+					{
+						perfumeBatch_ID =  bomLine.getM_AttributeSetInstance_ID();
+					}
+					else if (perfumeBatch_ID<=0)
+					{
+						int childOrder_ID = DB.getSQLValue(order.get_TrxName(), "Select PP_Order_ID From PP_Order Where M_AttributeSetInstance_ID = ? and M_Product_ID = ? ",bomLine.getM_AttributeSetInstance_ID(),bomLine.getM_Product_ID());
+						MPPOrder childOrder = new MPPOrder(Env.getCtx(),childOrder_ID,order.get_TrxName());
+						loopOnManufacturingOrders(childOrder);
+					}
+				}
+			}
+		}
 	}
 
 }

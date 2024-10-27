@@ -121,7 +121,7 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 				{
 					if(comp.getGS_HR_CompensationType().equalsIgnoreCase("OTI"))
 					{
-						System.out.println(comp.getDS_OvertimeType());
+						System.out.println(comp.getDS_OvertimeType()+" Employee: "+empComp.getGS_HR_Employee().getName());
 						BigDecimal perHour = alreadyCalculatedSalary.divide(new BigDecimal(totalDaysInMonth), 6, RoundingMode.HALF_UP).divide(averageWorkingHour, 6, RoundingMode.HALF_UP);
 						
 						if(comp.getDS_OvertimeType().equalsIgnoreCase(MGSHRCompensationMaster.DS_OVERTIMETYPE_OvertimeRegular1) && OT1.compareTo(Env.ZERO)>0)
@@ -170,7 +170,8 @@ public class MGSHRAttendanceDet extends X_GS_HR_Attendance_Det
 				+ "where adv.gs_hr_employeeadvance_id = ins.gs_hr_employeeadvance_id  "
 				+ "and ins.PayDate between ? and ?  "
 				+ "and adv.gs_hr_employee_id  = ? "
-				+ "and (ins.hr_break='N' or ins.IsActive='N') ",startDate,endDate,getGS_HR_Employee_ID());
+				+ "and ins.hr_break='N' and ins.IsActive='Y' "
+				+ "and ins.IsPaid='N' ",startDate,endDate,getGS_HR_Employee_ID());
 		for(int inst_id : installments_id)
 		{
 			MGSHRInstallments inst = new MGSHRInstallments(getCtx(), inst_id, get_TrxName());

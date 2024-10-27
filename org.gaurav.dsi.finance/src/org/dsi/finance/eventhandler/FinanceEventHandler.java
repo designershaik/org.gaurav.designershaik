@@ -118,10 +118,10 @@ public class FinanceEventHandler extends AbstractEventHandler
 						if(po.get_ValueAsInt("R_Request_ID")==0 || po.get_ValueAsInt("DS_Product_Request_ID")==0)
 							throw new AdempiereException("Request is mandatory");
 					}
-					if(!invoice.get_ValueAsBoolean("DS_IsZeroValueAllowed") && line.getLineNetAmt().compareTo(Env.ZERO)==0 && line.getLineTotalAmt().compareTo(Env.ZERO)==0)
-					{
-						throw new AdempiereException(Msg.getMsg(Env.getCtx(), "ZeroValueInvoiceNotAllowed"));
-					}
+//					if(!invoice.get_ValueAsBoolean("DS_IsZeroValueAllowed") && line.getLineNetAmt().compareTo(Env.ZERO)==0 && line.getLineTotalAmt().compareTo(Env.ZERO)==0)
+//					{
+//						throw new AdempiereException(Msg.getMsg(Env.getCtx(), "ZeroValueInvoiceNotAllowed"));
+//					}
 					if(line.getC_OrderLine_ID()!=0 && R_Request_ID!=0)
 					{
 						int DS_Product_Request_ID = coLine.get_ValueAsInt("DS_Product_Request_ID");
@@ -306,9 +306,8 @@ public class FinanceEventHandler extends AbstractEventHandler
 			MDSSettledInvoices inv = (MDSSettledInvoices)po;
 			MPayment payment = new MPayment(ctx, inv.getC_Payment_ID(), trxName);
 			BigDecimal totalCashPaidByEmp = (BigDecimal) payment.get_Value("DS_TotalCashBillAmt");
-			BigDecimal totalAmt = DB.getSQLValueBD(trxName, "Select coalesce(sum(pay.PayAmt),0) "
-					+ "From C_Payment pay,DS_Settled_Invoices dsi "
-					+ "where pay.C_Payment_ID = dsi.Ref_Payment_ID and dsi.C_Payment_ID = ? ", inv.getC_Payment_ID());
+			BigDecimal totalAmt = DB.getSQLValueBD(trxName, "Select coalesce(sum(dsi.TrxAmt),0) "
+					+ "From C_Payment pay left outer join DS_Settled_Invoices dsi on pay.C_Payment_ID = dsi.Ref_Payment_ID where pay.C_Payment_ID = ?  ", inv.getC_Payment_ID());
 			if(totalAmt.compareTo(totalCashPaidByEmp)>0)
 				throw new AdempiereException("Payment amout is less than liquividating invoices total");
 		}

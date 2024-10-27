@@ -67,10 +67,10 @@ public class ProcessCouponReceiptAndAdjustAmortization extends SvrProcess{
 				p_GL_Category_ID =para[i].getParameterAsInt();
 			else if (name.equals("PostingType"))
 				p_PostingType =para[i].getParameterAsString();
-			else if (name.equals("Amortization_Charge_ID"))
-				p_Amortization_Charge_ID =para[i].getParameterAsInt();
-			else if (name.equals("AccruedIncome_Charge_ID"))
-				p_AccruedIncome_Charge_ID =para[i].getParameterAsInt();
+//			else if (name.equals("Amortization_Charge_ID"))
+//				p_Amortization_Charge_ID =para[i].getParameterAsInt();
+//			else if (name.equals("AccruedIncome_Charge_ID"))
+//				p_AccruedIncome_Charge_ID =para[i].getParameterAsInt();
 			else
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);		
 		}
@@ -102,7 +102,7 @@ public class ProcessCouponReceiptAndAdjustAmortization extends SvrProcess{
 			invoice.saveEx();
 
 			MInvoiceLine line = new MInvoiceLine(invoice);
-			line.setC_Charge_ID(p_AccruedIncome_Charge_ID);
+			line.setC_Charge_ID(p_C_Charge_ID);
 			line.setC_Tax_ID(p_C_Tax_ID);
 			line.setDescription(p_description);
 			line.setPrice(couponAmt);
@@ -134,19 +134,17 @@ public class ProcessCouponReceiptAndAdjustAmortization extends SvrProcess{
 			journal.setC_ConversionType_ID(114);
 			journal.setCurrencyRate(rate);
 			journal.save();
-			int amortization_ValComb_ID = DB.getSQLValue(get_TrxName(), "Select Ch_Expense_Acct From C_Charge_Acct Where C_Charge_ID = ? ", p_Amortization_Charge_ID);
+//			int amortization_ValComb_ID = DB.getSQLValue(get_TrxName(), "Select Ch_Expense_Acct From C_Charge_Acct Where C_Charge_ID = ? ", p_Amortization_Charge_ID);
 			int asset_ValidComb_ID = DB.getSQLValue(get_TrxName(), "Select p_Asset_Acct From M_Product_Acct Where M_Product_ID = ? ", sc.getM_Product_ID());
 			int couponIncome_ValidComb_ID = DB.getSQLValue(get_TrxName(), "Select Ch_Expense_Acct From C_Charge_Acct Where C_Charge_ID = ? ", p_C_Charge_ID);
-			int accruedIncome_ValidComb_ID = DB.getSQLValue(get_TrxName(), "Select Ch_Expense_Acct From C_Charge_Acct Where C_Charge_ID = ? ", p_AccruedIncome_Charge_ID);
+//			int accruedIncome_ValidComb_ID = DB.getSQLValue(get_TrxName(), "Select Ch_Expense_Acct From C_Charge_Acct Where C_Charge_ID = ? ", p_AccruedIncome_Charge_ID);
 
-			MJournalLine assetAccountDrEntry= createPrincipalJournalLine(asset_ValidComb_ID,adjustedAmortization,rate,baseAmt,journal.getGL_Journal_ID(),true);
-			MJournalLine amortizationCrEntry = createPrincipalJournalLine(amortization_ValComb_ID,adjustedAmortization,rate,baseAmt,journal.getGL_Journal_ID(),false);
+			MJournalLine assetAccountDrEntry= createPrincipalJournalLine(asset_ValidComb_ID,adjustedAmortization.abs(),rate,baseAmt,journal.getGL_Journal_ID(),true);
+//			MJournalLine amortizationCrEntry = createPrincipalJournalLine(amortization_ValComb_ID,adjustedAmortization,rate,baseAmt,journal.getGL_Journal_ID(),false);
 
-			MJournalLine accruedIncomeDrEntry= createPrincipalJournalLine(accruedIncome_ValidComb_ID,couponAmt,rate,baseAmt,journal.getGL_Journal_ID(),true);
-			MJournalLine couponIncomeCrEntry = createPrincipalJournalLine(couponIncome_ValidComb_ID,couponAmt,rate,baseAmt,journal.getGL_Journal_ID(),false);
-			log.info("Asset Account "+assetAccountDrEntry.getC_ValidCombination_ID()+" Amortization Account: "+amortizationCrEntry.getC_ValidCombination_ID()+
-					" Accrued Income Account: "+accruedIncomeDrEntry.getC_ValidCombination_ID()
-					+"Coupon Income Account: "+couponIncomeCrEntry.getC_ValidCombination_ID());
+//			MJournalLine accruedIncomeDrEntry= createPrincipalJournalLine(accruedIncome_ValidComb_ID,couponAmt,rate,baseAmt,journal.getGL_Journal_ID(),true);
+			MJournalLine couponIncomeCrEntry = createPrincipalJournalLine(couponIncome_ValidComb_ID,adjustedAmortization.abs(),rate,baseAmt,journal.getGL_Journal_ID(),false);
+			log.info("Asset Account "+assetAccountDrEntry.getC_ValidCombination_ID()+" Amortization Account: "+"Coupon Income Account: "+couponIncomeCrEntry.getC_ValidCombination_ID());
 
 			addLog(journal.getGL_Journal_ID(), null, null, journal.getDocumentNo(), MJournal.Table_ID, journal.getGL_Journal_ID());
 			sc.setGL_Journal_ID(journal.getGL_Journal_ID());

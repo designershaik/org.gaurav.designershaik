@@ -36,14 +36,15 @@ public class WCreateFromPayment extends CreateFrom{
 		return true;
 	}
 	
+	@SuppressWarnings("deprecation")
 	protected Vector<Vector<Object>> getPaymentData( Object BPartner, String DocumentNo, 
 			Object DateFrom, Object DateTo, Object AmtFrom, Object AmtTo, Object IsSoTrx)
 	{
 		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
 		
 		StringBuilder sql = new StringBuilder();
-		sql.append("select p.DateAcct,p.C_Invoice_ID,(p.DocumentNo||'-'||COALESCE(p.description,'')), p.C_Currency_ID,c.ISO_Code, p.GrandTotal,");
-		sql.append("p.GrandTotal, bp.Name ");
+		sql.append("select p.DateAcct,p.C_Invoice_ID,(p.DocumentNo||'-'||COALESCE(p.description,'')), p.C_Currency_ID,c.ISO_Code,");
+		sql.append("p.GrandTotal,invoiceopen(p.C_Invoice_ID,null), bp.Name ");
 		sql.append("FROM C_Invoice_v p INNER JOIN C_Currency c ON (p.C_Currency_ID=c.C_Currency_ID)"
 				+ "  LEFT OUTER JOIN C_BPartner bp ON (p.C_BPartner_ID=bp.C_BPartner_ID)");
 		sql.append(getSQLWhere(BPartner, DocumentNo, DateFrom, DateTo, AmtFrom, AmtTo, IsSoTrx));
@@ -134,8 +135,8 @@ public class WCreateFromPayment extends CreateFrom{
 		columnNames.add(Msg.translate(Env.getCtx(), "Date"));
 		columnNames.add(Msg.getElement(Env.getCtx(), "C_Invoice_ID"));
 		columnNames.add(Msg.translate(Env.getCtx(), "C_Currency_ID"));
-		columnNames.add(Msg.translate(Env.getCtx(), "Amount"));
-		columnNames.add(Msg.translate(Env.getCtx(), "ConvertedAmount"));
+		columnNames.add(Msg.translate(Env.getCtx(), "GrandTotal"));
+		columnNames.add(Msg.translate(Env.getCtx(), "OpenAmt"));
 		columnNames.add(Msg.translate(Env.getCtx(), "C_BPartner_ID"));
 	    
 	    return columnNames;

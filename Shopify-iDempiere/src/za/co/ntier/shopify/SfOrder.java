@@ -257,9 +257,9 @@ public final class SfOrder {
 		MOrderLine orderLine = new MOrderLine(order);
 		orderLine.setAD_Org_ID(order.getAD_Org_ID());
 		// orderLine.setAD_Org_ID(11);
+		String sku = line.get("sku").toString();
+		int m_Product_ID = getProductId(sku);
 		
-		int m_Product_ID = getProductId(line.get("sku").toString());
-				
 		if(m_Product_ID<=0)
 		{
 			m_Product_ID = (int) sfDefaults.get_Value("m_product_id");
@@ -275,15 +275,16 @@ public final class SfOrder {
 		long qty = ((Number) line.get("quantity")).longValue();
 		orderLine.setQty(BigDecimal.valueOf((long) qty));
 		// orderLine.setC_Project_ID(originalOLine.getC_Project_ID());
-		 orderLine.setC_Activity_ID(1000024);
-		 orderLine.setUser2_ID(1001189);
-		 orderLine.setUser1_ID(1001230);
+		orderLine.setC_Activity_ID(1000024);
+		orderLine.setUser2_ID(1001189);
+		orderLine.setUser1_ID(1001230);
 		// orderLine.setC_Campaign_ID(originalOLine.getC_Campaign_ID());
 		orderLine.setPrice(new BigDecimal(Double.parseDouble((String) line.get("price"))));
 		orderLine.setPrice();
 		if (!orderLine.save()) {
-			throw new IllegalStateException("Could not create Order Line");
-		}
+			throw new IllegalStateException("Could not create Order Line"+sku);
+		}	
+		
 		return description;
 	}
 

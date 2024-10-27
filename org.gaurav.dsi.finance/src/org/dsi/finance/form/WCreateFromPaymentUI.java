@@ -42,6 +42,7 @@ import org.zkoss.zul.Borderlayout;
 import org.zkoss.zul.Center;
 import org.zkoss.zul.Hbox;
 
+@SuppressWarnings("removal")
 public class WCreateFromPaymentUI extends WCreateFromPayment implements EventListener<Event>{
 
 	public WCreateFromPaymentUI(GridTab mTab)
@@ -113,6 +114,7 @@ public class WCreateFromPaymentUI extends WCreateFromPayment implements EventLis
 	 *  @throws Exception if Lookups cannot be initialized
 	 *  @return true if initialized
 	 */
+	@SuppressWarnings("removal")
 	public boolean dynInit() throws Exception
 	{
 		log.config("");

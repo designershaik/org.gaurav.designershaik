@@ -23,6 +23,7 @@ import org.compiere.model.MLocator;
 import org.compiere.model.MMovement;
 import org.compiere.model.MMovementLine;
 import org.compiere.model.MProduct;
+import org.compiere.model.MProductCategory;
 import org.compiere.model.MProductCategoryAcct;
 import org.compiere.model.MWarehouse;
 import org.compiere.model.Query;
@@ -51,6 +52,15 @@ public class MDSMovementLine extends MMovementLine{
 
 	public String generateAssetAndTransferDisplay(MDSMovementLine line,String trxName) 
 	{
+		MProduct product = (MProduct)line.getM_Product();
+		MProductCategory category = (MProductCategory)product.getM_Product_Category();
+		int assetGroup_ID = category.getA_Asset_Group_ID();
+		if(assetGroup_ID<=0)
+			assetGroup_ID = category.get_ValueAsInt("DS_AssetGroup_ID");
+		
+		if(assetGroup_ID<=0)
+			return "Product has no asset group in the product category: "+product.getValue();
+		
 		MClient client = MClient.get(getCtx());
 		MAcctSchema asc = client.getAcctSchema();
 		
@@ -66,7 +76,6 @@ public class MDSMovementLine extends MMovementLine{
 			boolean isDestinationIsCogs = warehouseTo.get_ValueAsBoolean("DS_IsUseCogsForMovement");
 			MProductCategoryAcct acct = MProductCategoryAcct.get(getCtx(), line.getM_Product().getM_Product_Category_ID(),asc.getC_AcctSchema_ID(), trxName);
 			MAccount cogsAccount = new MAccount(getCtx(), acct.getP_COGS_Acct(), trxName);
-			System.out.println("Account type: "+cogsAccount.getAccountType()+"  asdsa ");
 			
 			if(cogsAccount.getAccountType().equalsIgnoreCase(MElementValue.ACCOUNTTYPE_Expense))
 			{
@@ -114,6 +123,8 @@ public class MDSMovementLine extends MMovementLine{
 					}
 				}
 			}
+			else
+				return "Product category cogs account is not expense";
 		}
 		line.set_ValueNoCheck("IsGenerated", true);
 		line.saveEx();
@@ -346,9 +357,9 @@ public class MDSMovementLine extends MMovementLine{
 		asset.setAssetActivationDate(line.getM_Movement().getMovementDate());
 		asset.setDateAcct(line.getM_Movement().getMovementDate());
 		asset.setA_Asset_Group_ID(A_Asset_Group_ID);
-		System.out.println(line.getM_Product().getM_Product_Category_ID());
 		int DS_AssetGroup_ID = DB.getSQLValue(trxName, "Select DS_AssetGroup_ID  from M_Product_Category cat where cat.M_Product_Category_ID = ? ",line.getM_Product().getM_Product_Category_ID());
-		asset.setA_Asset_Group_ID(DS_AssetGroup_ID);
+		if(A_Asset_Group_ID<=0)
+			asset.setA_Asset_Group_ID(DS_AssetGroup_ID);
 		asset.setHelp(Msg.getMsg(MClient.get(Env.getCtx()).getAD_Language(), "CreatedFromInvoiceLine",
 				new Object[] { line.getM_Movement().getDocumentNo(), line.getLine() }));
 
