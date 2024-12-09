@@ -3,7 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Finance
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-SymbolicName: com.gaurav.dsi.finance
-Bundle-Version: 10.1.11.qualifier
+Bundle-Version: 10.1.17.qualifier
+Export-Package: org.dsi.finance.processes
 Bundle-Vendor: GAURAV
 Require-Bundle: org.adempiere.base;bundle-version="10.0.0",
  org.adempiere.plugin.utils;bundle-version="10.0.0",

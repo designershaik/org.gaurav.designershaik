@@ -149,13 +149,17 @@ public class DSICRMCallOutFactories implements IColumnCalloutFactory{
 				&& columnName.equalsIgnoreCase(MDSPOSItemDetails.COLUMNNAME_QtyOrdered))
 			list.add(new CallOutSetPriceEnteredTaxPOSDetails());
 		
+		if(tableName.equalsIgnoreCase(MDSPOSItemDetails.Table_Name) 
+				&& columnName.equalsIgnoreCase("Discount"))
+			list.add(new CallOutSetPriceEnteredTaxPOSDetails());
+		
 		if(tableName.equalsIgnoreCase(MDSPOSHeader.Table_Name) 
 				&& columnName.equalsIgnoreCase(MDSPOSHeader.COLUMNNAME_C_OrderSource_ID))
 			list.add(new CallOutSetOrderSourceValue());
 		
-		if(tableName.equalsIgnoreCase(MOrder.Table_Name) 
-				&& columnName.equalsIgnoreCase(MOrder.COLUMNNAME_C_OrderSource_ID))
-			list.add(new CallOutSetOrderSourceValue());
+//		if(tableName.equalsIgnoreCase(MOrder.Table_Name) 
+//				&& columnName.equalsIgnoreCase(MOrder.COLUMNNAME_C_OrderSource_ID))
+//			list.add(new CallOutSetOrderSourceValue());
 		
 		if(tableName.equalsIgnoreCase(MDSPOSHeader.Table_Name) 
 				&& columnName.equalsIgnoreCase(MDSPOSHeader.COLUMNNAME_DS_POSHeader_ID))

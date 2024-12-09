@@ -1,21 +1,14 @@
 package org.dsi.finance.processes;
 
 import java.io.File;
+import java.util.ArrayList;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.exceptions.FillMandatoryException;
 import org.compiere.model.MAttachment;
-import org.compiere.model.MClient;
-import org.compiere.model.MDunningRunEntry;
-import org.compiere.model.MMailText;
-import org.compiere.model.MQuery;
-import org.compiere.model.MSysConfig;
-import org.compiere.model.MUser;
-import org.compiere.model.PrintInfo;
-import org.compiere.print.MPrintFormat;
-import org.compiere.print.ReportEngine;
+import org.compiere.model.MInvoice;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
-import org.compiere.util.EMail;
 import org.compiere.util.Env;
 import org.gaurav.dsi.model.MDSPOSHeader;
 
@@ -36,67 +29,34 @@ public class SendInvoiceFromDSPOS extends SvrProcess{
 		if(header.getEMail()==null)
 			throw new FillMandatoryException(MDSPOSHeader.COLUMNNAME_EMail);
 		
-		String textMsg = "";
-		int defaultMailTemplate = 0;
-		int AD_User_ID = Env.getContextAsInt(Env.getCtx(), "#AD_User_ID");
-		MUser from=new MUser(Env.getCtx(), AD_User_ID, get_TrxName());
-		defaultMailTemplate=Integer.parseInt(MSysConfig.getValue("DEFAULT_CUSTOMERINVOICE_EMAILTEMPLATE"));
-		String defaultEmailID=MSysConfig.getValue("DEFAULT_ACCOUNT_EMAIL_ID","accounts@shaik.net");
-		sendTo = header.getEMail();
-		MPrintFormat format = null;
-		int AD_PrintFormat_ID = DB.getSQLValue(get_TrxName(), "SELECT AD_PrintFormat_ID FROM AD_PrintFormat "
-				+ "WHERE AD_Table_ID IN (SELECT AD_Table_ID From AD_Table Where TableName like 'DS_POSHeader') and JasperProcess_ID is not null ");
+		File pdf = null;
+		int C_Invoice_ID = header.get_ValueAsInt("C_Invoice_ID");
+		if(C_Invoice_ID<=0)
+			C_Invoice_ID = DB.getSQLValue(get_TrxName(), "Select C_Invoice_ID From C_Invoice Where C_Order_ID = ? and DocStatus not in ('RE','VO') ");
 		
-		
-		format = MPrintFormat.get (getCtx(),AD_PrintFormat_ID, false);
-		MQuery query = new MQuery("DS_POSHeader");
-		query.addRestriction("DS_POSHeader_ID", MQuery.EQUAL, 
-			new Integer(getRecord_ID()));
+		if(C_Invoice_ID<=0)
+			throw new FillMandatoryException("No Invoice Found. Please process the POS order first.");
 
-		//	Engine
-		PrintInfo info = new PrintInfo(header.getBPName(),MDunningRunEntry.Table_ID,getRecord_ID());
-		StringBuilder msginfo = new StringBuilder().append(header.getBPName()).append(", Amt=").append("");
-		info.setDescription(msginfo.toString());
-		ReportEngine re = null;
-		if (format != null)
-			re = new ReportEngine(getCtx(), format, query, info);
+		MInvoice ci = new MInvoice(getCtx(),C_Invoice_ID,get_TrxName());
+		if(!(ci.getDocStatus().equalsIgnoreCase(MInvoice.DOCSTATUS_Completed) || 
+				ci.getDocStatus().equalsIgnoreCase(MInvoice.DOCSTATUS_Drafted) ||
+				ci.getDocStatus().equalsIgnoreCase(MInvoice.DOCSTATUS_InProgress)))
+			throw new AdempiereException("Can't send. Invoice is voided or reversed");
 		
-		MMailText text = new MMailText (Env.getCtx(), defaultMailTemplate, null);
-		text.setPO(header, true);
-		String subject = text.getMailHeader();
-		String message = "";
-		File pdf = re.getPDF(File.createTempFile(header.getBPName(), ".pdf"));
-		if(pdf.length()>3000)
-		{
-			MClient client = MClient.get(getCtx(),getAD_Client_ID());
-			EMail email =client.createEMail(from, sendTo, subject,message,true);
-			email.setFrom(defaultEmailID);
-			if (text.isHtml())
-			{
-				email.setMessageHTML(text.getMailHeader(), message);
-				email.setSubject(email.getSubject().concat(subject));
-			}
-			else
-			{
-				email.setSubject (text.getMailHeader());
-				email.setMessageText (message);
-			}
+		ArrayList<String> to = new ArrayList<>();
+		to.add(header.getEMail());
+		
+		pdf = SendEmails.getPOSPDF(C_Invoice_ID,get_TrxName());
+		
+		SendEmails.createSendEmail(ci, to,pdf);
 			
-			email.addAttachment(pdf);
-			String ifSent = email.send();
-			log.info("pdf name: "+pdf.getName()+" Size of the file: "+pdf.length());
-			log.info("\n");
-			log.info(ifSent);
-			
-			
-			MAttachment ma= new MAttachment(Env.getCtx(), 0, get_TrxName());
-			ma.setRecord_ID(getRecord_ID());
-			ma.addEntry(pdf);
-			ma.set_TrxName(get_TrxName());
-			ma.setAD_Table_ID(MDSPOSHeader.Table_ID);
-			ma.setTextMsg(textMsg);
-			ma.save();
-		}
+		MAttachment ma= new MAttachment(Env.getCtx(), 0, get_TrxName());
+		ma.setRecord_ID(getRecord_ID());
+		ma.addEntry(pdf);
+		ma.set_TrxName(get_TrxName());
+		ma.setAD_Table_ID(MDSPOSHeader.Table_ID);
+		ma.setTextMsg(to.toString());
+		ma.save();
 		
 		return null;
 	}
