@@ -58,16 +58,19 @@ public class GenerateOrderFromDSPOS extends SvrProcess{
 	@Override
 	protected String doIt() throws Exception 
 	{
-		try
-		{
+//		try
+//		{
 			int count = DB.getSQLValue(get_TrxName(), "Select count(*) from DS_POS_ItemDetails Where DS_POSHeader_ID =  ? and M_Product_ID is not null ",pos_ID);
 			if(count==0)
 				throw new AdempiereException(Msg.getMsg(getCtx(), "NoLines"));
 			if(header.getC_BPartner_ID()==0)
 				throw new AdempiereException(Msg.getMsg(getCtx(), "search.customer.notfound"));
 			
+			String description = header.getPhone2()==null ? "":"Phone: "+ header.getPhone2();
+			String email = header.getEMail()==null ? "":header.getEMail();
+			description = description.isEmpty() ? email:description.concat("\n").concat(email);
+			
 			String sqlWhere = " where AD_Client_ID = ? ";
-			String email = header.getEMail();
 			if(!Util.isEmpty(email, true))
 				sqlWhere = sqlWhere.concat(" and trim(upper(email)) like '"+email.toUpperCase().trim()+"' ");
 			String phone = header.getPhone2();
@@ -112,11 +115,11 @@ public class GenerateOrderFromDSPOS extends SvrProcess{
 				
 			}
 			
-			
-			String description = "";
+			int C_SODocType_ID = DB.getSQLValue(get_TrxName(), "Select C_DocType_ID From C_DocType WHERE Name like 'POS Standard Order' and AD_Client_ID = ? ",getAD_Client_ID());
 			MOrder order = new MOrder(getCtx(), 0, get_TrxName());
 			order.setIsSOTrx(true);
-			order.setC_DocTypeTarget_ID(MDocType.DOCBASETYPE_SalesOrder);
+			order.setC_DocType_ID(C_SODocType_ID);
+			order.setC_DocTypeTarget_ID(C_SODocType_ID);
 			order.setBPartner(bp);
 			order.setClientOrg(header.getAD_Client_ID(), header.getAD_Org_ID());
 			order.setC_OrderSource_ID(header.getC_OrderSource_ID());
@@ -176,14 +179,18 @@ public class GenerateOrderFromDSPOS extends SvrProcess{
 			header.saveEx();
 			
 //			description += header.getBPName()==null ? "":"Customer Name: "+header.getBPName();
-			description = header.getPhone2()==null ? "":"Phone: "+ header.getPhone2();
-			description = description.isEmpty() ? (header.getEMail()==null ? "":header.getEMail()):description.concat("\n").concat("Email: "+header.getEMail()==null ? "":header.getEMail());
+			
 			order.setDescription(description);
 			order.saveEx();
 			
 			invoice.setDescription(description);
 			invoice.saveEx();
+//			
+			if(order.processIt(MOrder.DOCACTION_Complete))
+				order.saveEx();
 			
+			if(inout.processIt(MOrder.DOCACTION_Complete))
+				inout.saveEx();
 			
 			addLog(pos_ID, null, null, order.getDocumentInfo(), MOrder.Table_ID, order.getC_Order_ID());
 			addLog(pos_ID, null, null, invoice.getDocumentNo(), MInvoice.Table_ID, invoice.getC_Invoice_ID());
@@ -198,11 +205,11 @@ public class GenerateOrderFromDSPOS extends SvrProcess{
 				
 				SendEmails.createSendEmail(invoice, to,pdf);
 			}
-		}
-		catch(Exception e)
-		{
-			throw new AdempiereException(e.getLocalizedMessage());
-		}
+//		}
+//		catch(Exception e)
+//		{
+//			throw new AdempiereException(e.getLocalizedMessage());
+//		}
 		
 		
 		return "@Generated@";
