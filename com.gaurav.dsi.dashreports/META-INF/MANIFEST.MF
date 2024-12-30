@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.gaurav.dsi.dashreports
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: GAURAV
 Automatic-Module-Name: com.gaurav.dsi.dashreports
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.adempiere.base;bundle-version="7.1.0",
  org.adempiere.plugin.utils;bundle-version="7.1.0",
  org.adempiere.ui.zk;bundle-version="7.1.0",
