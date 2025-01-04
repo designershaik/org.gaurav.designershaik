@@ -4,7 +4,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Shopify-Spieretech
 Bundle-SymbolicName: com.gaurav.spieretech.shopify;singleton:=true
 Bundle-Version: 1.0.5.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Require-Bundle: org.adempiere.base;bundle-version="7.1.0",
  org.adempiere.plugin.utils;bundle-version="7.1.0",
  org.eclipse.equinox.event;bundle-version="1.5.0"

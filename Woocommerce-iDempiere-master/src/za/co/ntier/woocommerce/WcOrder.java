@@ -296,7 +296,7 @@ public final class WcOrder {
 	}
 
 	public void createPosPayment(Map<?, ?> orderWc) {
-		X_C_POSPayment posPayment = new X_C_POSPayment(ctx, null, trxName);
+		X_C_POSPayment posPayment = new X_C_POSPayment(ctx, 0, trxName);
 		posPayment.setC_Order_ID(order.getC_Order_ID());
 		posPayment.setAD_Org_ID(order.getAD_Org_ID());
 		posPayment.setPayAmt(new BigDecimal(orderWc.get("total").toString()));

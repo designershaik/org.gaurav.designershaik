@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Watchinventoryadjustment
+Bundle-SymbolicName: com.gaurav.dsi.watchinventoryadjustment
+Bundle-Version: 1.0.0.qualifier
+Require-Bundle: org.adempiere.base;bundle-version="10.0.0",
+ org.adempiere.plugin.utils;bundle-version="10.0.0",
+ wrapped.org.apache.poi.poi;bundle-version="4.1.2",
+ wrapped.org.apache.poi.poi-ooxml;bundle-version="4.1.2"
+Bundle-Vendor: GAURAV
+Automatic-Module-Name: com.gaurav.dsi.watchinventoryadjustment
+Bundle-RequiredExecutionEnvironment: JavaSE-11
