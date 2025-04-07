@@ -9,8 +9,10 @@ import java.util.Properties;
 import org.adempiere.base.IColumnCallout;
 import org.compiere.model.GridField;
 import org.compiere.model.GridTab;
+import org.compiere.model.MCost;
 import org.compiere.model.MPriceList;
 import org.compiere.model.MPriceListVersion;
+import org.compiere.model.MProduct;
 import org.compiere.model.MProductPrice;
 import org.compiere.model.MTax;
 import org.compiere.model.Tax;
@@ -66,29 +68,55 @@ public class CallOutSetPriceEnteredTaxPOSDetails implements IColumnCallout{
 						+ "Where DS_IsDSPOSPriceList='Y' and AD_Client_ID = ? ",Env.getAD_Client_ID(ctx));
 			if(M_PriceList_ID<=0)
 				return "Please add pricelist for the customer";
-			
+
 			int precision = MPriceList.getPricePrecision(ctx, M_PriceList_ID);
-			
+
 			MPriceList pricelist = MPriceList.get(M_PriceList_ID, null);
 			MPriceListVersion version =  pricelist.getPriceListVersion(today);
 			MProductPrice productPrice = MProductPrice.get(ctx, version.getM_PriceList_Version_ID(), M_Product_ID, null);
-			
+			BigDecimal priceStnd = Env.ZERO;
+			BigDecimal lineNetAmt = Env.ZERO;
+			BigDecimal taxAmt = Env.ZERO;
+			BigDecimal rate = Env.ZERO;
+			int C_Tax_ID = 0;
 			if(productPrice!=null)
 			{
-				BigDecimal priceStnd = productPrice.getPriceStd();
-				if(discount.compareTo(Env.ZERO)!=0)
+				if(!header.get_ValueAsBoolean("GS_IsFree"))
 				{
-					BigDecimal discountAmt = priceStnd.multiply(discount).divide(Env.ONEHUNDRED,2, RoundingMode.CEILING);
-					priceStnd = priceStnd.subtract(discountAmt);
-					mTab.setValue("DiscountAmt", discountAmt);
+					priceStnd = productPrice.getPriceStd();
+					if(discount.compareTo(Env.ZERO)!=0)
+					{
+						BigDecimal discountAmt = priceStnd.multiply(discount).divide(Env.ONEHUNDRED,2, RoundingMode.CEILING);
+						priceStnd = priceStnd.subtract(discountAmt);
+						mTab.setValue("DiscountAmt", discountAmt);
+					}
+					C_Tax_ID = DB.getSQLValue(null, "Select C_Tax_ID From C_Tax Where GS_DefaultPOSTax='Y' and AD_Client_ID = ? ",header.getAD_Client_ID());
+					if(C_Tax_ID<=0)
+						C_Tax_ID = Tax.getProduct(ctx, M_Product_ID, today, today, AD_Org_ID, M_Warehouse_ID, C_BPartner_Location_ID, C_BPartner_Location_ID, true, null);
+					
+					lineNetAmt =  QtyOrdered.multiply(priceStnd);
+					taxAmt = lineNetAmt.multiply(rate.divide(Env.ONEHUNDRED, precision, RoundingMode.CEILING));
+					
 				}
-				int C_Tax_ID = DB.getSQLValue(null, "Select C_Tax_ID From C_Tax Where GS_DefaultPOSTax='Y' and AD_Client_ID = ? ",header.getAD_Client_ID());
+				else
+				{
+					MProduct prod = new MProduct(ctx,M_Product_ID,null);
+					BigDecimal cost = MCost.getCurrentCost(prod, 0, null);
+					priceStnd = cost == null ? Env.ZERO: cost;
+					C_Tax_ID = DB.getSQLValue(null, "Select C_Tax_ID From C_Tax Where DS_IsDeemedSales='Y' and AD_Client_ID = ? ",header.getAD_Client_ID());
+					
+					
+				}
 				if(C_Tax_ID<=0)
 					C_Tax_ID = Tax.getProduct(ctx, M_Product_ID, today, today, AD_Org_ID, M_Warehouse_ID, C_BPartner_Location_ID, C_BPartner_Location_ID, true, null);
+				
 				MTax tax = new MTax(ctx, C_Tax_ID, null);
-				BigDecimal rate = tax.getRate();
-				BigDecimal lineNetAmt =  QtyOrdered.multiply(priceStnd);
-				BigDecimal taxAmt = lineNetAmt.multiply(rate.divide(Env.ONEHUNDRED, precision, RoundingMode.CEILING));
+				rate = tax.getRate();
+				
+				lineNetAmt =  QtyOrdered.multiply(priceStnd);
+				taxAmt = lineNetAmt.multiply(rate.divide(Env.ONEHUNDRED, precision, RoundingMode.CEILING));
+				
+				
 				mTab.setValue("Price", priceStnd.setScale(precision, RoundingMode.CEILING));
 				mTab.setValue("LineNetAmt", lineNetAmt.setScale(precision, RoundingMode.CEILING));
 				mTab.setValue("TaxAmt", taxAmt.setScale(precision, RoundingMode.CEILING));

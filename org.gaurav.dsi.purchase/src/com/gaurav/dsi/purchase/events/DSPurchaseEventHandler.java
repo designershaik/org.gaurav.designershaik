@@ -11,14 +11,18 @@ import org.compiere.model.MDocType;
 import org.compiere.model.MInOut;
 import org.compiere.model.MInOutLine;
 import org.compiere.model.MInvoice;
+import org.compiere.model.MLocator;
 import org.compiere.model.MOrder;
 import org.compiere.model.MPayment;
 import org.compiere.model.MProduct;
 import org.compiere.model.MRequest;
+import org.compiere.model.MWarehouse;
 import org.compiere.model.PO;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
+import org.compiere.util.TimeUtil;
+import org.compiere.util.Util;
 import org.gaurav.dsi.model.MDSProductRequest;
 import org.osgi.service.event.Event;
 
@@ -197,9 +201,52 @@ public class DSPurchaseEventHandler extends AbstractEventHandler {
 				}
 			}
 		}
+		if(po instanceof MLocator)
+		{
+			MLocator loc = (MLocator)po;
+			if(loc.is_ValueChanged(MLocator.COLUMNNAME_IsActive) && !loc.isActive())
+				verifyIfLocatorHasTransactionsOrQuantity(loc,null);
+		}
+		if(po instanceof MWarehouse)
+		{
+			MWarehouse war = (MWarehouse)po;
+			if(war.is_ValueChanged(MLocator.COLUMNNAME_IsActive) && !war.isActive())
+				verifyIfLocatorHasTransactionsOrQuantity(null,war);
+		}
 	}
 	
 	
+
+	private void verifyIfLocatorHasTransactionsOrQuantity(MLocator loc, MWarehouse war) 
+	{
+		String error = "";
+		String sqlWhere = "";
+		if(loc==null)
+			sqlWhere = " and loc.M_Warehouse_ID = "+war.getM_Warehouse_ID();
+		
+		if(war==null)
+			sqlWhere = " and loc.M_Locator_ID = "+loc.getM_Locator_ID();
+		
+		int totalCount = DB.getSQLValue(trxName, "Select count(1) From M_Transaction mt,M_Locator loc "
+				+ " Where mt.M_Locator_ID = loc.M_Locator_ID "
+				+ " and mt.MovementDate > ?  "+sqlWhere,TimeUtil.addDays(Env.getContextAsDate(ctx, "#Date"), -720));
+		if(totalCount>1)
+			error = "Can't Deactivate warehouse/locator transactions exists in last 2 years.";
+		
+		BigDecimal count = DB.getSQLValueBD(trxName, "Select coalesce(sum(ms.QtyOnHand),0) From M_StorageOnHand ms,M_Locator loc "
+				+ " Where ms.M_Locator_ID = loc.M_Locator_ID "
+				+ sqlWhere
+				+ " group by ms.M_Product_ID having sum(ms.QtyOnHand)!=0 ");
+		
+		count = count ==null  ?Env.ZERO:count;
+		
+		if(count.compareTo(Env.ZERO)!=0)
+			error = error.concat("\n").concat("Quantity available on warehouse/locator.");
+		if(!Util.isEmpty(error, true))
+			throw new AdempiereException(error);
+	}
+
+
 
 	private void verifyIfThePOReferenceAlreadyExists(MInvoice invoice) 
 	{
@@ -227,6 +274,9 @@ public class DSPurchaseEventHandler extends AbstractEventHandler {
 		registerTableEvent(IEventTopics.DOC_AFTER_COMPLETE, MOrder.Table_Name);
 		
 		registerTableEvent(IEventTopics.DOC_BEFORE_COMPLETE, MInOut.Table_Name);
+		
+		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, MLocator.Table_Name);
+		registerTableEvent(IEventTopics.PO_BEFORE_CHANGE, MWarehouse.Table_Name);
 	}
 
 }

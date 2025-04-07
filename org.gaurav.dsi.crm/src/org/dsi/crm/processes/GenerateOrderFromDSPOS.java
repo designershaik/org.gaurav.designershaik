@@ -37,6 +37,10 @@ public class GenerateOrderFromDSPOS extends SvrProcess{
 	MInvoice invoice = null;
 	int M_Warehouse_ID = 0 ;
 	MInOut inout = null;
+	int C_Activity_ID = 0 ;
+	int User1_ID = 0 ;
+	int User2_ID = 0 ;
+	
 	@Override
 	protected void prepare() 
 	{
@@ -48,6 +52,12 @@ public class GenerateOrderFromDSPOS extends SvrProcess{
 				;
 			else if (name.equals("M_Warehouse_ID"))
 				M_Warehouse_ID = para[i].getParameterAsInt();
+			else if (name.equals("C_Activity_ID"))
+				C_Activity_ID = para[i].getParameterAsInt();
+			else if (name.equals("User1_ID"))
+				User1_ID = para[i].getParameterAsInt();
+			else if (name.equals("User2_ID"))
+				User2_ID = para[i].getParameterAsInt();
 			else
 				log.log(Level.SEVERE, "Unknown Parameter: " + name);
 		}
@@ -71,13 +81,20 @@ public class GenerateOrderFromDSPOS extends SvrProcess{
 			description = description.isEmpty() ? email:description.concat("\n").concat(email);
 			
 			String sqlWhere = " where AD_Client_ID = ? ";
+			int C_BPartner_ID = 0;
 			if(!Util.isEmpty(email, true))
+			{
 				sqlWhere = sqlWhere.concat(" and trim(upper(email)) like '"+email.toUpperCase().trim()+"' ");
+				C_BPartner_ID = DB.getSQLValue(get_TrxName(), "Select C_BPartner_ID From AD_User  "+sqlWhere,getAD_Client_ID());
+			}
 			String phone = header.getPhone2();
-			if(!Util.isEmpty(phone, true))
-				sqlWhere = sqlWhere.concat(" or trim(upper(phone2)) like '"+phone.toUpperCase().trim()+"' ");
+			if(C_BPartner_ID<=0 && !Util.isEmpty(phone, true))
+			{
+				sqlWhere = sqlWhere.concat(" and (trim(upper(phone2)) like '%"+phone.toUpperCase().trim()+"' or trim(upper(phone)) like '%"+phone.toUpperCase().trim()+"') ");
+				C_BPartner_ID = DB.getSQLValue(get_TrxName(), "Select C_BPartner_ID From AD_User  "+sqlWhere,getAD_Client_ID());
+			}
 			
-			int C_BPartner_ID = DB.getSQLValue(get_TrxName(), "Select C_BPartner_ID From AD_User  "+sqlWhere,getAD_Client_ID());
+			
 			MBPartner bp = null;
 			if(C_BPartner_ID>0)
 			{
@@ -158,6 +175,9 @@ public class GenerateOrderFromDSPOS extends SvrProcess{
 				line.setPriceList((BigDecimal)det.get_Value("PriceList"));
 				line.setLineNetAmt(det.getLineNetAmt());
 				description +=line.getM_Product().getValue().concat("_").concat(line.getM_Product().getName()).concat(" Qty: ")+det.getQtyOrdered()+"\n";
+				line.setC_Activity_ID(C_Activity_ID);
+				line.setUser1_ID(User1_ID);
+				line.setUser2_ID(User2_ID);
 				if(line.save())
 				{
 					MInvoiceLine invLine = new MInvoiceLine(invoice);
@@ -167,7 +187,8 @@ public class GenerateOrderFromDSPOS extends SvrProcess{
 					invLine.saveEx();
 					
 					MInOutLine inoutLine = new MInOutLine(inout);
-					inoutLine.setOrderLine(line, 0, det.getQtyOrdered());
+					inoutLine.setOrderLine(line, line.getM_Warehouse().getM_ReserveLocator_ID(), line.getQtyOrdered());
+					inoutLine.setQty(line.getQtyEntered());
 					inoutLine.saveEx();
 				}
 						
@@ -188,6 +209,13 @@ public class GenerateOrderFromDSPOS extends SvrProcess{
 //			
 			if(order.processIt(MOrder.DOCACTION_Complete))
 				order.saveEx();
+			if(!order.getDocStatus().equalsIgnoreCase(MOrder.DOCSTATUS_Completed))
+			{
+				order.setProcessed(true);
+				order.setDocStatus(MOrder.DOCSTATUS_Completed);
+				order.setDocAction(MOrder.DOCACTION_Close);
+				order.saveEx();
+			}
 			
 			if(inout.processIt(MOrder.DOCACTION_Complete))
 				inout.saveEx();
